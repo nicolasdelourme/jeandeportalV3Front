@@ -3,7 +3,7 @@
  * À REMPLACER par les vrais appels API quand le backend sera prêt
  */
 
-import type { LoginCredentials, RegisterCredentials, AuthResponse, User } from '@/types/auth.types'
+import type { LoginCredentials, RegisterCredentials, AuthResponse, AuthSuccessResponse, AuthErrorResponse, User } from '@/types/auth.types'
 
 // Base de données simulée (en mémoire)
 const MOCK_USERS: Array<User & { password: string }> = [
@@ -50,11 +50,8 @@ export async function mockLoginAPI(credentials: LoginCredentials): Promise<AuthR
     if (!user || user.password !== credentials.password) {
         return {
             status: 'error',
-            access_token: { token: '' },
-            type: 'Bearer',
-            expires_in: 0,
             message: 'Email ou mot de passe incorrect'
-        }
+        } as AuthErrorResponse
     }
 
     // Calculer l'expiration : 1 jour ou 14 jours si "rester connecté"
@@ -71,7 +68,7 @@ export async function mockLoginAPI(credentials: LoginCredentials): Promise<AuthR
         type: 'Bearer',
         expires_in: expiresIn,
         afterLogin
-    }
+    } as AuthSuccessResponse
 }
 
 /**
@@ -85,11 +82,8 @@ export async function mockRegisterAPI(credentials: RegisterCredentials): Promise
     if (existingUser) {
         return {
             status: 'error',
-            access_token: { token: '' },
-            type: 'Bearer',
-            expires_in: 0,
             message: 'Un compte existe déjà avec cet email'
-        }
+        } as AuthErrorResponse
     }
 
     // Créer le nouvel utilisateur
@@ -112,7 +106,7 @@ export async function mockRegisterAPI(credentials: RegisterCredentials): Promise
         type: 'Bearer',
         expires_in: 86400, // 1 jour par défaut
         afterLogin: '/' // Redirection vers home après inscription
-    }
+    } as AuthSuccessResponse
 }
 
 /**

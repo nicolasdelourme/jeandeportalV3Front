@@ -23,18 +23,30 @@ export interface RegisterCredentials {
 }
 
 /**
- * Réponse du backend pour le login/register
+ * Réponse de succès du backend pour le login/register
  */
-export interface AuthResponse {
-    status: 'success' | 'error'
+export interface AuthSuccessResponse {
+    status: 'success'
     access_token: {
         token: string  // Le token JWT en clair
     }
     type: 'Bearer'
     expires_in: number  // Durée de validité en secondes (86400 = 1 jour, 86400 * 14 = 14 jours)
     afterLogin?: string  // URL de redirection après login
-    message?: string  // Message d'erreur éventuel
 }
+
+/**
+ * Réponse d'erreur du backend
+ */
+export interface AuthErrorResponse {
+    status: 'error'
+    message: string  // Message d'erreur du backend
+}
+
+/**
+ * Union type pour toutes les réponses possibles
+ */
+export type AuthResponse = AuthSuccessResponse | AuthErrorResponse
 
 /**
  * Données de l'utilisateur connecté

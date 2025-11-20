@@ -88,14 +88,8 @@ export const useAuthStore = defineStore('auth', () => {
         error.value = null
 
         try {
+            // Le service lance une exception si la réponse contient une erreur
             const response = await authService.login(credentials)
-
-            if (response.status === 'error') {
-                throw new AuthError(
-                    response.message || 'Identifiants incorrects',
-                    'INVALID_CREDENTIALS'
-                )
-            }
 
             // Sauvegarder le token
             const authToken = response.access_token.token
@@ -128,14 +122,8 @@ export const useAuthStore = defineStore('auth', () => {
         error.value = null
 
         try {
+            // Le service lance une exception si la réponse contient une erreur
             const response = await authService.register(credentials)
-
-            if (response.status === 'error') {
-                throw new AuthError(
-                    response.message || 'Impossible de créer le compte',
-                    'UNKNOWN_ERROR'
-                )
-            }
 
             // Sauvegarder le token (auto-connexion après inscription)
             const authToken = response.access_token.token

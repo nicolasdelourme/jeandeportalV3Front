@@ -4,7 +4,7 @@
  */
 
 import { apiClient } from '@/api/client'
-import type { LoginCredentials, RegisterCredentials, AuthResponse, User } from '@/types/auth.types'
+import type { LoginCredentials, RegisterCredentials, AuthResponse, AuthSuccessResponse, User } from '@/types/auth.types'
 import { AuthError } from '@/types/auth.types'
 
 // MOCK MODE : À passer à false quand le vrai backend sera prêt
@@ -26,25 +26,46 @@ export class AuthService {
     /**
      * Connexion d'un utilisateur
      */
-    async login(credentials: LoginCredentials): Promise<AuthResponse> {
+    async login(credentials: LoginCredentials): Promise<AuthSuccessResponse> {
         try {
+            let response: AuthResponse
+
             if (USE_MOCK) {
                 // Utiliser le mock
-                return await mockLoginAPI(credentials)
+                response = await mockLoginAPI(credentials)
             } else {
                 // Appel API réel
-                const response = await apiClient.post<AuthResponse>('/auth/login', {
+                response = await apiClient.post<AuthResponse>('/auth/login', {
                     email: credentials.email,
                     password: credentials.password,
                     remember_me: credentials.rememberMe,
                     redirect_url: credentials.redirectUrl
                 })
-                return response
             }
+
+            // Vérifier si la réponse contient une erreur (dans le body)
+            if (response.status === 'error') {
+                throw new AuthError(
+                    response.message,
+                    'INVALID_CREDENTIALS'
+                )
+            }
+
+            return response
         } catch (error: any) {
+            // Si c'est déjà une AuthError, la re-lancer
+            if (error instanceof AuthError) {
+                throw error
+            }
+
+            // Gérer les erreurs HTTP/réseau
             console.error('Erreur lors de la connexion:', error)
+
+            // Essayer d'extraire le message d'erreur de la réponse
+            const errorMessage = error.response?.data?.message || 'Impossible de se connecter. Vérifiez vos identifiants.'
+
             throw new AuthError(
-                'Impossible de se connecter. Vérifiez vos identifiants.',
+                errorMessage,
                 'INVALID_CREDENTIALS',
                 error.response?.status
             )
@@ -54,35 +75,60 @@ export class AuthService {
     /**
      * Inscription d'un nouvel utilisateur
      */
-    async register(credentials: RegisterCredentials): Promise<AuthResponse> {
+    async register(credentials: RegisterCredentials): Promise<AuthSuccessResponse> {
         try {
+            let response: AuthResponse
+
             if (USE_MOCK) {
                 // Utiliser le mock
-                return await mockRegisterAPI(credentials)
+                response = await mockRegisterAPI(credentials)
             } else {
                 // Appel API réel
-                const response = await apiClient.post<AuthResponse>('/auth/register', {
+                response = await apiClient.post<AuthResponse>('/auth/register', {
                     first_name: credentials.firstName,
                     last_name: credentials.lastName,
                     email: credentials.email,
                     password: credentials.password
                 })
-                return response
             }
+
+            // Vérifier si la réponse contient une erreur (dans le body)
+            if (response.status === 'error') {
+                // Déterminer le code d'erreur selon le message
+                const errorCode = response.message.toLowerCase().includes('existe')
+                    ? 'USER_EXISTS'
+                    : 'UNKNOWN_ERROR'
+
+                throw new AuthError(
+                    response.message,
+                    errorCode
+                )
+            }
+
+            return response
         } catch (error: any) {
+            // Si c'est déjà une AuthError, la re-lancer
+            if (error instanceof AuthError) {
+                throw error
+            }
+
+            // Gérer les erreurs HTTP/réseau
             console.error('Erreur lors de l\'inscription:', error)
 
             // Gérer les erreurs spécifiques
             if (error.response?.status === 409) {
                 throw new AuthError(
-                    'Un compte existe déjà avec cet email.',
+                    error.response?.data?.message || 'Un compte existe déjà avec cet email.',
                     'USER_EXISTS',
                     409
                 )
             }
 
+            // Essayer d'extraire le message d'erreur de la réponse
+            const errorMessage = error.response?.data?.message || 'Impossible de créer le compte. Veuillez réessayer.'
+
             throw new AuthError(
-                'Impossible de créer le compte. Veuillez réessayer.',
+                errorMessage,
                 'UNKNOWN_ERROR',
                 error.response?.status
             )

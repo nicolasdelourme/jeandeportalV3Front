@@ -12,6 +12,7 @@ export default defineConfig({
         },
     },
     server: {
+        host: '0.0.0.0', // Écoute sur toutes les interfaces (IPv4 + IPv6)
         port: 3000,
         proxy: {
             "/api": {
