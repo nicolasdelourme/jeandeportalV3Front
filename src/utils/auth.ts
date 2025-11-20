@@ -4,6 +4,7 @@
  */
 
 import type { User } from '@/types/auth.types'
+import { logger } from '@/utils/logger'
 
 // Clés de stockage
 const AUTH_TOKEN_KEY = 'auth_token'
@@ -74,7 +75,7 @@ export function getAuthUser(): User | null {
     try {
         return JSON.parse(userStr) as User
     } catch (error) {
-        console.error('Erreur lors du parsing des données utilisateur:', error)
+        logger.error('Erreur lors du parsing des données utilisateur:', error)
         return null
     }
 }

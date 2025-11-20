@@ -7,6 +7,30 @@ import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
 
 /**
+ * Valide les URLs de redirection pour prévenir les attaques open redirect
+ * @param path - Le chemin à valider
+ * @returns true si le chemin est sûr, false sinon
+ */
+function isValidRedirect(path: string): boolean {
+    // N'autoriser que les chemins internes (commençant par /)
+    if (!path.startsWith('/')) {
+        return false
+    }
+
+    // Bloquer les URLs protocol-relative (//evil.com)
+    if (path.startsWith('//')) {
+        return false
+    }
+
+    // Bloquer javascript:, data:, vbscript:, file: URLs
+    if (path.match(/^(data|javascript|vbscript|file):/i)) {
+        return false
+    }
+
+    return true
+}
+
+/**
  * Guard qui vérifie si l'utilisateur est authentifié
  * Si non authentifié, redirige vers /auth avec l'URL de retour
  */
@@ -21,11 +45,14 @@ export async function authGuard(
     const requiresAuth = to.meta.requiresAuth
 
     if (requiresAuth && !authStore.isAuthenticated) {
+        // Valider l'URL de redirection pour prévenir les attaques open redirect
+        const safePath = isValidRedirect(to.fullPath) ? to.fullPath : '/mon-compte'
+
         // Sauvegarder l'URL de destination pour rediriger après le login
         next({
             path: '/auth',
             query: {
-                redirect: to.fullPath // URL complète incluant les query params
+                redirect: safePath // ✅ URL validée
             }
         })
     } else {

@@ -6,9 +6,15 @@
 import { apiClient } from '@/api/client'
 import type { LoginCredentials, RegisterCredentials, AuthResponse, AuthSuccessResponse, User } from '@/types/auth.types'
 import { AuthError } from '@/types/auth.types'
+import { logger } from '@/utils/logger'
 
-// MOCK MODE : À passer à false quand le vrai backend sera prêt
-const USE_MOCK = true
+// MOCK MODE : Automatiquement désactivé en production
+const USE_MOCK = import.meta.env.DEV
+
+// Sécurité : Empêcher le build si mock activé en production
+if (import.meta.env.PROD && USE_MOCK) {
+    throw new Error('🚨 SECURITY: Mock authentication must be disabled in production builds!')
+}
 
 // Import conditionnel du mock
 import {
@@ -59,7 +65,7 @@ export class AuthService {
             }
 
             // Gérer les erreurs HTTP/réseau
-            console.error('Erreur lors de la connexion:', error)
+            logger.error('Erreur lors de la connexion:', error)
 
             // Essayer d'extraire le message d'erreur de la réponse
             const errorMessage = error.response?.data?.message || 'Impossible de se connecter. Vérifiez vos identifiants.'
@@ -113,7 +119,7 @@ export class AuthService {
             }
 
             // Gérer les erreurs HTTP/réseau
-            console.error('Erreur lors de l\'inscription:', error)
+            logger.error('Erreur lors de l\'inscription:', error)
 
             // Gérer les erreurs spécifiques
             if (error.response?.status === 409) {
@@ -153,7 +159,7 @@ export class AuthService {
                 return response
             }
         } catch (error: any) {
-            console.error('Erreur lors de la récupération du profil:', error)
+            logger.error('Erreur lors de la récupération du profil:', error)
             throw new AuthError(
                 'Impossible de récupérer le profil utilisateur.',
                 'TOKEN_EXPIRED',
@@ -176,7 +182,7 @@ export class AuthService {
                 await apiClient.post('/auth/logout')
             }
         } catch (error: any) {
-            console.error('Erreur lors de la déconnexion:', error)
+            logger.error('Erreur lors de la déconnexion:', error)
             // On ne lève pas d'erreur car la déconnexion locale doit quand même se faire
         }
     }
@@ -198,7 +204,7 @@ export class AuthService {
                 return response
             }
         } catch (error: any) {
-            console.error('Erreur lors de la réinitialisation:', error)
+            logger.error('Erreur lors de la réinitialisation:', error)
             throw new AuthError(
                 'Impossible d\'envoyer l\'email de réinitialisation.',
                 'NETWORK_ERROR',

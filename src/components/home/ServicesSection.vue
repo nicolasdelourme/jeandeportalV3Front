@@ -39,7 +39,7 @@ const handleDiscoverCollections = () => {
             <div class="flex flex-col gap-3 items-center justify-center w-full">
                 <!-- Badge rouge -->
                 <Badge class="bg-linear-to-r from-[#aa0000] to-primary px-6 py-2 rounded-full">
-                    <p class="font-bold text text-center text-white tracking-[0.7px] uppercase"
+                    <p class="font-bold text-sm text-center text-white tracking-[0.7px] uppercase"
                         style="font-family: Roboto, sans-serif;">
                         Notre univers éditorial
                     </p>

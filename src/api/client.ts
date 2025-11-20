@@ -1,22 +1,25 @@
-import axios, { type AxiosInstance, type AxiosRequestConfig } from "axios";
+import axios, { type AxiosInstance, type AxiosRequestConfig } from "axios"
+import { getAuthToken, clearAuthData } from '@/utils/auth'
+import { logger } from '@/utils/logger'
 
 /**
  * Client API centralisé basé sur Axios
  * Configuré avec la base URL et les intercepteurs d'authentification
  */
 class ApiClient {
-    private axiosInstance: AxiosInstance;
+    private axiosInstance: AxiosInstance
 
     constructor() {
         this.axiosInstance = axios.create({
             baseURL: import.meta.env.VITE_API_BASE_URL || "/api",
-            timeout: 10000,
+            timeout: 5000,  // ✅ Réduit de 10s à 5s
             headers: {
                 "Content-Type": "application/json",
+                "X-Requested-With": "XMLHttpRequest",  // ✅ Protection CSRF
             },
-        });
+        })
 
-        this.setupInterceptors();
+        this.setupInterceptors()
     }
 
     /**
@@ -26,30 +29,38 @@ class ApiClient {
         // Request interceptor - Ajoute le token Bearer si disponible
         this.axiosInstance.interceptors.request.use(
             (config) => {
-                const token = localStorage.getItem("auth_token");
+                // ✅ Utilise getAuthToken() qui valide l'expiration
+                const token = getAuthToken()
                 if (token) {
-                    config.headers.Authorization = `Bearer ${token}`;
+                    config.headers.Authorization = `Bearer ${token}`
                 }
-                return config;
+                return config
             },
             (error) => {
-                return Promise.reject(error);
+                return Promise.reject(error)
             }
-        );
+        )
 
         // Response interceptor - Gère les erreurs d'authentification
         this.axiosInstance.interceptors.response.use(
             (response) => response,
-            (error) => {
+            async (error) => {
                 if (error.response?.status === 401) {
-                    // Token expiré ou invalide
-                    localStorage.removeItem("auth_token");
-                    // Rediriger vers la page de login si nécessaire
-                    // window.location.href = '/login';
+                    // Token expiré ou invalide - nettoyage complet
+                    clearAuthData()
+
+                    logger.warn('Session expirée (401), redirection vers /auth')
+
+                    // Redirection vers login (sera géré par le router)
+                    // Note: Évite d'importer router ici pour éviter les dépendances circulaires
+                    if (typeof window !== 'undefined') {
+                        const currentPath = window.location.pathname
+                        window.location.href = `/auth?redirect=${encodeURIComponent(currentPath)}&reason=session_expired`
+                    }
                 }
-                return Promise.reject(error);
+                return Promise.reject(error)
             }
-        );
+        )
     }
 
     /**

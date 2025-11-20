@@ -11,12 +11,13 @@ import { authService } from '@/services/auth.service'
 import {
     getAuthToken,
     setAuthToken,
-    getAuthUser,
     setAuthUser,
     clearAuthData,
     isAuthenticated as checkIsAuthenticated,
     getTimeUntilExpiry
 } from '@/utils/auth'
+import { logger } from '@/utils/logger'
+import { sanitizeUser } from '@/utils/sanitize'
 
 /**
  * Store d'authentification
@@ -60,23 +61,28 @@ export const useAuthStore = defineStore('auth', () => {
      */
     async function initialize(): Promise<void> {
         const storedToken = getAuthToken()
-        const storedUser = getAuthUser()
 
-        if (storedToken && storedUser) {
+        if (!storedToken) return
+
+        // ✅ Set loading state FIRST
+        isLoading.value = true
+
+        try {
+            // ✅ Fetch fresh data BEFORE setting authenticated state
+            const freshUser = await authService.getUserProfile(storedToken)
+
+            // ✅ Only set state AFTER successful validation
             token.value = storedToken
-            user.value = storedUser
-
-            // Optionnel : Vérifier que le token est toujours valide auprès du backend
-            // et récupérer les données utilisateur à jour
-            try {
-                const freshUser = await authService.getUserProfile(storedToken)
-                user.value = freshUser
-                setAuthUser(freshUser)
-            } catch (error) {
-                // Token invalide ou expiré, on déconnecte
-                console.warn('Token invalide lors de l\'initialisation, déconnexion')
-                await logout()
-            }
+            user.value = sanitizeUser(freshUser)
+            setAuthUser(freshUser)
+        } catch (error) {
+            // Token invalide ou expiré, on déconnecte
+            logger.warn('Token invalide lors de l\'initialisation, déconnexion')
+            clearAuthData()
+            token.value = null
+            user.value = null
+        } finally {
+            isLoading.value = false
         }
     }
 
@@ -98,7 +104,7 @@ export const useAuthStore = defineStore('auth', () => {
 
             // Récupérer les infos utilisateur
             const userProfile = await authService.getUserProfile(authToken)
-            user.value = userProfile
+            user.value = sanitizeUser(userProfile)  // ✅ Sanitized
             setAuthUser(userProfile)
 
             // Retourner l'URL de redirection
@@ -132,7 +138,7 @@ export const useAuthStore = defineStore('auth', () => {
 
             // Récupérer les infos utilisateur
             const userProfile = await authService.getUserProfile(authToken)
-            user.value = userProfile
+            user.value = sanitizeUser(userProfile)  // ✅ Sanitized
             setAuthUser(userProfile)
 
             // Retourner l'URL de redirection
@@ -158,7 +164,7 @@ export const useAuthStore = defineStore('auth', () => {
             // Appeler le backend pour invalider le token (optionnel mais recommandé)
             await authService.logout()
         } catch (err) {
-            console.error('Erreur lors de la déconnexion côté serveur:', err)
+            logger.error('Erreur lors de la déconnexion côté serveur:', err)
         } finally {
             // Nettoyer l'état local (même si l'appel backend a échoué)
             token.value = null
@@ -176,10 +182,10 @@ export const useAuthStore = defineStore('auth', () => {
 
         try {
             const userProfile = await authService.getUserProfile(token.value)
-            user.value = userProfile
+            user.value = sanitizeUser(userProfile)  // ✅ Sanitized
             setAuthUser(userProfile)
         } catch (err) {
-            console.error('Erreur lors du rafraîchissement du profil:', err)
+            logger.error('Erreur lors du rafraîchissement du profil:', err)
             // Si le token est invalide, déconnecter
             await logout()
         }
