@@ -45,24 +45,35 @@ const handleViewDetails = (reference: ShopReference) => {
 
 const handleAddToCart = (reference: ShopReference) => {
   try {
-    // Obtenir le prix minimum pour ce produit
+    // Obtenir tous les prix avec leurs infos complètes
     const allPrices = reference.products.flatMap((product) =>
-      product.prices.map((price) => price.amount)
+      product.prices
     )
-    const minPrice = allPrices.length > 0 ? Math.min(...allPrices) : 0
+
+    // Trouver le prix minimum (avec ses infos HT et TVA)
+    const minPriceObj = allPrices.length > 0
+      ? allPrices.reduce((min, price) => price.amount < min.amount ? price : min, allPrices[0])
+      : null
 
     // Obtenir l'image principale
     const mainImage = reference.images.length > 0
       ? getShopImageUrl(reference.images[0])
       : undefined
 
-    // Ajouter au panier
+    // Obtenir physical/immaterial depuis le premier produit
+    const firstProduct = reference.products[0]
+
+    // Ajouter au panier avec TOUS les champs requis
     cartStore.addItem({
       id: reference.id,
       name: reference.name || 'Produit',
-      price: minPrice,
+      price: minPriceObj?.amount || 0,         // Prix TTC
+      priceHT: minPriceObj?.htAmount || 0,     // ✅ Prix HT EXACT
+      vatRate: minPriceObj?.vatRate || 0,      // ✅ Taux TVA réel
       image: mainImage,
       slug: reference.id,
+      physical: firstProduct?.physical,
+      immaterial: firstProduct?.immaterial,
     })
 
     toast.success(`${reference.name} ajouté au panier`)

@@ -65,9 +65,9 @@ class ShopService {
 
       const rawData: APIRawResponse = await response.json()
 
-      // Validation basique de la structure
-      if (!Array.isArray(rawData)) {
-        throw new ShopAPIError('Structure de réponse API invalide: doit être un tableau')
+      // Validation basique de la structure (nouvelle structure: objet avec item_array)
+      if (!rawData || typeof rawData !== 'object' || !Array.isArray(rawData.item_array)) {
+        throw new ShopAPIError('Structure de réponse API invalide: attendu { item_array: [...] }')
       }
 
       // Mapper les données brutes vers notre modèle normalisé

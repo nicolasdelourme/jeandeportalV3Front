@@ -8,7 +8,9 @@
  */
 export interface ShopPrice {
   id: string
-  amount: number // Prix en euros
+  amount: number // Prix TTC en euros
+  htAmount: number // ✅ Prix HT EXACT en euros (depuis API)
+  vatRate: number // ✅ Taux de TVA réel (5.5, 20, etc.)
   currency: string // 'EUR'
   label?: string // Ex: "PDF", "Papier", "Bundle"
   isPromo?: boolean
@@ -24,6 +26,12 @@ export interface ShopProduct {
   description: string
   images: string[] // URLs des images
   prices: ShopPrice[]
+  physical: boolean // ✅ Produit physique (livraison requise)
+  immaterial: boolean // ✅ Produit dématérialisé (téléchargement/email)
+  weight: number // ✅ Poids en grammes
+  width: number // ✅ Largeur en cm
+  height: number // ✅ Hauteur en cm
+  depth: number // ✅ Profondeur en cm
 }
 
 /**
@@ -39,6 +47,11 @@ export interface ShopReference {
   products: ShopProduct[] // Produits/variantes de cette référence
   collectionId: string // ID de la collection (ex: "or", "argent", "patrimoine")
   tags: string[] // Tags/thèmes (ex: ["métaux", "investissement"])
+  stock: number // ✅ Stock disponible
+  visible: boolean // ✅ Visible sur le site
+  available: boolean // ✅ Disponible à la vente
+  timestamp: string // ✅ Date de mise à jour
+  priority: number // ✅ Ordre d'affichage (pour tri)
 }
 
 /**
@@ -144,6 +157,25 @@ export function getAllCollections(references: ShopReference[]): string[] {
 // ============================================================================
 
 /**
+ * Image dans la structure API brute
+ */
+export interface APIRawImage {
+  id: string
+  imageTypeId: string
+  name: string
+  description: string
+  width: string
+  height: string
+  size: string
+  tag: string
+  path: string
+  timestamp: string
+  imageId?: string
+  itemId?: string
+  sort?: string
+}
+
+/**
  * Produit dans la structure API brute
  */
 export interface APIRawProduct {
@@ -152,7 +184,7 @@ export interface APIRawProduct {
   productId: string
   productQuantity: string
   timestamp: string
-  fileId: string
+  fileId: string | null
   type: string | null
   name: string
   description: string
@@ -162,10 +194,11 @@ export interface APIRawProduct {
   width: string
   height: string
   depth: string
-  physical: string
-  immaterial: string
+  physical: string // ✅ "0" ou "1" - Produit physique
+  immaterial: string // ✅ "0" ou "1" - Produit dématérialisé
   actived: string
-  image_array: any[]
+  image_array: APIRawImage[]
+  feature_array: any[]
 }
 
 /**
@@ -177,11 +210,11 @@ export interface APIRawPrice {
   storeId: string
   currency: string
   price: string // Prix TTC en centimes (ex: "1900" = 19.00€)
-  HTPrice: string
+  HTPrice: string // ✅ Prix HT EXACT en centimes (ex: "1801" = 18.01€)
   promo: string
   discountPrice: string
   HTDiscount: string
-  vat: string
+  vat: string // ✅ Taux de TVA réel (ex: "5.5", "20")
   active: string
   timestamp: string
 }
@@ -207,77 +240,137 @@ export interface APIRawReference {
   timestamp: string
   product_array: APIRawProduct[]
   price_array: APIRawPrice[]
-  image_array: any[]
-  stock: number
+  image_array: APIRawImage[]
+  stock: number // ✅ Stock disponible
 }
 
 /**
- * Réponse brute de l'API (tableau de tableaux)
+ * Item dans la structure API brute (niveau parent des références)
  */
-export type APIRawResponse = APIRawReference[][]
+export interface APIRawItem {
+  id: string
+  name: string
+  subname: string | null
+  description: string | null
+  tag: string | null
+  seoUrl: string | null
+  seoTitle: string | null
+  seoMetaDescription: string | null
+  view: string | null
+  available: string
+  visible: string
+  actived: string
+  priorityDeprecated: string
+  timestamp: string
+  storeId: string
+  itemId: string
+  priority: string
+  saleStart: string
+  saleStop: string
+  featurePerEntity_array: any[]
+  reference_array: APIRawReference[] // ✅ Références dans l'item
+  feature_array: any[]
+  image_array: APIRawImage[] // ✅ Images au niveau item
+  tag_array: string[]
+  wishListActived: number
+}
 
 /**
- * Mapper une référence API brute vers notre modèle normalisé
+ * Réponse brute de l'API Store
  */
-export function mapAPIReferenceToShopReference(apiRef: APIRawReference): ShopReference {
-  // Parser les tags
-  const tags = apiRef.tag
-    ? apiRef.tag.split(',').map((t) => t.trim()).filter((t) => t.length > 0)
-    : []
+export interface APIRawStoreResponse {
+  id: string
+  projectId: string
+  name: string
+  start: string
+  stop: string
+  firstShipping: string
+  deferredShipping: string
+  numberPayment: string
+  firstPayment: string
+  deferredPayment: string
+  meanPayment: string
+  view: string
+  url: string
+  defaultStore: string
+  wishListActived: string
+  timestamp: string
+  item_array: APIRawItem[] // ✅ Items (contient les références)
+}
 
-  // Vérifier que product_array et price_array existent et sont des tableaux
-  const productArray = Array.isArray(apiRef.product_array) ? apiRef.product_array : []
-  const priceArray = Array.isArray(apiRef.price_array) ? apiRef.price_array : []
+/**
+ * Réponse brute de l'API (nouvelle structure)
+ */
+export type APIRawResponse = APIRawStoreResponse
 
-  // Mapper les produits
-  const products: ShopProduct[] = productArray.map((apiProduct) => {
-    // Trouver les prix associés à ce produit
-    const productPrices = priceArray
-      .filter((p) => p && p.referenceId === apiRef.id)
-      .map((apiPrice) => ({
-        id: apiPrice.id || '',
-        amount: parseFloat(apiPrice.price || '0') / 100, // Convertir centimes en euros
-        currency: (apiPrice.currency || 'EUR').toUpperCase(),
-        label: undefined, // Pas de label dans l'API
-        isPromo: apiPrice.promo === '1',
-        originalAmount:
-          apiPrice.promo === '1' ? parseFloat(apiPrice.discountPrice || '0') / 100 : undefined,
-      }))
+/**
+ * Mapper un item API vers ses références (nouvelle structure)
+ * Un item contient plusieurs références (reference_array)
+ */
+export function mapAPIItemToShopReferences(apiItem: APIRawItem): ShopReference[] {
+  // Parser les tags au niveau item
+  const itemTags = apiItem.tag_array || []
+
+  // Images au niveau item (c'est là qu'elles se trouvent maintenant)
+  const itemImages = (apiItem.image_array || [])
+    .filter((img) => img && img.path)
+    .map((img) => `https://jeandeportal.fr/${img.path}`)
+
+  // Mapper chaque référence de l'item
+  return apiItem.reference_array.map((apiRef) => {
+    // Vérifier que product_array et price_array existent
+    const productArray = Array.isArray(apiRef.product_array) ? apiRef.product_array : []
+    const priceArray = Array.isArray(apiRef.price_array) ? apiRef.price_array : []
+
+    // Mapper les produits avec TOUTES leurs infos
+    const products: ShopProduct[] = productArray.map((apiProduct) => {
+      // Trouver les prix de cette référence
+      const productPrices: ShopPrice[] = priceArray
+        .filter((p) => p && p.referenceId === apiRef.id && p.active === '1')
+        .map((apiPrice) => ({
+          id: apiPrice.id || '',
+          amount: parseFloat(apiPrice.price || '0') / 100, // TTC en euros
+          htAmount: parseFloat(apiPrice.HTPrice || '0') / 100, // ✅ HT EXACT en euros
+          vatRate: parseFloat(apiPrice.vat || '0'), // ✅ Taux TVA réel
+          currency: (apiPrice.currency || 'EUR').toUpperCase(),
+          label: undefined, // Pas de label dans l'API
+          isPromo: apiPrice.promo === '1',
+          originalAmount:
+            apiPrice.promo === '1' ? parseFloat(apiPrice.discountPrice || '0') / 100 : undefined,
+        }))
+
+      return {
+        id: apiProduct.id || '',
+        name: apiProduct.name || '',
+        description: apiProduct.description || '',
+        images: itemImages, // ✅ Images depuis l'item
+        prices: productPrices,
+        physical: apiProduct.physical === '1', // ✅ Type produit
+        immaterial: apiProduct.immaterial === '1', // ✅ Type produit
+        weight: parseFloat(apiProduct.weight || '0'),
+        width: parseFloat(apiProduct.width || '0'),
+        height: parseFloat(apiProduct.height || '0'),
+        depth: parseFloat(apiProduct.depth || '0'),
+      }
+    })
 
     return {
-      id: apiProduct.id || '',
-      name: apiProduct.name || '',
-      description: apiProduct.description || '',
-      images: [], // Pas d'images dans l'API actuelle
-      prices: productPrices,
+      id: apiRef.id,
+      name: apiItem.name || '', // ✅ Nom depuis l'item
+      subname: apiItem.subname || '', // ✅ Subname depuis l'item
+      description: apiItem.description || '', // ✅ Description depuis l'item
+      technicalReference: apiRef.reference || '',
+      images: itemImages, // ✅ Images depuis l'item
+      products,
+      collectionId: apiRef.collectionId || 'uncategorized',
+      tags: itemTags, // ✅ Tags depuis l'item
+      stock: apiRef.stock || 0, // ✅ Stock
+      visible: apiItem.visible === '1',
+      available: apiItem.available === '1',
+      timestamp: apiItem.timestamp || '',
+      priority: parseInt(apiItem.priority || '0'),
     }
   })
-
-  const mapped = {
-    id: apiRef.id,
-    name: apiRef.name || '', // Contient du HTML (ex: &nbsp;)
-    subname: apiRef.subname || '', // HTML - description courte pour la vente
-    description: apiRef.description || '', // HTML - description complète
-    technicalReference: apiRef.reference || '',
-    images: [], // Pas d'images dans l'API actuelle
-    products,
-    collectionId: apiRef.collectionId || 'uncategorized',
-    tags,
-  }
-
-  // Debug log pour le premier produit
-  if (apiRef.id === '82') {
-    console.log('🔍 Debug mapping premier produit:', {
-      id: apiRef.id,
-      hasName: !!apiRef.name,
-      hasSubname: !!apiRef.subname,
-      hasDescription: !!apiRef.description,
-      subnameLength: apiRef.subname?.length,
-      descriptionLength: apiRef.description?.length,
-    })
-  }
-
-  return mapped
 }
 
 /**
@@ -285,41 +378,34 @@ export function mapAPIReferenceToShopReference(apiRef: APIRawReference): ShopRef
  */
 export function mapAPIResponseToShopCatalog(apiResponse: APIRawResponse): ShopCatalogResponse {
   try {
-    // Vérifier que apiResponse est bien un tableau
-    if (!Array.isArray(apiResponse)) {
-      console.error('❌ API response is not an array:', apiResponse)
+    // Vérifier que c'est bien un objet avec item_array
+    if (!apiResponse || !Array.isArray(apiResponse.item_array)) {
+      console.error('❌ Invalid API response structure. Expected { item_array: [...] }')
       return { references: [] }
     }
 
-    // Aplatir le tableau de tableaux (flat(1) pour un seul niveau)
-    // Structure API: [[{item1}], [{item2}], [{item3}]]
-    const flatReferences = apiResponse.flat(1)
+    console.log(`📊 Processing ${apiResponse.item_array.length} items from API`)
 
-    // Filtrer les éléments null ou undefined et vérifier la structure minimale
-    const validReferences = flatReferences.filter((ref) => {
-      if (!ref) return false
-      if (!ref.id) {
-        console.warn('⚠️ Reference without ID skipped:', ref)
-        return false
-      }
-      return true
-    })
-
-    console.log(`📊 Valid references to map: ${validReferences.length}`)
-
-    // Mapper chaque référence avec gestion d'erreur
-    const references = validReferences
-      .map((ref, index) => {
+    // Filtrer les items visibles et actifs, puis mapper vers références et aplatir
+    const references = apiResponse.item_array
+      .filter((item) => {
+        // Filtrer les items invisibles ou inactifs
+        if (item.visible !== '1' || item.actived !== '1') {
+          return false
+        }
+        return true
+      })
+      .flatMap((item, index) => {
         try {
-          return mapAPIReferenceToShopReference(ref)
+          return mapAPIItemToShopReferences(item)
         } catch (err) {
-          console.error(`❌ Error mapping reference at index ${index}:`, err, ref)
-          return null
+          console.error(`❌ Error mapping item at index ${index}:`, err, item)
+          return []
         }
       })
-      .filter((ref): ref is ShopReference => ref !== null)
+      .filter((ref) => ref !== null && ref !== undefined)
 
-    console.log(`📦 Successfully mapped ${references.length} references from API`)
+    console.log(`✅ Successfully mapped ${references.length} references from ${apiResponse.item_array.length} items`)
 
     return { references }
   } catch (err) {

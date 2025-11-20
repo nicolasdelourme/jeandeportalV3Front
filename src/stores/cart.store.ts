@@ -35,8 +35,12 @@ function loadCartFromStorage(): CartState {
         id: item.id,
         name: decodeHtmlEntities(item.name),
         price: Number(item.price) || 0,
+        priceHT: Number(item.priceHT) || 0,        // ✅ Prix HT exact
+        vatRate: Number(item.vatRate) || 0,        // ✅ Taux TVA réel
         image: item.image,
         slug: item.slug,
+        physical: item.physical,
+        immaterial: item.immaterial,
       }))
       .filter((item) => item.price > 0) // Supprimer les items avec prix invalide
 
@@ -102,18 +106,45 @@ export const useCartStore = defineStore('cart', () => {
   })
 
   /**
-   * Montant HT (hors taxe)
+   * Montant HT (hors taxe) - EXACT depuis l'API
    */
   const subtotalExclVAT = computed(() => {
-    if (!subtotal.value || subtotal.value === 0) return 0
-    return subtotal.value / (1 + CART_CONFIG.VAT_RATE)
+    return cartState.value.items.reduce((total, item) => {
+      const priceHT = Number(item.priceHT) || 0
+      return total + priceHT
+    }, 0)
   })
 
   /**
-   * Montant de la TVA
+   * Montant de la TVA - EXACT depuis l'API
    */
   const vatAmount = computed(() => {
-    return subtotal.value - subtotalExclVAT.value
+    return cartState.value.items.reduce((total, item) => {
+      const priceTTC = Number(item.price) || 0
+      const priceHT = Number(item.priceHT) || 0
+      const vat = priceTTC - priceHT
+      return total + vat
+    }, 0)
+  })
+
+  /**
+   * TVA groupée par taux (pour affichage détaillé)
+   * Retourne un objet { "2.1": montant, "5.5": montant, "20": montant }
+   */
+  const vatByRate = computed(() => {
+    const vatMap: Record<string, number> = {}
+
+    cartState.value.items.forEach((item) => {
+      const vatRate = item.vatRate || 0
+      const priceTTC = Number(item.price) || 0
+      const priceHT = Number(item.priceHT) || 0
+      const vatAmount = priceTTC - priceHT
+
+      const key = vatRate.toString()
+      vatMap[key] = (vatMap[key] || 0) + vatAmount
+    })
+
+    return vatMap
   })
 
   /**
@@ -156,6 +187,8 @@ export const useCartStore = defineStore('cart', () => {
       ...product,
       name: decodeHtmlEntities(product.name),
       price: Number(product.price) || 0,
+      priceHT: Number(product.priceHT) || 0,        // ✅ Prix HT exact
+      vatRate: Number(product.vatRate) || 0,        // ✅ Taux TVA réel
     }
 
     // Nouvel article : l'ajouter au panier
@@ -209,6 +242,7 @@ export const useCartStore = defineStore('cart', () => {
     subtotal,
     subtotalExclVAT,
     vatAmount,
+    vatByRate,
     isEmpty,
     daysUntilExpiry,
 

@@ -169,13 +169,17 @@ const handleAddToCart = () => {
       ? getShopImageUrl(reference.value.images[0])
       : undefined
 
-    // Ajouter au panier
+    // Ajouter au panier avec TOUS les champs requis
     cartStore.addItem({
       id: reference.value.id,
       name: reference.value.name,
-      price: selectedPrice.value.amount,
+      price: selectedPrice.value.amount,             // Prix TTC
+      priceHT: selectedPrice.value.htAmount,         // ✅ Prix HT EXACT
+      vatRate: selectedPrice.value.vatRate,          // ✅ Taux TVA réel
       image: mainImage,
       slug: reference.value.id,
+      physical: selectedProduct.value?.physical,
+      immaterial: selectedProduct.value?.immaterial,
     })
 
     toast.success(`${decodeHTMLEntities(reference.value.name)} ajouté au panier`)
@@ -449,8 +453,8 @@ const sanitizedDescription = computed(() => {
             <!-- Galerie d'images sticky avec compensation navbar -->
             <div class="sticky top-20 space-y-4">
               <!-- Image principale -->
-              <Card class="overflow-hidden shadow-lg">
-                <AspectRatio :ratio="1 / 1.414">
+              <Card class="overflow-hidden shadow-lg p-0 rounded-md">
+                <AspectRatio :ratio="1 / 1.414" class="">
                   <img :src="activeImage" :alt="reference.name" class="w-full h-full object-cover" />
                 </AspectRatio>
               </Card>

@@ -9,9 +9,13 @@
 export interface CartItem {
   id: string | number           // ID du produit
   name: string                   // Nom du produit
-  price: number                  // Prix
+  price: number                  // Prix TTC
+  priceHT: number                // ✅ Prix HT EXACT (depuis API)
+  vatRate: number                // ✅ Taux de TVA réel (5.5, 20, etc.)
   image?: string                 // Image du produit (optionnel)
   slug?: string                  // Slug pour le lien produit
+  physical?: boolean             // ✅ Produit physique (livraison requise)
+  immaterial?: boolean           // ✅ Produit dématérialisé
 }
 
 /**
@@ -28,7 +32,6 @@ export interface CartState {
 export const CART_CONFIG = {
   STORAGE_KEY: 'jdp_cart',
   EXPIRY_DAYS: 7,                // Durée de vie du panier : 7 jours
-  VAT_RATE: 0.20,                // Taux de TVA français : 20%
 } as const
 
 /**

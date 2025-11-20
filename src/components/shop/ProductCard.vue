@@ -13,6 +13,7 @@ import { AspectRatio } from '@/components/ui/aspect-ratio'
 import { Button } from '@/components/ui/button'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
+import { useCartStore } from '@/stores/cart.store'
 
 const props = defineProps<{
   reference: ShopReference
@@ -22,6 +23,8 @@ const emit = defineEmits<{
   viewDetails: [reference: ShopReference]
   addToCart: [reference: ShopReference]
 }>()
+
+const cartStore = useCartStore()
 
 /**
  * Icônes FontAwesome
@@ -126,6 +129,20 @@ const subnameText = computed(() => {
 })
 
 /**
+ * Vérifier si le produit est déjà dans le panier
+ */
+const isInCart = computed(() => {
+  return cartStore.hasItem(props.reference.id)
+})
+
+/**
+ * Variant du bouton panier (outline si déjà dans le panier)
+ */
+const cartButtonVariant = computed(() => {
+  return isInCart.value ? 'outline' : 'default'
+})
+
+/**
  * Gérer les actions
  */
 const handleViewDetails = (e: Event) => {
@@ -142,7 +159,7 @@ const handleAddToCart = (e: Event) => {
 <template>
   <Card class="overflow-hidden group hover:shadow-lg py-0 rounded-md transition-shadow h-full flex flex-col">
     <!-- Image avec AspectRatio -->
-    <div class="relative overflow-hidden bg-gray-100 flex-shrink-0">
+    <div @click="handleViewDetails" class="relative overflow-hidden bg-gray-100 flex-shrink-0 cursor-pointer">
       <AspectRatio :ratio="aspectRatio">
         <img :src="mainImage" :alt="reference.name"
           class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
@@ -199,7 +216,13 @@ const handleAddToCart = (e: Event) => {
             <Button @click="handleViewDetails" variant="outline" size="sm" class="flex-1">
               <FontAwesomeIcon v-if="icons.eye" :icon="icons.eye" class="w-4 h-4" />
             </Button>
-            <Button @click="handleAddToCart" color="green-600" size="sm" class="flex-1">
+            <Button
+              @click="handleAddToCart"
+              :variant="cartButtonVariant"
+              color="green-600"
+              size="sm"
+              class="flex-1"
+            >
               <FontAwesomeIcon v-if="icons.shoppingCart" :icon="icons.shoppingCart" class="w-4 h-4" />
             </Button>
           </div>

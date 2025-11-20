@@ -201,10 +201,14 @@ function goToCheckout() {
                 <span class="font-medium">{{ formatPrice(cartStore.subtotalExclVAT) }}</span>
               </div>
 
-              <!-- TVA -->
-              <div class="flex justify-between text-neutral-600">
-                <span>TVA (20%)</span>
-                <span class="font-medium">{{ formatPrice(cartStore.vatAmount) }}</span>
+              <!-- TVA par taux (dynamique) -->
+              <div
+                v-for="(amount, rate) in cartStore.vatByRate"
+                :key="rate"
+                class="flex justify-between text-neutral-600"
+              >
+                <span>TVA {{ rate }}%</span>
+                <span class="font-medium">{{ formatPrice(amount) }}</span>
               </div>
 
               <Separator />
