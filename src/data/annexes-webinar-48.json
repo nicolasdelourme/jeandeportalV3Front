@@ -1,0 +1,55 @@
+{
+  "webinarId": 48,
+  "annexes": [
+    {
+      "id": 1,
+      "title": "Dossier Argent Metal 2025",
+      "description": "Analyse complete du marche de l'argent et strategies d'investissement physique",
+      "price": 29.9,
+      "coverImage": "/images/dossiers/argent-metal-2025.jpg",
+      "badgeLabel": "Argent Metal",
+      "badgeColor": "#FFD700",
+      "addedAt": "2025-01-08T10:00:00Z"
+    },
+    {
+      "id": 2,
+      "title": "Guide Or d'Investissement 2025",
+      "description": "Tout savoir sur l'or physique : achat, stockage, fiscalite et transmission",
+      "price": 39.9,
+      "coverImage": "/images/dossiers/guide-or-2025.jpg",
+      "badgeLabel": "Guide Or",
+      "badgeColor": "#C0C0C0",
+      "addedAt": "2025-01-08T10:00:00Z"
+    },
+    {
+      "id": 3,
+      "title": "Fiscalite des Metaux Precieux",
+      "description": "Guide complet sur la fiscalite de l'or et de l'argent physique",
+      "price": 24.9,
+      "coverImage": "/images/dossiers/fiscalite-metaux.jpg",
+      "badgeLabel": "Fiscalite",
+      "badgeColor": "#50E3C2",
+      "addedAt": "2025-01-08T10:00:00Z"
+    },
+    {
+      "id": 4,
+      "title": "Rapport Metaux Precieux Q4 2024",
+      "description": "Analyse trimestrielle des cours et perspectives pour l'or et l'argent",
+      "price": 19.9,
+      "coverImage": "/images/dossiers/rapport-q4-2024.jpg",
+      "badgeLabel": "Rapport Q4",
+      "badgeColor": "#4A90E2",
+      "addedAt": "2025-01-08T10:00:00Z"
+    },
+    {
+      "id": 5,
+      "title": "Strategies de Stockage Or & Argent",
+      "description": "Solutions securisees pour stocker vos metaux precieux",
+      "price": null,
+      "coverImage": "/images/dossiers/stockage-strategies.jpg",
+      "badgeLabel": "Stockage",
+      "badgeColor": "#F5A623",
+      "addedAt": "2025-01-08T10:00:00Z"
+    }
+  ]
+}
