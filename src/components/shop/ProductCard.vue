@@ -157,14 +157,14 @@ const handleAddToCart = (e: Event) => {
 </script>
 
 <template>
-  <Card class="overflow-hidden group hover:shadow-lg py-0 rounded-md transition-shadow h-full flex flex-col">
+  <Card class="group hover:shadow-lg py-0 rounded-md transition-shadow h-full flex flex-col gap-0">
     <!-- Image avec AspectRatio -->
-    <div @click="handleViewDetails" class="relative overflow-hidden bg-gray-100 flex-shrink-0 cursor-pointer">
+    <div @click="handleViewDetails" class="relative  bg-gray-100 shrink-0 cursor-pointer">
       <AspectRatio :ratio="aspectRatio">
         <img :src="mainImage" :alt="reference.name"
-          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+          class="w-full h-full object-cover group-hover:scale-[102%] transition-transform duration-300" />
       </AspectRatio>
-
+      
       <!-- Badge collection (overlay) -->
       <div class="absolute top-3 left-3">
         <Badge :color="collectionBadgeColor" variant="default" class="text-xs font-semibold uppercase">
@@ -172,9 +172,11 @@ const handleAddToCart = (e: Event) => {
         </Badge>
       </div>
     </div>
-
+    
+    <Separator />
     <!-- Contenu -->
     <CardContent class="p-4 flex flex-col flex-1">
+      
       <!-- Contenu flexible qui pousse le bottom -->
       <div class="space-y-2 mb-3 flex-1">
         <!-- Titre (décodé HTML) -->
