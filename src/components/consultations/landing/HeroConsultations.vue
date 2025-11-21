@@ -166,7 +166,7 @@ const handleMainButtonClick = () => {
 
   if (webinarState.value === 'live') {
     // Rediriger vers la page du direct
-    router.push(`/consultations-nicolas-delourme/${mainWebinar.value.id}`)
+    router.push(`/consultations-nicolas-delourme/watch/${mainWebinar.value.id}`)
   } else {
     // Ouvrir la modale pour poser une question
     openMainWebinarModal()

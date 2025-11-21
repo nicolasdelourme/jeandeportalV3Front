@@ -85,7 +85,7 @@ const handleDownload = () => {
  */
 const handlePlay = () => {
   closeModal()
-  router.push(`/consultations-nicolas-delourme/${props.webinar.id}`)
+  router.push(`/consultations-nicolas-delourme/watch/${props.webinar.id}`)
 }
 
 /**
@@ -94,7 +94,7 @@ const handlePlay = () => {
 const handleShare = async () => {
   try {
     // Construire l'URL complète du webinaire
-    const webinarUrl = `${window.location.origin}/consultations-nicolas-delourme/${props.webinar.id}`
+    const webinarUrl = `${window.location.origin}/consultations-nicolas-delourme/watch/${props.webinar.id}`
 
     // Copier dans le presse-papiers
     await navigator.clipboard.writeText(webinarUrl)

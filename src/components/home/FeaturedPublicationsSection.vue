@@ -30,6 +30,20 @@ const count = ref(0)
 
 let autoplayInterval: number | null = null
 
+/**
+ * Retourne le nombre de slides à scroller selon la taille du viewport
+ * Mobile (< 768px): 1 slide
+ * Tablet (768-1024px): 3 slides
+ * Desktop (≥ 1024px): 6 slides
+ */
+const getSlidesToScroll = (): number => {
+    if (typeof window === 'undefined') return 6
+
+    if (window.innerWidth < 768) return 1   // Mobile
+    if (window.innerWidth < 1024) return 3  // Tablet
+    return 6                                 // Desktop
+}
+
 const setApi = (api: CarouselApi) => {
     emblaApi.value = api
     if (!api) return
@@ -50,9 +64,10 @@ const startAutoplay = () => {
 
     autoplayInterval = setInterval(() => {
         if (emblaApi.value) {
-            // Défiler de 6 slides à la fois
+            // Défiler selon le viewport (1/3/6 slides)
             const currentIndex = emblaApi.value.selectedScrollSnap()
-            const targetIndex = currentIndex + 6
+            const slidesToScroll = getSlidesToScroll()
+            const targetIndex = currentIndex + slidesToScroll
             const snapCount = emblaApi.value.scrollSnapList().length
 
             // Si on dépasse, retourner au début
@@ -80,12 +95,13 @@ const handlePrevious = () => {
     stopAutoplay()
     if (emblaApi.value) {
         const currentIndex = emblaApi.value.selectedScrollSnap()
-        const targetIndex = currentIndex - 6
+        const slidesToScroll = getSlidesToScroll()
+        const targetIndex = currentIndex - slidesToScroll
 
         if (targetIndex < 0) {
-            // Aller à la dernière "page" de 6
+            // Aller à la dernière "page"
             const snapCount = emblaApi.value.scrollSnapList().length
-            const lastPageStart = Math.floor((snapCount - 1) / 6) * 6
+            const lastPageStart = Math.floor((snapCount - 1) / slidesToScroll) * slidesToScroll
             emblaApi.value.scrollTo(lastPageStart)
         } else {
             emblaApi.value.scrollTo(targetIndex)
@@ -98,7 +114,8 @@ const handleNext = () => {
     stopAutoplay()
     if (emblaApi.value) {
         const currentIndex = emblaApi.value.selectedScrollSnap()
-        const targetIndex = currentIndex + 6
+        const slidesToScroll = getSlidesToScroll()
+        const targetIndex = currentIndex + slidesToScroll
         const snapCount = emblaApi.value.scrollSnapList().length
 
         if (targetIndex >= snapCount) {
@@ -418,14 +435,14 @@ const handleViewAllPublications = () => {
                         <CarouselPrevious class="static translate-y-0" />
                     </Button>
 
-                    <!-- Indicateurs de pagination (3 pages de 6) -->
+                    <!-- Indicateurs de pagination dynamiques -->
                     <div class="flex gap-2">
-                        <button v-for="pageIndex in 3" :key="pageIndex" @click="() => {
+                        <button v-for="pageIndex in Math.ceil(publications.length / getSlidesToScroll())" :key="pageIndex" @click="() => {
                             stopAutoplay()
-                            emblaApi?.scrollTo((pageIndex - 1) * 6)
+                            emblaApi?.scrollTo((pageIndex - 1) * getSlidesToScroll())
                             startAutoplay()
                         }" class="w-2 h-2 rounded-full transition-all"
-                            :class="Math.floor((current - 1) / 6) === (pageIndex - 1) ? 'bg-primary w-8' : 'bg-neutral-300'">
+                            :class="Math.floor((current - 1) / getSlidesToScroll()) === (pageIndex - 1) ? 'bg-primary w-8' : 'bg-neutral-300'">
                         </button>
                     </div>
 

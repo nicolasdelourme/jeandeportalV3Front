@@ -82,6 +82,9 @@ const handleRegisterSubmit = async (values: {
     errors.value.general = '' // Clear previous errors
 
     try {
+        // Récupérer l'URL de redirection depuis les query params (même logique que login)
+        const redirectUrl = (route.query.redirect as string) || undefined
+
         // Appeler le store pour s'inscrire
         const afterLoginUrl = await authStore.register({
             firstName: values.firstName,
@@ -91,7 +94,9 @@ const handleRegisterSubmit = async (values: {
         })
 
         toast.success('Compte créé avec succès !')
-        router.push(afterLoginUrl)
+
+        // Rediriger vers l'URL d'origine ou l'URL par défaut
+        router.push(redirectUrl || afterLoginUrl)
     } catch (error: any) {
         console.error('Erreur:', error)
         errors.value.general = error.message || 'Une erreur est survenue lors de la création du compte.'

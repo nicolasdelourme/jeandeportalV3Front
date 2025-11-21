@@ -2,6 +2,7 @@
 /**
  * Composant CollectionsSection
  * Présentation des collections thématiques de publications
+ * Version responsive avec Accordion sur mobile et Grid sur desktop
  */
 import { Button } from '@/components/ui/button'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -10,6 +11,13 @@ import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import Badge from '../ui/badge/Badge.vue'
+import CollectionCard from './CollectionCard.vue'
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from '@/components/ui/accordion'
 
 const router = useRouter()
 
@@ -151,58 +159,58 @@ const handleViewAllCollections = () => {
                 </p>
             </div>
 
-            <!-- Grille de collections -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-                <div v-for="collection in collections" :key="collection.id"
-                    class="bg-white border border-neutral-200 rounded-lg p-6 flex flex-col gap-5 hover:shadow-lg transition-shadow">
-                    <!-- En-tête avec icône -->
-                    <div class="flex gap-3 items-center">
-                        <div :class="`bg-linear-to-r from-${collection.color} to-${collection.color} p-3 rounded-md shadow-sm`"
-                            :style="`background: linear-gradient(135deg, var(--color-${collection.color}), var(--color-${collection.color}))`">
-                            <FontAwesomeIcon v-if="getIcon(collection.icon)" :icon="getIcon(collection.icon)"
-                                class="w-6 h-6 text-white" />
+            <!-- Mobile: Accordion (< 768px) -->
+            <Accordion type="single" collapsible class="md:hidden w-full">
+                <AccordionItem v-for="collection in collections" :key="collection.id" :value="collection.id"
+                               class="border border-neutral-200 rounded-lg mb-3">
+                    <AccordionTrigger class="px-4 py-3 hover:no-underline">
+                        <div class="flex gap-3 items-center w-full">
+                            <div :style="`background: linear-gradient(135deg, var(--color-${collection.color}), var(--color-${collection.color}))`"
+                                 class="p-2 rounded-md shadow-sm shrink-0">
+                                <FontAwesomeIcon v-if="getIcon(collection.icon)" :icon="getIcon(collection.icon)"
+                                                 class="w-5 h-5 text-white" />
+                            </div>
+                            <div class="flex flex-col items-start text-left">
+                                <h3 class="font-bold text-lg text-neutral-800 leading-6"
+                                    style="font-family: Roboto, sans-serif;">
+                                    {{ collection.title }}
+                                </h3>
+                                <p class="font-medium text-xs text-neutral-600 leading-4"
+                                   style="font-family: Roboto, sans-serif;">
+                                    {{ collection.subtitle }}
+                                </p>
+                            </div>
                         </div>
-                        <div class="flex flex-col">
-                            <h3 class="font-bold text-2xl text-neutral-800 leading-7"
-                                style="font-family: Roboto, sans-serif;">
-                                {{ collection.title }}
-                            </h3>
-                            <p class="font-medium text-sm text-neutral-600 leading-5"
-                                style="font-family: Roboto, sans-serif;">
-                                {{ collection.subtitle }}
-                            </p>
-                        </div>
-                    </div>
+                    </AccordionTrigger>
+                    <AccordionContent class="px-4 pb-4">
+                        <CollectionCard
+                            :id="collection.id"
+                            :title="collection.title"
+                            :subtitle="collection.subtitle"
+                            :description="collection.description"
+                            :icon="getIcon(collection.icon)"
+                            :color="collection.color"
+                            :stats="collection.stats"
+                            @explore="handleExploreCollection"
+                        />
+                    </AccordionContent>
+                </AccordionItem>
+            </Accordion>
 
-                    <!-- Description -->
-                    <p class="font-normal text-sm text-neutral-600 flex-1 leading-6"
-                        style="font-family: Roboto, sans-serif;">
-                        {{ collection.description }}
-                    </p>
-
-                    <!-- Stats -->
-                    <div class="flex gap-4 w-full">
-                        <div v-for="(stat, index) in collection.stats" :key="index"
-                            class="flex-1 bg-neutral-50 flex flex-col gap-1 items-center justify-center py-3 rounded-md">
-                            <p class="font-bold text-2xl leading-7"
-                                :style="`color: var(--color-${collection.color}); font-family: Roboto, sans-serif;`">
-                                {{ stat.value }}
-                            </p>
-                            <p class="font-medium text-xs text-neutral-600 leading-4"
-                                style="font-family: Roboto, sans-serif;">
-                                {{ stat.label }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Bouton CTA -->
-                    <Button @click="handleExploreCollection(collection.id)" :color="collection.color"
-                        class="w-full mt-auto" size="default">
-                        <p class="font-bold text-sm" style="font-family: Roboto, sans-serif;">
-                            Explorer la collection
-                        </p>
-                    </Button>
-                </div>
+            <!-- Desktop: Grid (≥ 768px) -->
+            <div class="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+                <CollectionCard
+                    v-for="collection in collections"
+                    :key="collection.id"
+                    :id="collection.id"
+                    :title="collection.title"
+                    :subtitle="collection.subtitle"
+                    :description="collection.description"
+                    :icon="getIcon(collection.icon)"
+                    :color="collection.color"
+                    :stats="collection.stats"
+                    @explore="handleExploreCollection"
+                />
             </div>
 
             <!-- CTA pour voir toutes les collections -->

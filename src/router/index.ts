@@ -29,24 +29,24 @@ const routes: RouteRecordRaw[] = [
     },
     {
         path: "/consultations-nicolas-delourme",
-        name: "consultations-nicolas-delourme",
+        name: "consultations-catalogue",
         component: () =>
             import(
                 "@/views/consultations/ConsultationsNicolasDelourmePage.vue"
             ),
     },
     {
-        path: "/consultations-nicolas-delourme/marketing",
-        name: "consultations-marketing",
+        path: "/consultations-nicolas-delourme/a-propos",
+        name: "consultations-a-propos",
         component: () => import("@/views/consultations/MarketingPage.vue"),
     },
     {
         path: "/consultations-nicolas-delourme/invitation",
-        name: "invitation",
+        name: "consultations-invitation",
         component: () => import("@/views/consultations/InvitationPage.vue"),
     },
     {
-        path: "/consultations-nicolas-delourme/:id",
+        path: "/consultations-nicolas-delourme/watch/:id",
         name: "consultation-player",
         component: () =>
             import("@/views/consultations/ConsultationPlayerPage.vue"),
@@ -81,6 +81,11 @@ const routes: RouteRecordRaw[] = [
         path: "/panier",
         name: "cart",
         component: () => import("@/views/cart/CartPage.vue"),
+    },
+    {
+        path: "/:pathMatch(.*)*",
+        name: "not-found",
+        component: () => import("@/views/NotFoundPage.vue"),
     },
 ];
 
