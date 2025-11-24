@@ -38,11 +38,14 @@ export const CART_CONFIG = {
  * Erreurs du panier
  */
 export class CartError extends Error {
+  code: 'ITEM_ALREADY_IN_CART' | 'ITEM_NOT_FOUND'
+
   constructor(
     message: string,
-    public code: 'ITEM_ALREADY_IN_CART' | 'ITEM_NOT_FOUND',
+    code: 'ITEM_ALREADY_IN_CART' | 'ITEM_NOT_FOUND',
   ) {
     super(message)
     this.name = 'CartError'
+    this.code = code
   }
 }

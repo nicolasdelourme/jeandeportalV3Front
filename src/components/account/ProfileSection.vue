@@ -1,24 +1,32 @@
 <script setup lang="ts">
 /**
  * Section Profil
- * Gestion des informations personnelles et avatar
+ * Gestion des informations personnelles, avatar, adresses et mot de passe
  */
 import { ref } from 'vue'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
 import { toast } from 'vue-sonner'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
+import AddressManagement from './AddressManagement.vue'
+import PasswordChangeDialog from './PasswordChangeDialog.vue'
 
 /**
  * État de soumission
  */
 const isSubmitting = ref(false)
+
+/**
+ * État du dialog de changement de mot de passe
+ */
+const isPasswordDialogOpen = ref(false)
 
 /**
  * Schéma de validation
@@ -32,7 +40,7 @@ const formSchema = toTypedSchema(z.object({
         .email({ message: 'L\'email n\'est pas valide' }),
 }))
 
-const { handleSubmit, values, setValues } = useForm({
+const { handleSubmit } = useForm({
     validationSchema: formSchema,
     initialValues: {
         firstName: 'Jean',
@@ -67,82 +75,117 @@ const onSubmit = handleSubmit(async (values) => {
 </script>
 
 <template>
-    <Card>
-        <CardHeader>
-            <CardTitle style="font-family: Roboto, sans-serif;">Informations personnelles</CardTitle>
-            <CardDescription style="font-family: Roboto, sans-serif;">
-                Mettez à jour vos informations de profil
-            </CardDescription>
-        </CardHeader>
-        <CardContent class="space-y-6">
-            <!-- Avatar Section -->
-            <div class="flex items-center gap-6">
-                <Avatar class="h-24 w-24">
-                    <AvatarImage src="" alt="Photo de profil" />
-                    <AvatarFallback class="text-2xl bg-primary text-white">{{ initials }}</AvatarFallback>
-                </Avatar>
-                <div class="space-y-2">
-                    <h3 class="font-medium text-sm text-neutral-700" style="font-family: Roboto, sans-serif;">
-                        Photo de profil
-                    </h3>
-                    <div class="flex gap-2">
-                        <Button variant="outline" color="neutral-700" size="sm">
-                            <span class="text-sm" style="font-family: Roboto, sans-serif;">Modifier</span>
-                        </Button>
-                        <Button variant="outline" size="sm">
-                            <span class="text-sm" style="font-family: Roboto, sans-serif;">Supprimer</span>
-                        </Button>
+    <div class="space-y-6">
+        <!-- Informations personnelles -->
+        <Card>
+            <CardHeader>
+                <CardTitle style="font-family: Roboto, sans-serif;">Informations personnelles</CardTitle>
+                <CardDescription style="font-family: Roboto, sans-serif;">
+                    Mettez à jour vos informations de profil
+                </CardDescription>
+            </CardHeader>
+            <CardContent class="space-y-6">
+                <!-- Avatar Section -->
+                <div class="flex items-center gap-6">
+                    <Avatar class="h-24 w-24">
+                        <AvatarImage src="" alt="Photo de profil" />
+                        <AvatarFallback class="text-2xl bg-primary text-white">{{ initials }}</AvatarFallback>
+                    </Avatar>
+                    <div class="space-y-2">
+                        <h3 class="font-medium text-sm text-neutral-700" style="font-family: Roboto, sans-serif;">
+                            Photo de profil
+                        </h3>
+                        <div class="flex gap-2">
+                            <Button variant="outline" color="neutral-700" size="sm">
+                                <span class="text-sm" style="font-family: Roboto, sans-serif;">Modifier</span>
+                            </Button>
+                            <Button variant="outline" size="sm">
+                                <span class="text-sm" style="font-family: Roboto, sans-serif;">Supprimer</span>
+                            </Button>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <Separator />
+                <Separator />
 
-            <!-- Form -->
-            <form @submit="onSubmit" class="space-y-4">
-                <!-- Prénom et Nom -->
-                <div class="grid grid-cols-2 gap-4">
-                    <FormField v-slot="{ componentField }" name="firstName">
+                <!-- Form -->
+                <form @submit="onSubmit" class="space-y-4">
+                    <!-- Prénom et Nom -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <FormField v-slot="{ componentField }" name="firstName">
+                            <FormItem class="gap-1">
+                                <FormLabel class="text-sm font-medium text-neutral-700">Prénom</FormLabel>
+                                <FormControl>
+                                    <Input type="text" v-bind="componentField" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        </FormField>
+
+                        <FormField v-slot="{ componentField }" name="lastName">
+                            <FormItem class="gap-1">
+                                <FormLabel class="text-sm font-medium text-neutral-700">Nom</FormLabel>
+                                <FormControl>
+                                    <Input type="text" v-bind="componentField" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        </FormField>
+                    </div>
+
+                    <!-- Email -->
+                    <FormField v-slot="{ componentField }" name="email">
                         <FormItem class="gap-1">
-                            <FormLabel class="text-sm font-medium text-neutral-700">Prénom</FormLabel>
+                            <FormLabel class="text-sm font-medium text-neutral-700">Adresse email</FormLabel>
                             <FormControl>
-                                <Input type="text" v-bind="componentField" />
+                                <Input type="email" v-bind="componentField" />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
                     </FormField>
 
-                    <FormField v-slot="{ componentField }" name="lastName">
-                        <FormItem class="gap-1">
-                            <FormLabel class="text-sm font-medium text-neutral-700">Nom</FormLabel>
-                            <FormControl>
-                                <Input type="text" v-bind="componentField" />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    </FormField>
-                </div>
+                    <!-- Bouton -->
+                    <div class="flex justify-end pt-4">
+                        <Button type="submit" color="primary" :disabled="isSubmitting">
+                            <span class="font-medium" style="font-family: Roboto, sans-serif;">
+                                {{ isSubmitting ? 'Enregistrement...' : 'Enregistrer les modifications' }}
+                            </span>
+                        </Button>
+                    </div>
+                </form>
+            </CardContent>
+        </Card>
 
-                <!-- Email -->
-                <FormField v-slot="{ componentField }" name="email">
-                    <FormItem class="gap-1">
-                        <FormLabel class="text-sm font-medium text-neutral-700">Adresse email</FormLabel>
-                        <FormControl>
-                            <Input type="email" v-bind="componentField" />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                </FormField>
-
-                <!-- Bouton -->
-                <div class="flex justify-end pt-4">
-                    <Button type="submit" color="primary" :disabled="isSubmitting">
-                        <span class="font-medium" style="font-family: Roboto, sans-serif;">
-                            {{ isSubmitting ? 'Enregistrement...' : 'Enregistrer les modifications' }}
-                        </span>
+        <!-- Sécurité / Mot de passe -->
+        <Card>
+            <CardHeader>
+                <CardTitle style="font-family: Roboto, sans-serif;">Sécurité</CardTitle>
+                <CardDescription style="font-family: Roboto, sans-serif;">
+                    Gérez la sécurité de votre compte
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-medium text-neutral-700" style="font-family: Roboto, sans-serif;">
+                            Mot de passe
+                        </h3>
+                        <p class="text-sm text-muted-foreground mt-1">
+                            Modifiez votre mot de passe pour sécuriser votre compte
+                        </p>
+                    </div>
+                    <Button variant="outline" @click="isPasswordDialogOpen = true">
+                        <FontAwesomeIcon :icon="['fas', 'key']" class="mr-2" />
+                        Changer le mot de passe
                     </Button>
                 </div>
-            </form>
-        </CardContent>
-    </Card>
+            </CardContent>
+        </Card>
+
+        <!-- Adresses postales -->
+        <AddressManagement />
+
+        <!-- Dialog de changement de mot de passe -->
+        <PasswordChangeDialog v-model:open="isPasswordDialogOpen" />
+    </div>
 </template>

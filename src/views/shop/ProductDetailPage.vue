@@ -166,7 +166,7 @@ const handleAddToCart = () => {
   try {
     // Obtenir l'image principale
     const mainImage = reference.value.images.length > 0
-      ? getShopImageUrl(reference.value.images[0])
+      ? getShopImageUrl(reference.value.images[0]!)
       : undefined
 
     // Ajouter au panier avec TOUS les champs requis

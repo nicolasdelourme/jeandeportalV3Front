@@ -121,7 +121,7 @@ export async function mockGetUserProfileAPI(token: string): Promise<User | null>
         const parts = token.split('.')
         if (parts.length !== 3) return null
 
-        const payload = JSON.parse(atob(parts[1]))
+        const payload = JSON.parse(atob(parts[1]!))
         const userId = payload.sub
 
         // Chercher l'utilisateur

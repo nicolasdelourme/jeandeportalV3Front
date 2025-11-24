@@ -1,14 +1,13 @@
 <script setup lang="ts">
 /**
  * Page Mon Compte
- * Gestion du profil, abonnement, sécurité et paramètres
+ * Gestion du profil, abonnement et paramètres
  */
 import { ref } from 'vue'
 import DefaultLayout from '@/components/layout/DefaultLayout.vue'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import ProfileSection from '@/components/account/ProfileSection.vue'
 import SubscriptionSection from '@/components/account/SubscriptionSection.vue'
-import SecuritySection from '@/components/account/SecuritySection.vue'
 import SettingsSection from '@/components/account/SettingsSection.vue'
 import PurchasesSection from '@/components/account/PurchasesSection.vue'
 
@@ -34,7 +33,7 @@ const activeTab = ref('profile')
 
                 <!-- Tabs Navigation -->
                 <Tabs v-model="activeTab" class="w-full">
-                    <TabsList class="grid w-full grid-cols-5 ">
+                    <TabsList class="grid w-full grid-cols-4">
                         <TabsTrigger value="profile">
                             <span style="font-family: Roboto, sans-serif;">Profil</span>
                         </TabsTrigger>
@@ -43,9 +42,6 @@ const activeTab = ref('profile')
                         </TabsTrigger>
                         <TabsTrigger value="purchases">
                             <span style="font-family: Roboto, sans-serif;">Mes achats</span>
-                        </TabsTrigger>
-                        <TabsTrigger value="security">
-                            <span style="font-family: Roboto, sans-serif;">Sécurité</span>
                         </TabsTrigger>
                         <TabsTrigger value="settings">
                             <span style="font-family: Roboto, sans-serif;">Paramètres</span>
@@ -65,11 +61,6 @@ const activeTab = ref('profile')
                     <!-- Purchases Tab -->
                     <TabsContent value="purchases">
                         <PurchasesSection />
-                    </TabsContent>
-
-                    <!-- Security Tab -->
-                    <TabsContent value="security">
-                        <SecuritySection />
                     </TabsContent>
 
                     <!-- Settings Tab -->

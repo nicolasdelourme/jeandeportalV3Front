@@ -6,6 +6,7 @@
 import { computed } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
 
 /**
  * Icônes FontAwesome
@@ -18,6 +19,13 @@ const icons = computed(() => ({
   fileContract: byPrefixAndName.fas?.['file-contract'],
   infinity: byPrefixAndName.fas?.['infinity'],
 }))
+
+/**
+ * Helper pour obtenir une icône de manière type-safe
+ */
+const getIcon = (iconKey: string): IconDefinition => {
+  return icons.value[iconKey as keyof typeof icons.value] as IconDefinition
+}
 
 /**
  * Liste des bénéfices
@@ -83,7 +91,7 @@ const benefits = [
           <!-- En-tête avec icône et badge -->
           <div class="flex items-start justify-between mb-4">
             <div class="bg-consultations-nd p-3 rounded-lg">
-              <FontAwesomeIcon v-if="icons[benefit.icon]" :icon="icons[benefit.icon]" class="w-6 h-6 text-white" />
+              <FontAwesomeIcon v-if="getIcon(benefit.icon)" :icon="getIcon(benefit.icon)" class="w-6 h-6 text-white" />
             </div>
             <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-3 py-1 rounded-full">
               {{ benefit.badge }}
