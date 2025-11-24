@@ -41,7 +41,7 @@ export class AuthService {
                 response = await mockLoginAPI(credentials)
             } else {
                 // Appel API réel
-                response = await apiClient.post<AuthResponse>('/auth/login', {
+                response = await apiClient.post<AuthResponse>('/api/login', {
                     email: credentials.email,
                     password: credentials.password,
                     remember_me: credentials.rememberMe,
@@ -90,7 +90,7 @@ export class AuthService {
                 response = await mockRegisterAPI(credentials)
             } else {
                 // Appel API réel
-                response = await apiClient.post<AuthResponse>('/auth/register', {
+                response = await apiClient.post<AuthResponse>('/api/register', {
                     first_name: credentials.firstName,
                     last_name: credentials.lastName,
                     email: credentials.email,
@@ -158,7 +158,7 @@ export class AuthService {
                 return user
             } else {
                 // Appel API réel - le cookie sera automatiquement envoyé
-                const response = await apiClient.get<User>('/auth/me')
+                const response = await apiClient.get<User>('/api/me')
                 return response
             }
         } catch (error: any) {
@@ -182,7 +182,7 @@ export class AuthService {
                 await mockLogoutAPI()
             } else {
                 // Appel API réel
-                await apiClient.post('/auth/logout')
+                await apiClient.post('/api/logout')
             }
         } catch (error: any) {
             logger.error('Erreur lors de la déconnexion:', error)
@@ -201,7 +201,7 @@ export class AuthService {
             } else {
                 // Appel API réel
                 const response = await apiClient.post<{ success: boolean; message: string }>(
-                    '/auth/forgot-password',
+                    '/api/forgot-password',
                     { email }
                 )
                 return response

@@ -3,6 +3,7 @@
  * Gestion des appels à l'API du catalogue produits
  */
 
+import { apiClient } from '@/api/client'
 import type { ShopCatalogResponse, APIRawResponse } from '@/types/shop-api.types'
 import { ShopAPIError, mapAPIResponseToShopCatalog } from '@/types/shop-api.types'
 
@@ -10,7 +11,6 @@ import { ShopAPIError, mapAPIResponseToShopCatalog } from '@/types/shop-api.type
  * Configuration de l'API Shop
  */
 const API_CONFIG = {
-  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'https://jeandeportal.fr',
   ENDPOINTS: {
     CATALOG: '/api/fetchStore',
   },
@@ -36,34 +36,25 @@ class ShopService {
     this.abortController = new AbortController()
 
     try {
-      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CATALOG}`
-
-      console.log(`📡 Fetching shop catalog from: ${url}`)
+      console.log(`📡 Fetching shop catalog from: ${API_CONFIG.ENDPOINTS.CATALOG}`)
 
       // Timeout de la requête
       const timeoutId = setTimeout(() => {
         this.abortController?.abort()
       }, API_CONFIG.TIMEOUT)
 
-      const response = await fetch(url, {
-        method: 'GET',
-        signal: this.abortController.signal,
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-      })
+      // Utilisation d'apiClient au lieu de fetch() manuel
+      // Cela évite les problèmes de conversion de path sur Git Bash Windows
+      // et utilise automatiquement le proxy Vite en dev
+      // Note: apiClient.get() retourne directement les données (pas besoin de .data)
+      const rawData = await apiClient.get<APIRawResponse>(
+        API_CONFIG.ENDPOINTS.CATALOG,
+        {
+          signal: this.abortController.signal,
+        }
+      )
 
       clearTimeout(timeoutId)
-
-      if (!response.ok) {
-        throw new ShopAPIError(
-          `Erreur HTTP: ${response.status} ${response.statusText}`,
-          response.status
-        )
-      }
-
-      const rawData: APIRawResponse = await response.json()
 
       // Validation basique de la structure (nouvelle structure: objet avec item_array)
       if (!rawData || typeof rawData !== 'object' || !Array.isArray(rawData.item_array)) {
@@ -76,16 +67,30 @@ class ShopService {
       console.log(`✅ Shop catalog loaded: ${data.references.length} references`)
 
       return data
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof ShopAPIError) {
         throw error
       }
 
-      if (error instanceof Error) {
-        if (error.name === 'AbortError') {
+      // Gestion des erreurs Axios
+      if (error.response) {
+        // Le serveur a répondu avec un code d'erreur
+        throw new ShopAPIError(
+          `Erreur HTTP: ${error.response.status} ${error.response.statusText}`,
+          error.response.status
+        )
+      }
+
+      if (error.request) {
+        // La requête a été faite mais pas de réponse
+        if (error.code === 'ECONNABORTED' || error.name === 'AbortError') {
           throw new ShopAPIError('Requête annulée ou timeout')
         }
+        throw new ShopAPIError('Aucune réponse du serveur')
+      }
 
+      // Autre type d'erreur
+      if (error instanceof Error) {
         throw new ShopAPIError(
           `Erreur lors de la récupération du catalogue: ${error.message}`,
           undefined,
