@@ -25,14 +25,14 @@ const icons = computed(() => ({
 }))
 
 /**
- * Supprime un article du panier
+ * Supprime un article du panier (appel API backend)
  */
-function handleRemoveItem(productId: string | number, productName: string) {
+async function handleRemoveItem(referenceId: number, productName: string) {
   try {
-    cartStore.removeItem(productId)
-    toast.success(`${productName} retiré du panier`)
+    await cartStore.removeItem(referenceId)
+    // Toast géré par le store
   } catch (error) {
-    toast.error('Erreur lors de la suppression')
+    // Toast d'erreur géré par le store
   }
 }
 
@@ -108,17 +108,26 @@ function formatPrice(price: number): string {
         <div class="max-h-64 overflow-y-auto space-y-3">
           <div
             v-for="item in cartStore.items.slice(0, 3)"
-            :key="item.id"
+            :key="item.itemId"
             class="flex gap-3 p-2 rounded-lg hover:bg-neutral-50 transition-colors"
           >
-            <!-- Image -->
-            <div class="w-16 h-16 flex-shrink-0 bg-neutral-100 rounded-md overflow-hidden">
+            <!-- Image avec badge quantité -->
+            <div class="w-16 h-16 flex-shrink-0 bg-neutral-100 rounded-md overflow-hidden relative">
               <img
-                v-if="item.image"
-                :src="item.image"
+                v-if="item.images && item.images[0]"
+                :src="item.images[0]"
                 :alt="item.name"
                 class="w-full h-full object-cover"
               />
+              <!-- Badge quantité si > 1 -->
+              <Badge
+                v-if="item.quantity > 1"
+                variant="default"
+                color="neutral-800"
+                class="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+              >
+                {{ item.quantity }}
+              </Badge>
             </div>
 
             <!-- Infos -->
@@ -126,16 +135,24 @@ function formatPrice(price: number): string {
               <p class="font-medium text-sm truncate" style="font-family: Roboto, sans-serif;">
                 {{ item.name }}
               </p>
-              <p class="font-semibold text-sm text-primary mt-1">
-                {{ formatPrice(item.price) }}
-              </p>
+              <div class="flex items-center gap-2 mt-1">
+                <!-- Prix réduit si applicable -->
+                <p class="font-semibold text-sm text-primary">
+                  {{ formatPrice(item.discountPrice ?? item.price) }}
+                </p>
+                <!-- Prix barré si réduction -->
+                <p v-if="item.discountPrice" class="text-xs text-neutral-500 line-through">
+                  {{ formatPrice(item.price) }}
+                </p>
+              </div>
             </div>
 
             <!-- Bouton supprimer -->
             <button
-              @click="handleRemoveItem(item.id, item.name)"
+              @click="handleRemoveItem(item.referenceId, item.name)"
               class="flex-shrink-0 text-neutral-400 hover:text-red-600 transition-colors p-1"
               title="Retirer du panier"
+              :disabled="cartStore.isLoading"
             >
               <FontAwesomeIcon v-if="icons.xmark" :icon="icons.xmark" class="h-4 w-4" />
             </button>

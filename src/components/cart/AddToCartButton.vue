@@ -1,19 +1,22 @@
 <script setup lang="ts">
 /**
  * Bouton réutilisable "Ajouter au panier"
- * Gère l'ajout avec feedback visuel (items uniques)
+ * Gère l'ajout avec feedback visuel et support des quantités
  */
 import { ref, computed } from 'vue'
 import { useCartStore } from '@/stores/cart.store'
 import { Button } from '@/components/ui/button'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
-import { toast } from 'vue-sonner'
 import { CartError } from '@/types/cart.types'
-import type { CartItem } from '@/types/cart.types'
 
 interface Props {
-  product: CartItem
+  /** ID de la référence produit */
+  referenceId: number
+  /** Nom du produit (pour feedback visuel optionnel) */
+  productName?: string
+  /** Quantité à ajouter (défaut: 1) */
+  quantity?: number
   variant?: 'default' | 'outline' | 'ghost'
   size?: 'default' | 'sm' | 'lg'
   fullWidth?: boolean
@@ -22,6 +25,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  quantity: 1,
   variant: 'default',
   size: 'default',
   fullWidth: false,
@@ -38,7 +42,7 @@ const icons = computed(() => ({
 }))
 
 /**
- * Ajoute le produit au panier
+ * Ajoute le produit au panier via l'API backend
  */
 async function addToCart() {
   if (isAdding.value || props.disabled) return
@@ -46,21 +50,15 @@ async function addToCart() {
   isAdding.value = true
 
   try {
-    cartStore.addItem(props.product)
-
-    // Feedback visuel de succès
-    toast.success(`${props.product.name} ajouté au panier`)
+    // Appel API backend (toast géré par le store)
+    await cartStore.addItem(props.referenceId, props.quantity)
 
     // Animation de succès
     setTimeout(() => {
       isAdding.value = false
     }, 1000)
   } catch (error) {
-    if (error instanceof CartError) {
-      toast.error(error.message)
-    } else {
-      toast.error('Impossible d\'ajouter au panier')
-    }
+    // Le store gère déjà l'affichage de l'erreur via toast
     isAdding.value = false
   }
 }
@@ -68,7 +66,7 @@ async function addToCart() {
 /**
  * Vérifie si le produit est dans le panier
  */
-const isInCart = computed(() => cartStore.hasItem(props.product.id))
+const isInCart = computed(() => cartStore.hasItem(props.referenceId))
 </script>
 
 <template>

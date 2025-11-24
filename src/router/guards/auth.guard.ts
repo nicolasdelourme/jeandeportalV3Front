@@ -44,7 +44,13 @@ export async function authGuard(
     // Vérifier si la route nécessite une authentification
     const requiresAuth = to.meta.requiresAuth
 
+    console.log('🛡️ [AUTH GUARD] Navigation vers:', to.path)
+    console.log('🛡️ [AUTH GUARD] requiresAuth:', requiresAuth)
+    console.log('🛡️ [AUTH GUARD] isAuthenticated:', authStore.isAuthenticated)
+    console.log('🛡️ [AUTH GUARD] user:', authStore.user)
+
     if (requiresAuth && !authStore.isAuthenticated) {
+        console.log('❌ [AUTH GUARD] Accès refusé, redirection vers /auth')
         // Valider l'URL de redirection pour prévenir les attaques open redirect
         const safePath = isValidRedirect(to.fullPath) ? to.fullPath : '/mon-compte'
 
@@ -56,6 +62,7 @@ export async function authGuard(
             }
         })
     } else {
+        console.log('✅ [AUTH GUARD] Accès autorisé')
         next()
     }
 }

@@ -1,6 +1,9 @@
 /**
  * Store Pinia pour l'authentification
- * Gère l'état de l'utilisateur connecté, le token et la session
+ * Gère l'état de l'utilisateur connecté et la session
+ *
+ * ⚠️ SÉCURITÉ: Les tokens JWT sont maintenant gérés via cookies HttpOnly
+ * Ce store ne gère plus les tokens - seulement les données utilisateur
  */
 
 import { defineStore } from 'pinia'
@@ -9,12 +12,9 @@ import type { User, LoginCredentials, RegisterCredentials } from '@/types/auth.t
 import { AuthError } from '@/types/auth.types'
 import { authService } from '@/services/auth.service'
 import {
-    getAuthToken,
-    setAuthToken,
     setAuthUser,
     clearAuthData,
-    isAuthenticated as checkIsAuthenticated,
-    getTimeUntilExpiry
+    getAuthUser
 } from '@/utils/auth'
 import { logger } from '@/utils/logger'
 import { sanitizeUser } from '@/utils/sanitize'
@@ -25,7 +25,6 @@ import { sanitizeUser } from '@/utils/sanitize'
 export const useAuthStore = defineStore('auth', () => {
     // === État ===
     const user = ref<User | null>(null)
-    const token = ref<string | null>(null)
     const isLoading = ref<boolean>(false)
     const error = ref<AuthError | null>(null)
 
@@ -33,9 +32,13 @@ export const useAuthStore = defineStore('auth', () => {
 
     /**
      * Vérifie si l'utilisateur est authentifié
+     *
+     * Note: La vérification réelle du token JWT se fait côté serveur
+     * Côté client, on vérifie seulement la présence des données utilisateur
+     * dans le store (user.value) qui est réactif, pas dans localStorage
      */
     const isAuthenticated = computed(() => {
-        return !!token.value && checkIsAuthenticated()
+        return user.value !== null
     })
 
     /**
@@ -46,40 +49,35 @@ export const useAuthStore = defineStore('auth', () => {
         return `${user.value.firstName} ${user.value.lastName}`
     })
 
-    /**
-     * Temps restant avant expiration du token (en secondes)
-     */
-    const timeUntilExpiry = computed(() => {
-        return getTimeUntilExpiry()
-    })
-
     // === Actions ===
 
     /**
-     * Initialise le store à partir du localStorage
+     * Initialise le store à partir du localStorage et valide la session
      * À appeler au démarrage de l'application
+     *
+     * Note: Le cookie HttpOnly est automatiquement envoyé par le navigateur
+     * On vérifie juste si le backend reconnaît la session
      */
     async function initialize(): Promise<void> {
-        const storedToken = getAuthToken()
+        const storedUser = getAuthUser()
 
-        if (!storedToken) return
+        if (!storedUser) return
 
         // ✅ Set loading state FIRST
         isLoading.value = true
 
         try {
-            // ✅ Fetch fresh data BEFORE setting authenticated state
-            const freshUser = await authService.getUserProfile(storedToken)
+            // ✅ Valide la session en récupérant le profil utilisateur
+            // Le cookie HttpOnly sera automatiquement envoyé avec la requête
+            const freshUser = await authService.getUserProfile()
 
             // ✅ Only set state AFTER successful validation
-            token.value = storedToken
             user.value = sanitizeUser(freshUser)
             setAuthUser(freshUser)
         } catch (error) {
-            // Token invalide ou expiré, on déconnecte
-            logger.warn('Token invalide lors de l\'initialisation, déconnexion')
+            // Cookie invalide ou expiré, on déconnecte
+            logger.warn('Session invalide lors de l\'initialisation, déconnexion')
             clearAuthData()
-            token.value = null
             user.value = null
         } finally {
             isLoading.value = false
@@ -88,28 +86,38 @@ export const useAuthStore = defineStore('auth', () => {
 
     /**
      * Connexion d'un utilisateur
+     *
+     * Note: Le backend définira le cookie HttpOnly automatiquement
+     * dans la réponse. Le navigateur stockera ce cookie et l'enverra
+     * automatiquement avec chaque requête ultérieure.
      */
     async function login(credentials: LoginCredentials): Promise<string> {
         isLoading.value = true
         error.value = null
 
         try {
+            console.log('🔐 [AUTH STORE] Début du login...')
+
             // Le service lance une exception si la réponse contient une erreur
+            // Le backend définit le cookie HttpOnly dans Set-Cookie header
             const response = await authService.login(credentials)
+            console.log('✅ [AUTH STORE] Login API réussi, response:', response)
 
-            // Sauvegarder le token
-            const authToken = response.access_token.token
-            token.value = authToken
-            setAuthToken(authToken, response.expires_in)
+            // Récupérer les infos utilisateur (le cookie sera envoyé automatiquement)
+            console.log('👤 [AUTH STORE] Récupération du profil utilisateur...')
+            const userProfile = await authService.getUserProfile()
+            console.log('✅ [AUTH STORE] Profil récupéré:', userProfile)
 
-            // Récupérer les infos utilisateur
-            const userProfile = await authService.getUserProfile(authToken)
             user.value = sanitizeUser(userProfile)  // ✅ Sanitized
             setAuthUser(userProfile)
+            console.log('✅ [AUTH STORE] User défini dans le store:', user.value)
 
             // Retourner l'URL de redirection
-            return response.afterLogin || '/'
+            const redirectUrl = response.afterLogin || '/'
+            console.log('🔀 [AUTH STORE] URL de redirection:', redirectUrl)
+            return redirectUrl
         } catch (err: any) {
+            console.error('❌ [AUTH STORE] Erreur lors du login:', err)
             error.value = err instanceof AuthError ? err : new AuthError(
                 'Une erreur est survenue lors de la connexion',
                 'UNKNOWN_ERROR'
@@ -122,6 +130,8 @@ export const useAuthStore = defineStore('auth', () => {
 
     /**
      * Inscription d'un nouvel utilisateur
+     *
+     * Note: Le backend définira le cookie HttpOnly automatiquement (auto-login)
      */
     async function register(credentials: RegisterCredentials): Promise<string> {
         isLoading.value = true
@@ -129,15 +139,11 @@ export const useAuthStore = defineStore('auth', () => {
 
         try {
             // Le service lance une exception si la réponse contient une erreur
+            // Le backend définit le cookie HttpOnly dans Set-Cookie header
             const response = await authService.register(credentials)
 
-            // Sauvegarder le token (auto-connexion après inscription)
-            const authToken = response.access_token.token
-            token.value = authToken
-            setAuthToken(authToken, response.expires_in)
-
-            // Récupérer les infos utilisateur
-            const userProfile = await authService.getUserProfile(authToken)
+            // Récupérer les infos utilisateur (auto-connexion après inscription)
+            const userProfile = await authService.getUserProfile()
             user.value = sanitizeUser(userProfile)  // ✅ Sanitized
             setAuthUser(userProfile)
 
@@ -156,18 +162,19 @@ export const useAuthStore = defineStore('auth', () => {
 
     /**
      * Déconnexion de l'utilisateur
+     *
+     * Note: Le backend supprimera le cookie HttpOnly (Max-Age=0)
      */
     async function logout(): Promise<void> {
         isLoading.value = true
 
         try {
-            // Appeler le backend pour invalider le token (optionnel mais recommandé)
+            // Appeler le backend pour supprimer le cookie HttpOnly
             await authService.logout()
         } catch (err) {
             logger.error('Erreur lors de la déconnexion côté serveur:', err)
         } finally {
             // Nettoyer l'état local (même si l'appel backend a échoué)
-            token.value = null
             user.value = null
             clearAuthData()
             isLoading.value = false
@@ -176,17 +183,19 @@ export const useAuthStore = defineStore('auth', () => {
 
     /**
      * Rafraîchit les données utilisateur
+     *
+     * Note: Le cookie HttpOnly sera automatiquement envoyé avec la requête
      */
     async function refreshUser(): Promise<void> {
-        if (!token.value) return
+        if (!user.value) return
 
         try {
-            const userProfile = await authService.getUserProfile(token.value)
+            const userProfile = await authService.getUserProfile()
             user.value = sanitizeUser(userProfile)  // ✅ Sanitized
             setAuthUser(userProfile)
         } catch (err) {
             logger.error('Erreur lors du rafraîchissement du profil:', err)
-            // Si le token est invalide, déconnecter
+            // Si le cookie est invalide, déconnecter
             await logout()
         }
     }
@@ -202,14 +211,12 @@ export const useAuthStore = defineStore('auth', () => {
     return {
         // State
         user,
-        token,
         isLoading,
         error,
 
         // Getters
         isAuthenticated,
         userFullName,
-        timeUntilExpiry,
 
         // Actions
         initialize,

@@ -24,11 +24,6 @@ export function useAuth() {
     const user = computed(() => authStore.user)
 
     /**
-     * Token d'authentification
-     */
-    const token = computed(() => authStore.token)
-
-    /**
      * État de chargement
      */
     const isLoading = computed(() => authStore.isLoading)
@@ -40,6 +35,10 @@ export function useAuth() {
 
     /**
      * Vérifie si l'utilisateur est authentifié
+     *
+     * Note: La vérification réelle du token JWT se fait côté serveur
+     * via le cookie HttpOnly. Côté client, on vérifie seulement la
+     * présence des données utilisateur.
      */
     const isAuthenticated = computed(() => authStore.isAuthenticated)
 
@@ -47,11 +46,6 @@ export function useAuth() {
      * Nom complet de l'utilisateur
      */
     const userFullName = computed(() => authStore.userFullName)
-
-    /**
-     * Temps restant avant expiration du token (en secondes)
-     */
-    const timeUntilExpiry = computed(() => authStore.timeUntilExpiry)
 
     // === Actions ===
 
@@ -118,14 +112,12 @@ export function useAuth() {
     return {
         // State
         user,
-        token,
         isLoading,
         error,
 
         // Getters
         isAuthenticated,
         userFullName,
-        timeUntilExpiry,
 
         // Actions
         login,

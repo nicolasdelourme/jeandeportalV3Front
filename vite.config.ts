@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
+import os from "os";
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -11,15 +12,18 @@ export default defineConfig({
             "@": path.resolve(__dirname, "./src"),
         },
     },
+    // Store Vite cache outside Dropbox to prevent file locking issues
+    cacheDir: path.join(os.tmpdir(), "vite-jdpv3"),
     server: {
         host: '0.0.0.0', // Écoute sur toutes les interfaces (IPv4 + IPv6)
         port: 3000,
         proxy: {
             "/api": {
-                target:
-                    process.env.VITE_API_BASE_URL || "http://localhost:3000",
+                target: "https://jeandeportal.fr",
                 changeOrigin: true,
-                rewrite: (path) => path.replace(/^\/api/, ""),
+                secure: true,
+                // Ne pas retirer /api, le backend attend /api/* dans l'URL
+                rewrite: (path) => path.replace(/^\/api/, "/api"),
             },
         },
     },

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * Page Panier
- * Page complète pour gérer le panier d'achat (items uniques)
+ * Page complète pour gérer le panier d'achat avec contrôles de quantité
  */
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
@@ -20,6 +20,8 @@ const cartStore = useCartStore()
 const icons = computed(() => ({
   shoppingCart: byPrefixAndName.fas?.['shopping-cart'],
   trash: byPrefixAndName.fas?.['trash'],
+  plus: byPrefixAndName.fas?.['plus'],
+  minus: byPrefixAndName.fas?.['minus'],
 }))
 
 /**
@@ -33,26 +35,52 @@ function formatPrice(price: number): string {
 }
 
 /**
- * Supprime un article
+ * Supprime un article (appel API backend)
  */
-function removeItem(productId: string | number, productName: string) {
+async function removeItem(referenceId: number, productName: string) {
   if (confirm(`Voulez-vous vraiment retirer "${productName}" du panier ?`)) {
     try {
-      cartStore.removeItem(productId)
-      toast.success(`${productName} retiré du panier`)
+      await cartStore.removeItem(referenceId)
+      // Toast géré par le store
     } catch (error) {
-      toast.error('Erreur lors de la suppression')
+      // Toast d'erreur géré par le store
     }
   }
 }
 
 /**
- * Vide le panier
+ * Vide le panier (appel API backend)
  */
-function clearCart() {
+async function clearCart() {
   if (confirm('Voulez-vous vraiment vider le panier ?')) {
-    cartStore.clearCart()
-    toast.success('Panier vidé')
+    try {
+      await cartStore.clearCart()
+      // Toast géré par le store
+    } catch (error) {
+      // Toast d'erreur géré par le store
+    }
+  }
+}
+
+/**
+ * Augmente la quantité d'un article
+ */
+async function increaseQuantity(referenceId: number) {
+  try {
+    await cartStore.increaseQuantity(referenceId)
+  } catch (error) {
+    // Toast d'erreur géré par le store
+  }
+}
+
+/**
+ * Diminue la quantité d'un article
+ */
+async function decreaseQuantity(referenceId: number) {
+  try {
+    await cartStore.decreaseQuantity(referenceId)
+  } catch (error) {
+    // Toast d'erreur géré par le store
   }
 }
 
@@ -143,15 +171,15 @@ function goToCheckout() {
           <div class="space-y-4">
             <div
               v-for="item in cartStore.items"
-              :key="item.id"
+              :key="item.itemId"
               class="bg-white border border-neutral-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
             >
               <div class="flex gap-4">
                 <!-- Image -->
                 <div class="w-24 h-24 flex-shrink-0 bg-neutral-100 rounded-md overflow-hidden">
                   <img
-                    v-if="item.image"
-                    :src="item.image"
+                    v-if="item.images && item.images[0]"
+                    :src="item.images[0]"
                     :alt="item.name"
                     class="w-full h-full object-cover"
                   />
@@ -164,18 +192,50 @@ function goToCheckout() {
                     <h3 class="font-semibold text-lg mb-1" style="font-family: Roboto, sans-serif;">
                       {{ item.name }}
                     </h3>
-                    <p class="font-bold text-lg text-primary mt-2">
-                      {{ formatPrice(item.price) }}
-                    </p>
+                    <div class="flex items-center gap-2 mt-2">
+                      <!-- Prix réduit si applicable -->
+                      <p class="font-bold text-lg text-primary">
+                        {{ formatPrice(item.discountPrice ?? item.price) }}
+                      </p>
+                      <!-- Prix barré si réduction -->
+                      <p v-if="item.discountPrice" class="text-sm text-neutral-500 line-through">
+                        {{ formatPrice(item.price) }}
+                      </p>
+                    </div>
                   </div>
 
-                  <!-- Bouton suppression -->
-                  <div class="flex items-center justify-end mt-3">
+                  <!-- Contrôles quantité et suppression -->
+                  <div class="flex items-center justify-between mt-3">
+                    <!-- Contrôles quantité -->
+                    <div class="flex items-center gap-2 border border-neutral-300 rounded-md">
+                      <Button
+                        @click="decreaseQuantity(item.referenceId)"
+                        variant="ghost"
+                        size="sm"
+                        class="h-8 w-8 p-0"
+                        :disabled="cartStore.isLoading"
+                      >
+                        <FontAwesomeIcon v-if="icons.minus" :icon="icons.minus" class="h-3 w-3" />
+                      </Button>
+                      <span class="px-3 font-medium">{{ item.quantity }}</span>
+                      <Button
+                        @click="increaseQuantity(item.referenceId)"
+                        variant="ghost"
+                        size="sm"
+                        class="h-8 w-8 p-0"
+                        :disabled="cartStore.isLoading"
+                      >
+                        <FontAwesomeIcon v-if="icons.plus" :icon="icons.plus" class="h-3 w-3" />
+                      </Button>
+                    </div>
+
+                    <!-- Bouton suppression -->
                     <Button
-                      @click="removeItem(item.id, item.name)"
+                      @click="removeItem(item.referenceId, item.name)"
                       variant="ghost"
                       size="sm"
                       class="text-red-600 hover:text-red-700"
+                      :disabled="cartStore.isLoading"
                     >
                       <FontAwesomeIcon v-if="icons.trash" :icon="icons.trash" class="h-4 w-4 mr-2" />
                       Retirer
@@ -246,11 +306,6 @@ function goToCheckout() {
             >
               Continuer mes achats
             </Button>
-
-            <!-- Info expiration -->
-            <p class="text-xs text-neutral-500 text-center mt-4">
-              Votre panier expire dans {{ cartStore.daysUntilExpiry }} jour{{ cartStore.daysUntilExpiry > 1 ? 's' : '' }}
-            </p>
           </div>
         </div>
       </div>

@@ -1,10 +1,13 @@
 import axios, { type AxiosInstance, type AxiosRequestConfig } from "axios"
-import { getAuthToken, clearAuthData } from '@/utils/auth'
+import { clearAuthData } from '@/utils/auth'
 import { logger } from '@/utils/logger'
 
 /**
  * Client API centralisé basé sur Axios
  * Configuré avec la base URL et les intercepteurs d'authentification
+ *
+ * ⚠️ SÉCURITÉ: Utilise des cookies HttpOnly au lieu de localStorage
+ * Les tokens JWT sont automatiquement envoyés via cookies (withCredentials: true)
  */
 class ApiClient {
     private axiosInstance: AxiosInstance
@@ -12,7 +15,8 @@ class ApiClient {
     constructor() {
         this.axiosInstance = axios.create({
             baseURL: import.meta.env.VITE_API_BASE_URL || "/api",
-            timeout: 5000,  // ✅ Réduit de 10s à 5s
+            timeout: 5000,
+            withCredentials: true,  // ✅ Envoie automatiquement les cookies HttpOnly
             headers: {
                 "Content-Type": "application/json",
                 "X-Requested-With": "XMLHttpRequest",  // ✅ Protection CSRF
@@ -23,30 +27,18 @@ class ApiClient {
     }
 
     /**
-     * Configure les intercepteurs pour ajouter le token Bearer automatiquement
+     * Configure les intercepteurs pour gérer les erreurs d'authentification
+     *
+     * Note: Pas besoin d'ajouter le token manuellement - les cookies HttpOnly
+     * sont automatiquement envoyés par le navigateur avec chaque requête
      */
     private setupInterceptors(): void {
-        // Request interceptor - Ajoute le token Bearer si disponible
-        this.axiosInstance.interceptors.request.use(
-            (config) => {
-                // ✅ Utilise getAuthToken() qui valide l'expiration
-                const token = getAuthToken()
-                if (token) {
-                    config.headers.Authorization = `Bearer ${token}`
-                }
-                return config
-            },
-            (error) => {
-                return Promise.reject(error)
-            }
-        )
-
         // Response interceptor - Gère les erreurs d'authentification
         this.axiosInstance.interceptors.response.use(
             (response) => response,
             async (error) => {
                 if (error.response?.status === 401) {
-                    // Token expiré ou invalide - nettoyage complet
+                    // Session expirée ou invalide - nettoyage des données utilisateur
                     clearAuthData()
 
                     logger.warn('Session expirée (401), redirection vers /auth')

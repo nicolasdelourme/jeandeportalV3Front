@@ -1,78 +1,46 @@
 /**
  * Store Pinia pour la gestion du panier
- * - Persistance dans localStorage avec expiration (7 jours)
- * - Items uniques (pas de quantités multiples)
- * - Calcul du total
+ *
+ * ⚠️ MIGRATION: Passage de localStorage uniquement à synchronisation backend
+ * - Ancien système: items uniques en localStorage avec expiration 7 jours
+ * - Nouveau système: items avec quantités synchronisés avec backend API
+ *
+ * Les paniers localStorage existants sont automatiquement vidés au profit du backend
  */
 
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { CartItem, CartState } from '@/types/cart.types'
+import type { CartItem, CartState, CartReceipt } from '@/types/cart.types'
 import { CartError, CART_CONFIG } from '@/types/cart.types'
+import { cartService } from '@/services/cart.service'
 import { decodeHtmlEntities } from '@/utils/html.utils'
+import { toast } from 'vue-sonner'
 
 /**
- * Charge le panier depuis localStorage
+ * Crée un état de panier vide
  */
-function loadCartFromStorage(): CartState {
-  try {
-    const stored = localStorage.getItem(CART_CONFIG.STORAGE_KEY)
-    if (!stored) {
-      return createEmptyCart()
-    }
-
-    const cart: CartState = JSON.parse(stored)
-
-    // Vérifier si le panier a expiré
-    if (Date.now() > cart.expiresAt) {
-      localStorage.removeItem(CART_CONFIG.STORAGE_KEY)
-      return createEmptyCart()
-    }
-
-    // Nettoyer et valider les items (supprimer quantity si présente, valider prix, décoder HTML)
-    const validItems = cart.items
-      .map((item: any) => ({
-        id: item.id,
-        name: decodeHtmlEntities(item.name),
-        price: Number(item.price) || 0,
-        priceHT: Number(item.priceHT) || 0,        // ✅ Prix HT exact
-        vatRate: Number(item.vatRate) || 0,        // ✅ Taux TVA réel
-        image: item.image,
-        slug: item.slug,
-        physical: item.physical,
-        immaterial: item.immaterial,
-      }))
-      .filter((item) => item.price > 0) // Supprimer les items avec prix invalide
-
-    return {
-      items: validItems,
-      expiresAt: cart.expiresAt,
-    }
-  } catch (error) {
-    console.error('Erreur lors du chargement du panier:', error)
-    return createEmptyCart()
-  }
-}
-
-/**
- * Sauvegarde le panier dans localStorage
- */
-function saveCartToStorage(cart: CartState): void {
-  try {
-    localStorage.setItem(CART_CONFIG.STORAGE_KEY, JSON.stringify(cart))
-  } catch (error) {
-    console.error('Erreur lors de la sauvegarde du panier:', error)
-  }
-}
-
-/**
- * Crée un panier vide avec expiration
- */
-function createEmptyCart(): CartState {
-  const expiresAt = Date.now() + CART_CONFIG.EXPIRY_DAYS * 24 * 60 * 60 * 1000
+function createEmptyCartState(): CartState {
   return {
     items: [],
-    expiresAt,
+    receipt: null,
+    isLoading: false,
+    isSynced: false,
+    lastSyncTimestamp: 0,
+  }
+}
+
+/**
+ * Vide l'ancien panier localStorage (migration)
+ */
+function clearOldLocalStorageCart(): void {
+  try {
+    const oldCart = localStorage.getItem(CART_CONFIG.STORAGE_KEY)
+    if (oldCart) {
+      localStorage.removeItem(CART_CONFIG.STORAGE_KEY)
+      console.info('🛒 [CART STORE] Ancien panier localStorage vidé (migration vers backend)')
+    }
+  } catch (error) {
+    console.error('Erreur lors du nettoyage du localStorage:', error)
   }
 }
 
@@ -81,7 +49,7 @@ function createEmptyCart(): CartState {
  */
 export const useCartStore = defineStore('cart', () => {
   // === État ===
-  const cartState = ref<CartState>(loadCartFromStorage())
+  const cartState = ref<CartState>(createEmptyCartState())
 
   // === Getters ===
 
@@ -91,54 +59,86 @@ export const useCartStore = defineStore('cart', () => {
   const items = computed(() => cartState.value.items)
 
   /**
-   * Nombre d'articles dans le panier
+   * Récapitulatif du panier (backend receipt)
    */
-  const itemCount = computed(() => cartState.value.items.length)
+  const receipt = computed(() => cartState.value.receipt)
 
   /**
-   * Total du panier TTC (somme des prix)
+   * État de chargement
    */
-  const subtotal = computed(() => {
+  const isLoading = computed(() => cartState.value.isLoading)
+
+  /**
+   * Panier synchronisé avec backend
+   */
+  const isSynced = computed(() => cartState.value.isSynced)
+
+  /**
+   * ⚠️ CHANGEMENT: Nombre d'articles = somme des quantités
+   * Avant: items.length (items uniques)
+   * Après: sum(item.quantity)
+   */
+  const itemCount = computed(() => {
     return cartState.value.items.reduce((total, item) => {
-      const price = Number(item.price) || 0
-      return total + price
+      return total + (item.quantity || 0)
     }, 0)
   })
 
   /**
-   * Montant HT (hors taxe) - EXACT depuis l'API
+   * Total du panier TTC
+   * Priorité au receipt backend si disponible, sinon calcul local
+   */
+  const subtotal = computed(() => {
+    // Si on a le receipt backend, l'utiliser (plus fiable)
+    if (cartState.value.receipt) {
+      return cartState.value.receipt.discountTotal
+    }
+
+    // Sinon, calcul local (fallback)
+    return cartState.value.items.reduce((total, item) => {
+      const price = item.discountPrice ?? item.price
+      const quantity = item.quantity || 0
+      return total + price * quantity
+    }, 0)
+  })
+
+  /**
+   * Montant HT (hors taxe)
+   * Calcul depuis les items avec quantités
    */
   const subtotalExclVAT = computed(() => {
     return cartState.value.items.reduce((total, item) => {
-      const priceHT = Number(item.priceHT) || 0
-      return total + priceHT
+      const priceHT = item.HTDiscount ?? item.priceHT
+      const quantity = item.quantity || 0
+      return total + priceHT * quantity
     }, 0)
   })
 
   /**
-   * Montant de la TVA - EXACT depuis l'API
+   * Montant de la TVA
+   * Priorité au receipt backend si disponible
    */
   const vatAmount = computed(() => {
-    return cartState.value.items.reduce((total, item) => {
-      const priceTTC = Number(item.price) || 0
-      const priceHT = Number(item.priceHT) || 0
-      const vat = priceTTC - priceHT
-      return total + vat
-    }, 0)
+    // Si on a le receipt backend, l'utiliser
+    if (cartState.value.receipt) {
+      return cartState.value.receipt.tax
+    }
+
+    // Sinon, calcul local
+    return subtotal.value - subtotalExclVAT.value
   })
 
   /**
    * TVA groupée par taux (pour affichage détaillé)
-   * Retourne un objet { "2.1": montant, "5.5": montant, "20": montant }
    */
   const vatByRate = computed(() => {
     const vatMap: Record<string, number> = {}
 
     cartState.value.items.forEach((item) => {
       const vatRate = item.vatRate || 0
-      const priceTTC = Number(item.price) || 0
-      const priceHT = Number(item.priceHT) || 0
-      const vatAmount = priceTTC - priceHT
+      const priceTTC = item.discountPrice ?? item.price
+      const priceHT = item.HTDiscount ?? item.priceHT
+      const vatAmount = (priceTTC - priceHT) * (item.quantity || 0)
 
       const key = vatRate.toString()
       vatMap[key] = (vatMap[key] || 0) + vatAmount
@@ -153,107 +153,224 @@ export const useCartStore = defineStore('cart', () => {
   const isEmpty = computed(() => cartState.value.items.length === 0)
 
   /**
-   * Trouve un article par ID
+   * Trouve un article par referenceId
    */
-  const findItem = (productId: string | number): CartItem | undefined => {
-    return cartState.value.items.find(item => item.id === productId)
+  const findItem = (referenceId: number): CartItem | undefined => {
+    return cartState.value.items.find(item => item.referenceId === referenceId)
   }
 
   /**
    * Vérifie si un produit est dans le panier
    */
-  const hasItem = (productId: string | number): boolean => {
-    return findItem(productId) !== undefined
+  const hasItem = (referenceId: number): boolean => {
+    return findItem(referenceId) !== undefined
   }
 
   // === Actions ===
 
   /**
-   * Ajoute un article au panier (item unique)
+   * Synchronise le panier avec le backend
+   * Charge le panier complet depuis l'API
    */
-  function addItem(product: CartItem): void {
-    const existingItem = findItem(product.id)
+  async function syncWithBackend(): Promise<void> {
+    cartState.value.isLoading = true
 
-    if (existingItem) {
-      // L'article existe déjà dans le panier
-      throw new CartError(
-        'Ce produit est déjà dans votre panier',
-        'ITEM_ALREADY_IN_CART'
-      )
+    try {
+      console.log('🔄 [CART STORE] Synchronisation avec le backend...')
+
+      const response = await cartService.fetchCart()
+      const mapped = cartService.mapAPIResponse(response)
+
+      cartState.value.items = mapped.items
+      cartState.value.receipt = mapped.receipt
+      cartState.value.isSynced = true
+      cartState.value.lastSyncTimestamp = Date.now()
+
+      console.log(`✅ [CART STORE] Panier synchronisé: ${mapped.items.length} items`)
+    } catch (error) {
+      console.error('❌ [CART STORE] Erreur lors de la synchronisation:', error)
+      toast.error('Impossible de charger le panier')
+      throw error
+    } finally {
+      cartState.value.isLoading = false
+    }
+  }
+
+  /**
+   * Initialise le panier au chargement de l'application
+   * Vide l'ancien localStorage et charge depuis backend
+   */
+  async function initialize(): Promise<void> {
+    // Vider l'ancien panier localStorage (migration)
+    clearOldLocalStorageCart()
+
+    // Charger le panier depuis le backend
+    try {
+      await syncWithBackend()
+    } catch (error) {
+      // En cas d'erreur, panier vide (normal pour utilisateur non connecté sans session)
+      console.info('🛒 [CART STORE] Panier vide ou non accessible (normal si pas de session)')
+    }
+  }
+
+  /**
+   * ⚠️ CHANGEMENT: addItem devient async et appelle le backend
+   * Avant: Ajout local immédiat en localStorage
+   * Après: Appel API puis mise à jour du store
+   *
+   * @param referenceId - ID de la référence à ajouter
+   * @param quantity - Quantité à ajouter (défaut: 1)
+   */
+  async function addItem(referenceId: number, quantity: number = CART_CONFIG.DEFAULT_QUANTITY): Promise<void> {
+    cartState.value.isLoading = true
+
+    try {
+      console.log(`🛒 [CART STORE] Ajout au panier: referenceId=${referenceId}, quantity=${quantity}`)
+
+      const response = await cartService.addToCart(referenceId, quantity)
+      const mapped = cartService.mapAPIResponse(response)
+
+      cartState.value.items = mapped.items
+      cartState.value.receipt = mapped.receipt
+      cartState.value.isSynced = true
+      cartState.value.lastSyncTimestamp = Date.now()
+
+      toast.success('Article ajouté au panier')
+      console.log('✅ [CART STORE] Article ajouté')
+    } catch (error: any) {
+      console.error('❌ [CART STORE] Erreur lors de l\'ajout:', error)
+      toast.error(error.message || 'Impossible d\'ajouter l\'article')
+      throw error
+    } finally {
+      cartState.value.isLoading = false
+    }
+  }
+
+  /**
+   * ⚠️ NOUVEAU: Met à jour la quantité d'un article
+   *
+   * @param referenceId - ID de la référence à modifier
+   * @param quantity - Nouvelle quantité (0 = supprimer)
+   */
+  async function updateItemQuantity(referenceId: number, quantity: number): Promise<void> {
+    cartState.value.isLoading = true
+
+    try {
+      console.log(`🛒 [CART STORE] Mise à jour quantité: referenceId=${referenceId}, quantity=${quantity}`)
+
+      const response = await cartService.updateQuantity(referenceId, quantity)
+      const mapped = cartService.mapAPIResponse(response)
+
+      cartState.value.items = mapped.items
+      cartState.value.receipt = mapped.receipt
+      cartState.value.lastSyncTimestamp = Date.now()
+
+      if (quantity === 0) {
+        toast.success('Article retiré du panier')
+      } else {
+        toast.success('Quantité mise à jour')
+      }
+
+      console.log('✅ [CART STORE] Quantité mise à jour')
+    } catch (error: any) {
+      console.error('❌ [CART STORE] Erreur lors de la mise à jour:', error)
+      toast.error(error.message || 'Impossible de modifier la quantité')
+      throw error
+    } finally {
+      cartState.value.isLoading = false
+    }
+  }
+
+  /**
+   * ⚠️ CHANGEMENT: removeItem devient async et appelle le backend
+   *
+   * @param referenceId - ID de la référence à supprimer
+   */
+  async function removeItem(referenceId: number): Promise<void> {
+    return updateItemQuantity(referenceId, 0)
+  }
+
+  /**
+   * ⚠️ CHANGEMENT: clearCart appelle le backend pour supprimer tous les items
+   */
+  async function clearCart(): Promise<void> {
+    if (cartState.value.items.length === 0) {
+      return
     }
 
-    // Normaliser le produit (s'assurer que price est un nombre et décoder les entités HTML)
-    const normalizedProduct: CartItem = {
-      ...product,
-      name: decodeHtmlEntities(product.name),
-      price: Number(product.price) || 0,
-      priceHT: Number(product.priceHT) || 0,        // ✅ Prix HT exact
-      vatRate: Number(product.vatRate) || 0,        // ✅ Taux TVA réel
+    cartState.value.isLoading = true
+
+    try {
+      console.log('🛒 [CART STORE] Vidage du panier')
+
+      const response = await cartService.clearCart(cartState.value.items)
+      const mapped = cartService.mapAPIResponse(response)
+
+      cartState.value.items = mapped.items
+      cartState.value.receipt = mapped.receipt
+      cartState.value.lastSyncTimestamp = Date.now()
+
+      toast.success('Panier vidé')
+      console.log('✅ [CART STORE] Panier vidé')
+    } catch (error: any) {
+      console.error('❌ [CART STORE] Erreur lors du vidage:', error)
+      toast.error(error.message || 'Impossible de vider le panier')
+      throw error
+    } finally {
+      cartState.value.isLoading = false
+    }
+  }
+
+  /**
+   * Augmente la quantité d'un article de 1
+   */
+  async function increaseQuantity(referenceId: number): Promise<void> {
+    const item = findItem(referenceId)
+    if (!item) {
+      throw new CartError('Article non trouvé', 'ITEM_NOT_FOUND')
+    }
+    return updateItemQuantity(referenceId, item.quantity + 1)
+  }
+
+  /**
+   * Diminue la quantité d'un article de 1
+   */
+  async function decreaseQuantity(referenceId: number): Promise<void> {
+    const item = findItem(referenceId)
+    if (!item) {
+      throw new CartError('Article non trouvé', 'ITEM_NOT_FOUND')
     }
 
-    // Nouvel article : l'ajouter au panier
-    cartState.value.items.push(normalizedProduct)
-    saveCartToStorage(cartState.value)
+    const newQuantity = Math.max(0, item.quantity - 1)
+    return updateItemQuantity(referenceId, newQuantity)
   }
-
-  /**
-   * Supprime un article du panier
-   */
-  function removeItem(productId: string | number): void {
-    const index = cartState.value.items.findIndex(item => item.id === productId)
-
-    if (index === -1) {
-      throw new CartError('Produit non trouvé dans le panier', 'ITEM_NOT_FOUND')
-    }
-
-    cartState.value.items.splice(index, 1)
-    saveCartToStorage(cartState.value)
-  }
-
-  /**
-   * Vide complètement le panier
-   */
-  function clearCart(): void {
-    cartState.value = createEmptyCart()
-    saveCartToStorage(cartState.value)
-  }
-
-  /**
-   * Prolonge la durée de vie du panier (renouvelle l'expiration)
-   */
-  function renewCart(): void {
-    cartState.value.expiresAt = Date.now() + CART_CONFIG.EXPIRY_DAYS * 24 * 60 * 60 * 1000
-    saveCartToStorage(cartState.value)
-  }
-
-  /**
-   * Obtient le nombre de jours restants avant expiration
-   */
-  const daysUntilExpiry = computed(() => {
-    const msUntilExpiry = cartState.value.expiresAt - Date.now()
-    return Math.ceil(msUntilExpiry / (24 * 60 * 60 * 1000))
-  })
 
   // === Return (API publique du store) ===
   return {
     // State
     items,
+    receipt,
+    isLoading,
+    isSynced,
     itemCount,
     subtotal,
     subtotalExclVAT,
     vatAmount,
     vatByRate,
     isEmpty,
-    daysUntilExpiry,
 
     // Getters
     findItem,
     hasItem,
 
     // Actions
+    initialize,
+    syncWithBackend,
     addItem,
+    updateItemQuantity,
     removeItem,
     clearCart,
-    renewCart,
+    increaseQuantity,
+    decreaseQuantity,
   }
 })

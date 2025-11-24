@@ -143,18 +143,21 @@ export class AuthService {
 
     /**
      * Récupère le profil de l'utilisateur connecté
+     *
+     * Note: Le cookie HttpOnly est automatiquement envoyé par le navigateur
+     * avec la requête (withCredentials: true dans axios config)
      */
-    async getUserProfile(token: string): Promise<User> {
+    async getUserProfile(): Promise<User> {
         try {
             if (USE_MOCK) {
                 // Utiliser le mock
-                const user = await mockGetUserProfileAPI(token)
+                const user = await mockGetUserProfileAPI()
                 if (!user) {
                     throw new Error('Utilisateur non trouvé')
                 }
                 return user
             } else {
-                // Appel API réel
+                // Appel API réel - le cookie sera automatiquement envoyé
                 const response = await apiClient.get<User>('/auth/me')
                 return response
             }

@@ -45,23 +45,31 @@ const handleLoginSubmit = async (values: { email: string; password: string; reme
     errors.value.general = '' // Clear previous errors
 
     try {
+        console.log('📝 [AUTH PAGE] Soumission du formulaire de login...')
+
         // Récupérer l'URL de redirection depuis les query params (si l'utilisateur a essayé d'accéder à une page protégée)
         const redirectUrl = (route.query.redirect as string) || undefined
+        console.log('🔗 [AUTH PAGE] Redirect URL depuis query params:', redirectUrl)
 
         // Appeler le store pour se connecter
+        console.log('📞 [AUTH PAGE] Appel authStore.login()...')
         const afterLoginUrl = await authStore.login({
             email: values.email,
             password: values.password,
             rememberMe: values.rememberMe,
             redirectUrl
         })
+        console.log('✅ [AUTH PAGE] authStore.login() terminé, afterLoginUrl:', afterLoginUrl)
 
         toast.success('Connexion réussie !')
 
         // Rediriger vers l'URL retournée par le backend (ou l'URL d'origine si disponible)
-        router.push(redirectUrl || afterLoginUrl)
+        const finalUrl = redirectUrl || afterLoginUrl
+        console.log('🚀 [AUTH PAGE] Redirection vers:', finalUrl)
+        await router.push(finalUrl)
+        console.log('✅ [AUTH PAGE] router.push() terminé')
     } catch (error: any) {
-        console.error('Erreur:', error)
+        console.error('❌ [AUTH PAGE] Erreur lors du login:', error)
         errors.value.general = error.message || 'Identifiants incorrects. Veuillez réessayer.'
     } finally {
         isSubmitting.value = false
