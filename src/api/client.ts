@@ -16,7 +16,10 @@ class ApiClient {
         this.axiosInstance = axios.create({
             baseURL: import.meta.env.VITE_API_BASE_URL || "/api",
             timeout: 5000,
-            withCredentials: true,  // ✅ Envoie automatiquement les cookies HttpOnly
+            // ✅ withCredentials uniquement en production pour éviter les erreurs CORS en dev
+            // En dev: false (pas de cookies, pas de CORS errors)
+            // En prod: true (envoie les cookies HttpOnly)
+            withCredentials: import.meta.env.PROD,
             headers: {
                 "Content-Type": "application/json",
                 "X-Requested-With": "XMLHttpRequest",  // ✅ Protection CSRF

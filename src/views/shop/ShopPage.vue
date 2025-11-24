@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * Page ShopPage
- * Landing page de la boutique avec filtres, recherche et grille de produits
+ * Landing page de la boutique avec hero carrousel et grille de produits
  */
 import { onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
@@ -9,12 +9,12 @@ import { toast } from 'vue-sonner'
 import DefaultLayout from '@/components/layout/DefaultLayout.vue'
 import { useShopStore } from '@/stores/shop.store'
 import { useCartStore } from '@/stores/cart.store'
-import ShopSearchBar from '@/components/shop/ShopSearchBar.vue'
+import ShopHeroCarousel from '@/components/shop/ShopHeroCarousel.vue'
+// import ShopSearchBar from '@/components/shop/ShopSearchBar.vue' // ⚠️ Désactivé temporairement - à réactiver plus tard (décision chef de projet)
 import ShopSort from '@/components/shop/ShopSort.vue'
 import ShopFilters from '@/components/shop/ShopFilters.vue'
 import ProductGrid from '@/components/shop/ProductGrid.vue'
 import type { ShopReference } from '@/types/shop-api.types'
-import { getShopImageUrl } from '@/types/shop-api.types'
 import { CartError } from '@/types/cart.types'
 
 const router = useRouter()
@@ -71,27 +71,28 @@ const handleAddToCart = async (reference: ShopReference) => {
 
 <template>
   <DefaultLayout>
-    <div class="min-h-screen bg-gray-50">
-      <!-- Hero Section -->
-      <section class="bg-white border-b border-gray-200 py-12">
+    <div class="min-h-screen bg-gradient-to-br from-neutral-50 to-white">
+      <!-- Hero Carrousel -->
+      <ShopHeroCarousel />
+
+      <!--
+        ⚠️ PLACEHOLDER RECHERCHE
+        La barre de recherche sera activée plus tard (décision chef de projet)
+        Position prévue : ici, entre le hero et les filtres
+        Layout sans recherche : fonctionne bien tel quel
+      -->
+      <!--
+      <section class="bg-white/50 backdrop-blur-sm border-b border-neutral-200/50 py-6">
         <div class="max-w-7xl mx-auto px-4">
-          <!-- Header avec titre et sous-titre -->
-          <div class="text-center mb-8">
-            <h1 class="text-4xl md:text-5xl font-bold text-neutral-800 mb-3" style="font-family: Roboto, sans-serif;">
-              La boutique
-            </h1>
-
-            <p class="text-lg text-neutral-600 max-w-2xl mx-auto">
-              Découvrez notre sélection de métaux précieux, formations et outils pour développer votre patrimoine
-            </p>
-          </div>
-
-          <!-- Barre de recherche centrée -->
           <div class="max-w-2xl mx-auto">
             <ShopSearchBar />
           </div>
         </div>
       </section>
+      -->
+
+      <!-- Séparateur avec accent doré -->
+      <div class="h-px bg-gradient-to-r from-transparent via-yellow-400/30 to-transparent"></div>
 
       <!-- Contenu principal -->
       <section class="max-w-6xl mx-auto px-4 py-8">
