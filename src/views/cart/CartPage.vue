@@ -243,7 +243,6 @@ function goToCheckout() {
               variant="outline"
               color="neutral-800"
               class="w-full mt-3"
-              size=""
             >
               Continuer mes achats
             </Button>

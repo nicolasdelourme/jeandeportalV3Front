@@ -181,8 +181,8 @@ export function usePlayerConsultation(consultationId?: number | Ref<number>) {
     }
 
     // Parser l'heure de début et de fin
-    const [heureDebutH, heureDebutM] = consultation.value.heureDebut.split(':').map(Number)
-    const [heureFinH, heureFinM] = consultation.value.heureFin.split(':').map(Number)
+    const [heureDebutH = 0, heureDebutM = 0] = consultation.value.heureDebut.split(':').map(Number)
+    const [heureFinH = 0, heureFinM = 0] = consultation.value.heureFin.split(':').map(Number)
 
     const debut = new Date(consultationDate)
     debut.setHours(heureDebutH, heureDebutM, 0, 0)

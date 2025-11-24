@@ -73,12 +73,17 @@ export interface AuthState {
  * Erreurs d'authentification
  */
 export class AuthError extends Error {
+    code: 'INVALID_CREDENTIALS' | 'TOKEN_EXPIRED' | 'NETWORK_ERROR' | 'UNKNOWN_ERROR' | 'USER_EXISTS'
+    statusCode?: number
+
     constructor(
         message: string,
-        public code: 'INVALID_CREDENTIALS' | 'TOKEN_EXPIRED' | 'NETWORK_ERROR' | 'UNKNOWN_ERROR' | 'USER_EXISTS',
-        public statusCode?: number
+        code: 'INVALID_CREDENTIALS' | 'TOKEN_EXPIRED' | 'NETWORK_ERROR' | 'UNKNOWN_ERROR' | 'USER_EXISTS',
+        statusCode?: number
     ) {
         super(message)
         this.name = 'AuthError'
+        this.code = code
+        this.statusCode = statusCode
     }
 }

@@ -9,7 +9,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
@@ -51,11 +50,17 @@ const goToSubscriptionPage = () => {
 }
 
 /**
- * Annuler l'abonnement (modal de confirmation)
+ * Naviguer vers la page des factures d'abonnement
  */
-const cancelSubscription = async () => {
-    // TODO: Appeler l'API d'annulation
-    console.log('Annulation abonnement')
+const goToInvoicesPage = () => {
+    router.push('/mon-compte/factures-abonnement')
+}
+
+/**
+ * Naviguer vers le tunnel d'annulation
+ */
+const goToCancelSubscription = () => {
+    router.push('/mon-compte/annuler-abonnement')
 }
 </script>
 
@@ -135,34 +140,11 @@ const cancelSubscription = async () => {
                         </span>
                     </Button>
 
-                    <Dialog>
-                        <DialogTrigger as-child>
-                            <Button variant="outline">
-                                <span class="font-medium" style="font-family: Roboto, sans-serif;">
-                                    Annuler l'abonnement
-                                </span>
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle style="font-family: Roboto, sans-serif;">
-                                    Annuler votre abonnement ?
-                                </DialogTitle>
-                                <DialogDescription style="font-family: Roboto, sans-serif;">
-                                    Vous perdrez l'accès aux consultations à la fin de la période de facturation en cours.
-                                    Cette action est irréversible.
-                                </DialogDescription>
-                            </DialogHeader>
-                            <DialogFooter>
-                                <Button variant="outline">
-                                    <span style="font-family: Roboto, sans-serif;">Annuler</span>
-                                </Button>
-                                <Button variant="destructive" @click="cancelSubscription">
-                                    <span style="font-family: Roboto, sans-serif;">Confirmer l'annulation</span>
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
+                    <Button variant="outline" @click="goToCancelSubscription">
+                        <span class="font-medium" style="font-family: Roboto, sans-serif;">
+                            Annuler l'abonnement
+                        </span>
+                    </Button>
                 </div>
             </CardContent>
         </Card>
@@ -192,19 +174,22 @@ const cancelSubscription = async () => {
         <!-- Historique de facturation -->
         <Card>
             <CardHeader>
-                <CardTitle style="font-family: Roboto, sans-serif;">
-                    <FontAwesomeIcon v-if="getIcon('receipt')" :icon="getIcon('receipt')" class="w-5 h-5 mr-2" />
-                    Historique de facturation
-                </CardTitle>
-                <CardDescription style="font-family: Roboto, sans-serif;">
-                    Consultez vos factures précédentes
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <div class="text-center py-8 text-neutral-500" style="font-family: Roboto, sans-serif;">
-                    Aucune facture disponible
+                <div class="flex items-center justify-between">
+                    <div>
+                        <CardTitle style="font-family: Roboto, sans-serif;">
+                            <FontAwesomeIcon v-if="getIcon('receipt')" :icon="getIcon('receipt')" class="w-5 h-5 mr-2" />
+                            Historique de facturation
+                        </CardTitle>
+                        <CardDescription style="font-family: Roboto, sans-serif;">
+                            Consultez vos factures d'abonnement
+                        </CardDescription>
+                    </div>
+                    <Button variant="outline" @click="goToInvoicesPage">
+                        <FontAwesomeIcon :icon="['fas', 'arrow-right']" class="mr-2" />
+                        Voir les factures
+                    </Button>
                 </div>
-            </CardContent>
+            </CardHeader>
         </Card>
     </div>
 </template>

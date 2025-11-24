@@ -138,7 +138,7 @@ const saveSettings = async () => {
                         <p class="text-sm text-neutral-500 mb-3" style="font-family: Roboto, sans-serif;">
                             Une fois supprimé, votre compte et toutes vos données seront définitivement perdues.
                         </p>
-                        <Button variant="destructive">
+                        <Button variant="outline" class="bg-destructive hover:bg-destructive/90 text-white">
                             <span style="font-family: Roboto, sans-serif;">Supprimer mon compte</span>
                         </Button>
                     </div>

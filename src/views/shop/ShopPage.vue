@@ -52,12 +52,12 @@ const handleAddToCart = (reference: ShopReference) => {
 
     // Trouver le prix minimum (avec ses infos HT et TVA)
     const minPriceObj = allPrices.length > 0
-      ? allPrices.reduce((min, price) => price.amount < min.amount ? price : min, allPrices[0])
+      ? allPrices.reduce((min, price) => price.amount < min.amount ? price : min, allPrices[0]!)
       : null
 
     // Obtenir l'image principale
     const mainImage = reference.images.length > 0
-      ? getShopImageUrl(reference.images[0])
+      ? getShopImageUrl(reference.images[0]!)
       : undefined
 
     // Obtenir physical/immaterial depuis le premier produit

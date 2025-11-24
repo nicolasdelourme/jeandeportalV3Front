@@ -68,6 +68,22 @@ const routes: RouteRecordRaw[] = [
         },
     },
     {
+        path: "/mon-compte/annuler-abonnement",
+        name: "cancel-subscription",
+        component: () => import("@/views/account/CancelSubscription.vue"),
+        meta: {
+            requiresAuth: true, // Nécessite une authentification
+        },
+    },
+    {
+        path: "/mon-compte/factures-abonnement",
+        name: "subscription-invoices",
+        component: () => import("@/views/account/SubscriptionInvoices.vue"),
+        meta: {
+            requiresAuth: true, // Nécessite une authentification
+        },
+    },
+    {
         path: "/boutique",
         name: "boutique",
         component: () => import("@/views/shop/ShopPage.vue"),
