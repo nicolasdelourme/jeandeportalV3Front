@@ -72,7 +72,7 @@ export async function mockLoginAPI(credentials: LoginCredentials): Promise<AuthR
 
     // Créer la session (simule le cookie HttpOnly côté serveur)
     MOCK_SESSION = {
-        userId: user.id,
+        userId: Number(user.id),
         expiresAt: Date.now() + expiresIn * 1000
     }
     console.log('✅ [MOCK API] Session créée:', MOCK_SESSION)
@@ -126,7 +126,7 @@ export async function mockRegisterAPI(credentials: RegisterCredentials): Promise
     // Créer la session (simule le cookie HttpOnly côté serveur - auto-login)
     const expiresIn = 86400 // 1 jour par défaut
     MOCK_SESSION = {
-        userId: newUser.id,
+        userId: Number(newUser.id),
         expiresAt: Date.now() + expiresIn * 1000
     }
 
@@ -160,8 +160,6 @@ export async function mockGetUserProfileAPI(): Promise<User | null> {
         throw new Error('Non authentifié')
     }
 
-        const payload = JSON.parse(atob(parts[1]!))
-        const userId = payload.sub
     // Vérifier si la session est expirée
     if (Date.now() >= MOCK_SESSION.expiresAt) {
         console.log('❌ [MOCK API] Session expirée')

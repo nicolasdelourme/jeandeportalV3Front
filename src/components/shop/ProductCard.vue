@@ -132,7 +132,7 @@ const subnameText = computed(() => {
  * Vérifier si le produit est déjà dans le panier
  */
 const isInCart = computed(() => {
-  return cartStore.hasItem(props.reference.id)
+  return cartStore.hasItem(Number(props.reference.id))
 })
 
 /**

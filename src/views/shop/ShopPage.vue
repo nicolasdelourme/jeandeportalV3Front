@@ -43,7 +43,7 @@ const handleViewDetails = (reference: ShopReference) => {
   router.push(`/boutique/${reference.id}`)
 }
 
-const handleAddToCart = (reference: ShopReference) => {
+const handleAddToCart = async (reference: ShopReference) => {
   try {
     // Obtenir tous les prix avec leurs infos complètes
     const allPrices = reference.products.flatMap((product) =>
@@ -55,26 +55,8 @@ const handleAddToCart = (reference: ShopReference) => {
       ? allPrices.reduce((min, price) => price.amount < min.amount ? price : min, allPrices[0]!)
       : null
 
-    // Obtenir l'image principale
-    const mainImage = reference.images.length > 0
-      ? getShopImageUrl(reference.images[0]!)
-      : undefined
-
-    // Obtenir physical/immaterial depuis le premier produit
-    const firstProduct = reference.products[0]
-
-    // Ajouter au panier avec TOUS les champs requis
-    cartStore.addItem({
-      id: reference.id,
-      name: reference.name || 'Produit',
-      price: minPriceObj?.amount || 0,         // Prix TTC
-      priceHT: minPriceObj?.htAmount || 0,     // ✅ Prix HT EXACT
-      vatRate: minPriceObj?.vatRate || 0,      // ✅ Taux TVA réel
-      image: mainImage,
-      slug: reference.id,
-      physical: firstProduct?.physical,
-      immaterial: firstProduct?.immaterial,
-    })
+    // Ajouter au panier (le backend gérera les détails du produit)
+    await cartStore.addItem(Number(reference.id))
 
     toast.success(`${reference.name} ajouté au panier`)
   } catch (error) {

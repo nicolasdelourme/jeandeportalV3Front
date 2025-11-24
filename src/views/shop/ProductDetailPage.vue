@@ -157,30 +157,15 @@ const handleBack = () => {
   router.push('/boutique')
 }
 
-const handleAddToCart = () => {
+const handleAddToCart = async () => {
   if (!reference.value || !selectedPrice.value) {
     toast.error('Veuillez sélectionner un produit et un prix')
     return
   }
 
   try {
-    // Obtenir l'image principale
-    const mainImage = reference.value.images.length > 0
-      ? getShopImageUrl(reference.value.images[0]!)
-      : undefined
-
-    // Ajouter au panier avec TOUS les champs requis
-    cartStore.addItem({
-      id: reference.value.id,
-      name: reference.value.name,
-      price: selectedPrice.value.amount,             // Prix TTC
-      priceHT: selectedPrice.value.htAmount,         // ✅ Prix HT EXACT
-      vatRate: selectedPrice.value.vatRate,          // ✅ Taux TVA réel
-      image: mainImage,
-      slug: reference.value.id,
-      physical: selectedProduct.value?.physical,
-      immaterial: selectedProduct.value?.immaterial,
-    })
+    // Ajouter au panier (le backend gérera les détails du produit)
+    await cartStore.addItem(Number(reference.value.id))
 
     toast.success(`${decodeHTMLEntities(reference.value.name)} ajouté au panier`)
   } catch (error) {
@@ -241,7 +226,7 @@ const handleShare = async () => {
  */
 const isInCart = computed(() => {
   if (!reference.value) return false
-  return cartStore.hasItem(reference.value.id)
+  return cartStore.hasItem(Number(reference.value.id))
 })
 
 /**

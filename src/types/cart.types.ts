@@ -203,11 +203,11 @@ export const CART_CONFIG = {
  * Erreurs du panier
  */
 export class CartError extends Error {
-  code: 'ITEM_ALREADY_IN_CART' | 'ITEM_NOT_FOUND'
+  code: 'ITEM_ALREADY_IN_CART' | 'ITEM_NOT_FOUND' | 'API_ERROR' | 'INVALID_QUANTITY' | 'SYNC_ERROR'
 
   constructor(
     message: string,
-    public code:
+    code:
       | 'ITEM_ALREADY_IN_CART'
       | 'ITEM_NOT_FOUND'
       | 'API_ERROR'
