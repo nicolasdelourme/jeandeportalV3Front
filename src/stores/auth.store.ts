@@ -59,9 +59,14 @@ export const useAuthStore = defineStore('auth', () => {
      * On vérifie juste si le backend reconnaît la session
      */
     async function initialize(): Promise<void> {
+        console.log('🔄 [AUTH STORE] initialize() appelé')
         const storedUser = getAuthUser()
+        console.log('🔄 [AUTH STORE] storedUser:', storedUser)
 
-        if (!storedUser) return
+        if (!storedUser) {
+            console.log('🔄 [AUTH STORE] Pas de user stocké, skip init')
+            return
+        }
 
         // ✅ Set loading state FIRST
         isLoading.value = true
@@ -69,13 +74,16 @@ export const useAuthStore = defineStore('auth', () => {
         try {
             // ✅ Valide la session en récupérant le profil utilisateur
             // Le cookie HttpOnly sera automatiquement envoyé avec la requête
+            console.log('🔄 [AUTH STORE] Validation de la session via /me...')
             const freshUser = await authService.getUserProfile()
+            console.log('✅ [AUTH STORE] Session valide, user:', freshUser)
 
             // ✅ Only set state AFTER successful validation
             user.value = sanitizeUser(freshUser)
             setAuthUser(freshUser)
         } catch (error) {
             // Cookie invalide ou expiré, on déconnecte
+            console.error('❌ [AUTH STORE] Session invalide lors de l\'initialisation:', error)
             logger.warn('Session invalide lors de l\'initialisation, déconnexion')
             clearAuthData()
             user.value = null

@@ -18,12 +18,18 @@ export default defineConfig({
         host: '0.0.0.0', // Écoute sur toutes les interfaces (IPv4 + IPv6)
         port: 3000,
         proxy: {
+            // Proxy pour le mode dev:real - évite les problèmes de cookies tiers
             "/api": {
-                target: "https://jeandeportal.fr",
+                target: "https://api.jeandeportal.fr",
                 changeOrigin: true,
                 secure: true,
-                // Ne pas retirer /api, le backend attend /api/* dans l'URL
-                rewrite: (path) => path.replace(/^\/api/, "/api"),
+                // Retirer /api car le nouveau backend n'a plus ce préfixe
+                rewrite: (path) => path.replace(/^\/api/, ""),
+                // Réécrire le domaine du cookie pour qu'il fonctionne en local
+                cookieDomainRewrite: {
+                    "api.jeandeportal.fr": "localhost",
+                    ".jeandeportal.fr": "localhost",
+                },
             },
         },
     },

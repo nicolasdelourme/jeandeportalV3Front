@@ -17,7 +17,7 @@ const USE_MOCK = false
  */
 const API_CONFIG = {
   ENDPOINTS: {
-    WEBINAR_LIST: '/api/fetchWebinarList',
+    WEBINAR_LIST: '/fetchWebinarList',
   },
   CACHE_DURATION: 10 * 60 * 1000, // 10 minutes en millisecondes
   TIMEOUT: 30000, // 30 secondes (l'API peut être lente)

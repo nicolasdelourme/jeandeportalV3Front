@@ -8,8 +8,10 @@ import type { LoginCredentials, RegisterCredentials, AuthResponse, AuthSuccessRe
 import { AuthError } from '@/types/auth.types'
 import { logger } from '@/utils/logger'
 
-// MOCK MODE : Automatiquement désactivé en production
-const USE_MOCK = import.meta.env.DEV
+// MOCK MODE : Contrôlé par VITE_API_MODE
+// - "mock" (défaut en dev) : utilise les données fictives
+// - "real" (npm run dev:real) : utilise le vrai backend
+const USE_MOCK = import.meta.env.VITE_API_MODE === 'mock'
 
 // Sécurité : Empêcher le build si mock activé en production
 if (import.meta.env.PROD && USE_MOCK) {
@@ -41,11 +43,11 @@ export class AuthService {
                 response = await mockLoginAPI(credentials)
             } else {
                 // Appel API réel
-                response = await apiClient.post<AuthResponse>('/api/login', {
+                response = await apiClient.post<AuthResponse>('/login', {
                     email: credentials.email,
                     password: credentials.password,
-                    remember_me: credentials.rememberMe,
-                    redirect_url: credentials.redirectUrl
+                    rememberMe: credentials.rememberMe,
+                    redirectUrl: credentials.redirectUrl
                 })
             }
 
@@ -90,7 +92,7 @@ export class AuthService {
                 response = await mockRegisterAPI(credentials)
             } else {
                 // Appel API réel
-                response = await apiClient.post<AuthResponse>('/api/register', {
+                response = await apiClient.post<AuthResponse>('/register', {
                     first_name: credentials.firstName,
                     last_name: credentials.lastName,
                     email: credentials.email,
@@ -158,7 +160,7 @@ export class AuthService {
                 return user
             } else {
                 // Appel API réel - le cookie sera automatiquement envoyé
-                const response = await apiClient.get<User>('/api/me')
+                const response = await apiClient.get<User>('/me')
                 return response
             }
         } catch (error: any) {
@@ -182,7 +184,7 @@ export class AuthService {
                 await mockLogoutAPI()
             } else {
                 // Appel API réel
-                await apiClient.post('/api/logout')
+                await apiClient.post('/logout')
             }
         } catch (error: any) {
             logger.error('Erreur lors de la déconnexion:', error)
@@ -201,7 +203,7 @@ export class AuthService {
             } else {
                 // Appel API réel
                 const response = await apiClient.post<{ success: boolean; message: string }>(
-                    '/api/forgot-password',
+                    '/forgot-password',
                     { email }
                 )
                 return response

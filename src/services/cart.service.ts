@@ -41,7 +41,7 @@ class CartService {
             }
 
             const response = await apiClient.post<CartAPIResponse>(
-                '/api/addReference',
+                '/addReference',
                 request
             )
 
@@ -65,7 +65,7 @@ class CartService {
         try {
             logger.info('🛒 [CART SERVICE] Récupération du panier')
 
-            const response = await apiClient.get<CartAPIResponse>('/api/fetchBasket')
+            const response = await apiClient.get<CartAPIResponse>('/fetchBasket')
 
             logger.info(`✅ [CART SERVICE] Panier récupéré: ${response.length} items`)
             return response
@@ -104,7 +104,7 @@ class CartService {
             }
 
             const response = await apiClient.post<CartAPIResponse>(
-                '/api/basketChangeQuantityReference',
+                '/basketChangeQuantityReference',
                 request
             )
 

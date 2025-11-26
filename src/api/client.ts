@@ -16,10 +16,11 @@ class ApiClient {
         this.axiosInstance = axios.create({
             baseURL: import.meta.env.VITE_API_BASE_URL || "/api",
             timeout: 5000,
-            // ✅ withCredentials uniquement en production pour éviter les erreurs CORS en dev
-            // En dev: false (pas de cookies, pas de CORS errors)
+            // ✅ withCredentials activé en mode "real" ou en production
+            // En dev mock: false (pas de cookies nécessaires)
+            // En dev real: true (envoie les cookies pour tester le vrai backend)
             // En prod: true (envoie les cookies HttpOnly)
-            withCredentials: import.meta.env.PROD,
+            withCredentials: import.meta.env.VITE_API_MODE === 'real' || import.meta.env.PROD,
             headers: {
                 "Content-Type": "application/json",
                 "X-Requested-With": "XMLHttpRequest",  // ✅ Protection CSRF
@@ -40,7 +41,14 @@ class ApiClient {
         this.axiosInstance.interceptors.response.use(
             (response) => response,
             async (error) => {
-                if (error.response?.status === 401) {
+                const requestUrl = error.config?.url || ''
+
+                // Ne pas rediriger pour les endpoints d'auth (login, register, etc.)
+                const isAuthEndpoint = ['/login', '/register', '/logout', '/me', '/forgot-password'].some(
+                    endpoint => requestUrl.includes(endpoint)
+                )
+
+                if (error.response?.status === 401 && !isAuthEndpoint) {
                     // Session expirée ou invalide - nettoyage des données utilisateur
                     clearAuthData()
 

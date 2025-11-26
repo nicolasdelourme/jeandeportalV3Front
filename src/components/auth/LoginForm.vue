@@ -75,7 +75,7 @@ const onSubmit = handleSubmit((values) => {
 </script>
 
 <template>
-    <form @submit="onSubmit" class="space-y-1">
+    <form @submit.prevent="onSubmit" class="space-y-1">
         <!-- Email -->
         <FormField v-slot="{ componentField }" name="email">
             <FormItem class="gap-1">

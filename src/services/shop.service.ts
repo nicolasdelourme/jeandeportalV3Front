@@ -6,13 +6,17 @@
 import { apiClient } from '@/api/client'
 import type { ShopCatalogResponse, APIRawResponse } from '@/types/shop-api.types'
 import { ShopAPIError, mapAPIResponseToShopCatalog } from '@/types/shop-api.types'
+import { mockFetchCatalogAPI } from '@/api/shop.mock'
+
+// MOCK MODE : Contrôlé par VITE_API_MODE
+const USE_MOCK = import.meta.env.VITE_API_MODE === 'mock'
 
 /**
  * Configuration de l'API Shop
  */
 const API_CONFIG = {
   ENDPOINTS: {
-    CATALOG: '/api/fetchStore',
+    CATALOG: '/fetchStore',
   },
   TIMEOUT: 30000, // 30 secondes
 } as const
@@ -28,6 +32,16 @@ class ShopService {
    * @throws {ShopAPIError} Si l'API échoue ou timeout
    */
   async fetchCatalog(): Promise<ShopCatalogResponse> {
+    // Mode mock : utiliser les données fictives
+    if (USE_MOCK) {
+      try {
+        const rawData = await mockFetchCatalogAPI()
+        return mapAPIResponseToShopCatalog(rawData)
+      } catch (error) {
+        throw new ShopAPIError('Erreur lors du chargement du mock', undefined, error as Error)
+      }
+    }
+
     // Annuler la requête précédente si elle existe
     if (this.abortController) {
       this.abortController.abort()
