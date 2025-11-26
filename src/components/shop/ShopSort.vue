@@ -42,7 +42,7 @@ const activeSortOption = computed({
 <template>
   <div class="flex items-center gap-2">
     <!-- Icône -->
-    <FontAwesomeIcon v-if="icons.sort" :icon="icons.sort" class="w-5 h-5 text-neutral-600" />
+    <FontAwesomeIcon v-if="icons.sort" :icon="icons.sort" class="w-5 h-5 text-primary" />
 
     <!-- Select custom -->
     <select

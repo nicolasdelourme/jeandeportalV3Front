@@ -4,7 +4,7 @@
  * Carrousel hero pour la boutique avec 3 produits mis en avant
  * Auto-play 5 secondes + navigation manuelle
  */
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useShopStore } from "@/stores/shop.store";
 import { Badge } from "@/components/ui/badge";
@@ -127,9 +127,16 @@ const handleScrollDown = () => {
 /**
  * Lifecycle
  */
-onMounted(() => {
-    selectRandomProducts();
-});
+// Watch pour réagir quand les données arrivent (résout le problème de timing)
+watch(
+    () => shopStore.references,
+    (newReferences) => {
+        if (newReferences.length > 0 && featuredProducts.value.length === 0) {
+            selectRandomProducts();
+        }
+    },
+    { immediate: true }
+);
 
 onUnmounted(() => {
     stopAutoplay();

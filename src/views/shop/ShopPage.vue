@@ -71,7 +71,10 @@ const handleAddToCart = async (reference: ShopReference) => {
 
 <template>
   <DefaultLayout>
-    <div class="min-h-screen bg-gradient-to-br from-neutral-50 to-white">
+    <div class="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-red-50/30 relative">
+      <!-- Élément décoratif de fond -->
+      <div class="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+      <div class="absolute bottom-0 left-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
       <!-- Hero Carrousel -->
       <ShopHeroCarousel />
 
@@ -91,17 +94,15 @@ const handleAddToCart = async (reference: ShopReference) => {
       </section>
       -->
 
-      <!-- Séparateur avec accent doré -->
-      <div class="h-px bg-gradient-to-r from-transparent via-yellow-400/30 to-transparent"></div>
+      <!-- Séparateur -->
+      <div class="h-px bg-neutral-200"></div>
 
       <!-- Contenu principal -->
       <section class="max-w-6xl mx-auto px-4 py-8">
         <div class="grid lg:grid-cols-[280px_1fr] gap-5">
           <!-- Sidebar gauche: Filtres -->
-          <aside class="hidden lg:block">
-            <div class="sticky top-21">
-              <ShopFilters />
-            </div>
+          <aside class="hidden lg:block sticky top-24 self-start">
+            <ShopFilters />
           </aside>
 
           <!-- Contenu principal: Grille produits -->

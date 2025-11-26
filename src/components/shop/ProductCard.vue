@@ -157,7 +157,7 @@ const handleAddToCart = (e: Event) => {
 </script>
 
 <template>
-  <Card class="group hover:shadow-lg py-0 rounded-md transition-shadow h-full flex flex-col gap-0">
+  <Card class="group shadow-none hover:shadow-md py-0 rounded-md transition-all duration-300 h-full flex flex-col gap-0">
     <!-- Image avec AspectRatio -->
     <div @click="handleViewDetails" class="relative  bg-gray-100 shrink-0 cursor-pointer">
       <AspectRatio :ratio="aspectRatio">
@@ -208,9 +208,9 @@ const handleAddToCart = (e: Event) => {
 
         <!-- Prix + CTA -->
         <div class="space-y-2">
-          <div class="text-center">
+          <div class="bg-gradient-to-r from-red-50 to-transparent rounded-md p-3 -mx-1 text-center">
             <p class="text-xs text-neutral-500 uppercase tracking-wide">Prix</p>
-            <p class="font-bold text-lg text-neutral-800">{{ priceDisplay }}</p>
+            <p class="font-bold text-lg text-primary">{{ priceDisplay }}</p>
           </div>
 
           <!-- Boutons d'action -->
@@ -221,7 +221,7 @@ const handleAddToCart = (e: Event) => {
             <Button
               @click="handleAddToCart"
               :variant="cartButtonVariant"
-              color="green-600"
+              color="primary"
               size="sm"
               class="flex-1"
             >

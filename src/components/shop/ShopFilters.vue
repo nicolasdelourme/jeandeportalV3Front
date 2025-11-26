@@ -95,14 +95,14 @@ const resetFilters = () => {
   <Card class="rounded-md">
     <CardHeader>
       <div class="flex items-center justify-between">
-        <CardTitle class="flex items-center gap-2">
-          <FontAwesomeIcon v-if="icons.filter" :icon="icons.filter" class="w-5 h-5 text-neutral-600" />
+        <CardTitle class="flex items-center gap-2 text-primary">
+          <FontAwesomeIcon v-if="icons.filter" :icon="icons.filter" class="w-5 h-5" />
           <span>Filtres</span>
         </CardTitle>
 
         <!-- Bouton reset (visible uniquement si filtres actifs) -->
         <Button v-if="shopStore.hasActiveFilters" @click="resetFilters" variant="ghost" size="sm"
-          class="text-xs text-neutral-500 hover:text-neutral-800">
+          class="text-xs text-neutral-500 hover:text-primary">
           <FontAwesomeIcon v-if="icons.times" :icon="icons.times" class="w-3 h-3 mr-1" />
           Réinitialiser
         </Button>
@@ -113,7 +113,7 @@ const resetFilters = () => {
       <!-- Section Collections avec style boutons -->
       <Collapsible default-open>
         <CollapsibleTrigger
-          class="flex items-center justify-between w-full p-2 hover:bg-gray-50 rounded-md transition-colors">
+          class="flex items-center justify-between w-full p-2 hover:bg-red-50 rounded-md transition-colors">
           <h4 class="font-semibold text-sm text-neutral-700 uppercase tracking-wide">Collections</h4>
           <FontAwesomeIcon v-if="icons.chevronDown" :icon="icons.chevronDown" class="w-4 h-4 text-neutral-400" />
         </CollapsibleTrigger>
@@ -129,12 +129,12 @@ const resetFilters = () => {
         </CollapsibleContent>
       </Collapsible>
 
-      <Separator />
+      <Separator class="bg-primary/20" />
 
       <!-- Section Tags/Thèmes en collapse fermé par défaut -->
       <Collapsible>
         <CollapsibleTrigger
-          class="flex items-center justify-between w-full p-2 hover:bg-gray-50 rounded-md transition-colors">
+          class="flex items-center justify-between w-full p-2 hover:bg-red-50 rounded-md transition-colors">
           <h4 class="font-semibold text-sm text-neutral-700 uppercase tracking-wide">
             Thèmes
             <span v-if="shopStore.activeTagFilters.size > 0" class="ml-2 text-xs text-primary">
@@ -158,10 +158,12 @@ const resetFilters = () => {
 
       <!-- Compteur de résultats -->
       <div v-if="shopStore.hasActiveFilters">
-        <Separator />
-        <div class="pt-4 text-center text-sm text-neutral-600">
-          <strong>{{ shopStore.resultsCount }}</strong>
-          {{ shopStore.resultsCount === 1 ? 'produit trouvé' : 'produits trouvés' }}
+        <Separator class="bg-primary/20" />
+        <div class="pt-4 text-center">
+          <Badge color="primary" variant="default" class="text-sm px-4 py-1">
+            <strong>{{ shopStore.resultsCount }}</strong>
+            {{ shopStore.resultsCount === 1 ? 'produit trouvé' : 'produits trouvés' }}
+          </Badge>
         </div>
       </div>
     </CardContent>
