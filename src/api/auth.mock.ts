@@ -14,8 +14,17 @@ const MOCK_USERS: Array<User & { password: string }> = [
         id: 1,
         email: 'test@example.com',
         password: 'Test1234', // En production, JAMAIS stocker les mots de passe en clair !
+        emailVerified: true,
+        title: 'M.',
         firstName: 'Jean',
-        lastName: 'Dupont'
+        lastName: 'Dupont',
+        phone: '0612345678',
+        avatarUrl: null,
+        birthDate: null,
+        addresses: [],
+        tag: 'mock_user',
+        createdOn: '2024-01-15 10:00:00',
+        lastLogin: null,
     }
 ]
 
@@ -117,8 +126,17 @@ export async function mockRegisterAPI(credentials: RegisterCredentials): Promise
         id: MOCK_USERS.length + 1,
         email: credentials.email,
         password: credentials.password,
+        emailVerified: false,
+        title: null,
         firstName: credentials.firstName,
-        lastName: credentials.lastName
+        lastName: credentials.lastName,
+        phone: null,
+        avatarUrl: null,
+        birthDate: null,
+        addresses: [],
+        tag: 'new_user',
+        createdOn: new Date().toISOString().replace('T', ' ').substring(0, 19),
+        lastLogin: null,
     }
 
     MOCK_USERS.push(newUser)
