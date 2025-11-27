@@ -50,13 +50,47 @@ export type AuthResponse = AuthSuccessResponse | AuthErrorResponse
 
 /**
  * Données de l'utilisateur connecté
+ *
+ * SÉCURITÉ: Ces champs sont filtrés via sanitizeUser() - whitelist pattern
+ * Les champs sensibles (password, salt, token, etc.) ne sont JAMAIS stockés
  */
 export interface User {
+    // Identité
     id: number | string
     email: string
-    firstName: string
-    lastName: string
-    // Ajoute d'autres champs selon ton backend
+    emailVerified?: boolean          // À venir côté backend
+
+    // Profil (disponible maintenant)
+    title: string | null             // API: "title" - M. / Mme / Dr
+    firstName: string | null         // API: "firstname" (lowercase)
+    lastName: string | null          // API: "lastname" (lowercase)
+    phone: string | null             // API: "phone"
+
+    // Profil (à venir)
+    avatarUrl: string | null         // À venir
+    birthDate: string | null         // À venir
+
+    // Adresses (à venir - sera un array)
+    addresses: UserAddress[]         // À venir - backend prévoit un array
+
+    // Métadonnées (disponible maintenant)
+    tag: string | null               // API: "tag" - segmentation marketing
+    createdOn: string | null         // API: "createdOn" - date inscription
+    lastLogin: string | null         // API: "lastLogin" - dernière connexion
+}
+
+/**
+ * Adresse utilisateur (pour livraison/facturation)
+ * Structure préparée pour le futur array d'adresses du backend
+ */
+export interface UserAddress {
+    id?: number | string
+    label?: string              // "Domicile", "Bureau", etc.
+    street: string
+    city: string
+    postalCode: string
+    country: string
+    isDefault?: boolean
 }
 
 /**
