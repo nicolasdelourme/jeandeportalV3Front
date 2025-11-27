@@ -33,6 +33,9 @@ function isValidRedirect(path: string): boolean {
 /**
  * Guard qui vérifie si l'utilisateur est authentifié
  * Si non authentifié, redirige vers /auth avec l'URL de retour
+ *
+ * IMPORTANT: Attend que le store soit initialisé avant de vérifier l'auth
+ * pour éviter les faux négatifs lors du refresh de page
  */
 export async function authGuard(
     to: RouteLocationNormalized,
@@ -43,6 +46,14 @@ export async function authGuard(
 
     // Vérifier si la route nécessite une authentification
     const requiresAuth = to.meta.requiresAuth
+
+    // ⏳ Attendre que le store soit initialisé avant de vérifier l'auth
+    // Cela évite les redirections incorrectes lors du refresh de page
+    if (!authStore.isInitialized) {
+        console.log('🛡️ [AUTH GUARD] Attente initialisation du store...')
+        await authStore.waitForInitialization()
+        console.log('🛡️ [AUTH GUARD] Store initialisé !')
+    }
 
     console.log('🛡️ [AUTH GUARD] Navigation vers:', to.path)
     console.log('🛡️ [AUTH GUARD] requiresAuth:', requiresAuth)
@@ -80,6 +91,11 @@ export async function guestGuard(
 
     // Vérifier si la route est réservée aux invités (non connectés)
     const guestOnly = to.meta.guestOnly
+
+    // ⏳ Attendre que le store soit initialisé
+    if (!authStore.isInitialized) {
+        await authStore.waitForInitialization()
+    }
 
     if (guestOnly && authStore.isAuthenticated) {
         // Si déjà connecté, rediriger vers la home

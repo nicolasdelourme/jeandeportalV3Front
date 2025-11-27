@@ -27,6 +27,7 @@ export const useAuthStore = defineStore('auth', () => {
     const user = ref<User | null>(null)
     const isLoading = ref<boolean>(false)
     const error = ref<AuthError | null>(null)
+    const isInitialized = ref<boolean>(false) // Track si initialize() a été appelé
 
     // === Getters (computed) ===
 
@@ -60,11 +61,19 @@ export const useAuthStore = defineStore('auth', () => {
      */
     async function initialize(): Promise<void> {
         console.log('🔄 [AUTH STORE] initialize() appelé')
+
+        // Évite les doubles initialisations
+        if (isInitialized.value) {
+            console.log('🔄 [AUTH STORE] Déjà initialisé, skip')
+            return
+        }
+
         const storedUser = getAuthUser()
         console.log('🔄 [AUTH STORE] storedUser:', storedUser)
 
         if (!storedUser) {
             console.log('🔄 [AUTH STORE] Pas de user stocké, skip init')
+            isInitialized.value = true
             return
         }
 
@@ -89,7 +98,26 @@ export const useAuthStore = defineStore('auth', () => {
             user.value = null
         } finally {
             isLoading.value = false
+            isInitialized.value = true
         }
+    }
+
+    /**
+     * Attend que le store soit initialisé
+     * Utile pour les guards de navigation
+     */
+    async function waitForInitialization(): Promise<void> {
+        if (isInitialized.value) return
+
+        // Attendre que isInitialized devienne true (polling simple)
+        return new Promise((resolve) => {
+            const checkInterval = setInterval(() => {
+                if (isInitialized.value) {
+                    clearInterval(checkInterval)
+                    resolve()
+                }
+            }, 10)
+        })
     }
 
     /**
@@ -221,6 +249,7 @@ export const useAuthStore = defineStore('auth', () => {
         user,
         isLoading,
         error,
+        isInitialized,
 
         // Getters
         isAuthenticated,
@@ -228,6 +257,7 @@ export const useAuthStore = defineStore('auth', () => {
 
         // Actions
         initialize,
+        waitForInitialization,
         login,
         register,
         logout,
