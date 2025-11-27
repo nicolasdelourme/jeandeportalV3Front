@@ -2,8 +2,9 @@
 /**
  * Section Profil
  * Gestion des informations personnelles, avatar, adresses et mot de passe
+ * Connecté au store auth pour afficher les vraies données utilisateur
  */
-import { ref } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
@@ -17,6 +18,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
 import AddressManagement from './AddressManagement.vue'
 import PasswordChangeDialog from './PasswordChangeDialog.vue'
+import { useAuth } from '@/composables/useAuth'
+import { useUserDisplay } from '@/composables/useUserDisplay'
+
+/**
+ * Auth store et display utilities
+ */
+const { user } = useAuth()
+const { avatarInitials, avatarUrl } = useUserDisplay(user)
 
 /**
  * État de soumission
@@ -30,29 +39,46 @@ const isPasswordDialogOpen = ref(false)
 
 /**
  * Schéma de validation
+ * Note: firstName et lastName peuvent être null côté API, on permet les strings vides
  */
 const formSchema = toTypedSchema(z.object({
-    firstName: z.string({ required_error: 'Le prénom est requis' })
-        .min(1, { message: 'Le prénom est requis' }),
-    lastName: z.string({ required_error: 'Le nom est requis' })
-        .min(1, { message: 'Le nom est requis' }),
+    firstName: z.string().optional(),
+    lastName: z.string().optional(),
     email: z.string({ required_error: 'L\'email est requis' })
         .email({ message: 'L\'email n\'est pas valide' }),
+    phone: z.string().optional(),
 }))
 
-const { handleSubmit } = useForm({
+/**
+ * Valeurs initiales depuis le store (computed pour réactivité)
+ */
+const initialFormValues = computed(() => ({
+    firstName: user.value?.firstName ?? '',
+    lastName: user.value?.lastName ?? '',
+    email: user.value?.email ?? '',
+    phone: user.value?.phone ?? '',
+}))
+
+const { handleSubmit, resetForm } = useForm({
     validationSchema: formSchema,
-    initialValues: {
-        firstName: 'Jean',
-        lastName: 'Dupont',
-        email: 'jean.dupont@exemple.com',
-    }
+    initialValues: initialFormValues.value,
 })
 
 /**
- * Initiales pour l'avatar
+ * Réinitialiser le formulaire quand les données user changent
  */
-const initials = ref('JD')
+watch(user, (newUser) => {
+    if (newUser) {
+        resetForm({
+            values: {
+                firstName: newUser.firstName ?? '',
+                lastName: newUser.lastName ?? '',
+                email: newUser.email ?? '',
+                phone: newUser.phone ?? '',
+            }
+        })
+    }
+}, { immediate: true })
 
 /**
  * Soumission du formulaire
@@ -88,8 +114,8 @@ const onSubmit = handleSubmit(async (values) => {
                 <!-- Avatar Section -->
                 <div class="flex items-center gap-6">
                     <Avatar class="h-24 w-24">
-                        <AvatarImage src="" alt="Photo de profil" />
-                        <AvatarFallback class="text-2xl bg-primary text-white">{{ initials }}</AvatarFallback>
+                        <AvatarImage v-if="avatarUrl" :src="avatarUrl" alt="Photo de profil" />
+                        <AvatarFallback class="text-2xl bg-primary text-white">{{ avatarInitials }}</AvatarFallback>
                     </Avatar>
                     <div class="space-y-2">
                         <h3 class="font-medium text-sm text-neutral-700" style="font-family: Roboto, sans-serif;">
@@ -133,16 +159,28 @@ const onSubmit = handleSubmit(async (values) => {
                         </FormField>
                     </div>
 
-                    <!-- Email -->
-                    <FormField v-slot="{ componentField }" name="email">
-                        <FormItem class="gap-1">
-                            <FormLabel class="text-sm font-medium text-neutral-700">Adresse email</FormLabel>
-                            <FormControl>
-                                <Input type="email" v-bind="componentField" />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    </FormField>
+                    <!-- Email et Téléphone -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <FormField v-slot="{ componentField }" name="email">
+                            <FormItem class="gap-1">
+                                <FormLabel class="text-sm font-medium text-neutral-700">Adresse email</FormLabel>
+                                <FormControl>
+                                    <Input type="email" v-bind="componentField" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        </FormField>
+
+                        <FormField v-slot="{ componentField }" name="phone">
+                            <FormItem class="gap-1">
+                                <FormLabel class="text-sm font-medium text-neutral-700">Téléphone</FormLabel>
+                                <FormControl>
+                                    <Input type="tel" placeholder="06 12 34 56 78" v-bind="componentField" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        </FormField>
+                    </div>
 
                     <!-- Bouton -->
                     <div class="flex justify-end pt-4">
