@@ -45,12 +45,19 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
 import Separator from '../ui/separator/Separator.vue'
 
+import { useUserDisplay } from '@/composables/useUserDisplay'
+
 /**
  * Router et Auth
  */
 const router = useRouter()
 const route = router.currentRoute
 const { isAuthenticated, user, userFullName, logout } = useAuth()
+
+/**
+ * Display utilities pour l'utilisateur
+ */
+const { avatarInitials, avatarUrl, displayName } = useUserDisplay(user)
 
 /**
  * Détecte si on est sur la page d'auth et en quel mode
@@ -93,20 +100,8 @@ const navItems = [
     { label: 'Boutique', href: '/boutique', type: 'link' },
 ] as const
 
-/**
- * Avatar utilisateur (optionnel - peut être ajouté au type User plus tard)
- */
-const userAvatar = ref<string | undefined>(undefined)
-
-/**
- * Initiales de l'utilisateur pour l'avatar fallback
- */
-const userInitials = computed(() => {
-    if (!user.value) return 'U'
-    const firstInitial = user.value.firstName?.[0] || ''
-    const lastInitial = user.value.lastName?.[0] || ''
-    return (firstInitial + lastInitial).toUpperCase() || 'U'
-})
+// Avatar et initiales maintenant gérés par useUserDisplay composable
+// Voir: avatarUrl, avatarInitials, displayName
 
 /**
  * Actions
@@ -257,14 +252,14 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                             <!-- Avatar + Nom -->
                             <div class="flex items-center gap-3 px-3 py-2 mb-2">
                                 <Avatar class="h-9 w-9">
-                                    <AvatarImage v-if="userAvatar" :src="userAvatar" :alt="userFullName" />
+                                    <AvatarImage v-if="avatarUrl" :src="avatarUrl" :alt="displayName" />
                                     <AvatarFallback class="bg-primary/10 text-primary font-semibold text-xs">
-                                        {{ userInitials }}
+                                        {{ avatarInitials }}
                                     </AvatarFallback>
                                 </Avatar>
                                 <div class="flex flex-col overflow-hidden">
                                     <p class="text-sm font-semibold text-neutral-800 truncate" style="font-family: Roboto, sans-serif;">
-                                        {{ userFullName }}
+                                        {{ displayName }}
                                     </p>
                                 </div>
                             </div>
@@ -437,15 +432,15 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                             <button
                                 class="hidden md:inline-flex rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
                                 <Avatar class="h-10 w-10 cursor-pointer">
-                                    <AvatarImage v-if="userAvatar" :src="userAvatar" :alt="userFullName" />
+                                    <AvatarImage v-if="avatarUrl" :src="avatarUrl" :alt="displayName" />
                                     <AvatarFallback class="bg-primary/10 text-primary font-semibold">
-                                        {{ userInitials }}
+                                        {{ avatarInitials }}
                                     </AvatarFallback>
                                 </Avatar>
                             </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" class="w-56">
-                            <DropdownMenuLabel>{{ userFullName }}</DropdownMenuLabel>
+                            <DropdownMenuLabel>{{ displayName }}</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem @click="handleAccount" class="cursor-pointer">
                                 <FontAwesomeIcon v-if="icons.userCircle" :icon="icons.userCircle"
