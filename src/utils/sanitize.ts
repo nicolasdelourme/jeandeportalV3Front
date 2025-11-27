@@ -1,42 +1,103 @@
 import DOMPurify from 'dompurify'
-import type { User } from '@/types/auth.types'
+import type { User, UserAddress } from '@/types/auth.types'
 
 /**
  * Type guard pour valider la structure des données utilisateur
  * Accepte les deux formats : camelCase (firstName) et lowercase (firstname)
  */
-export function isValidUser(obj: any): boolean {
+export function isValidUser(obj: unknown): boolean {
     if (typeof obj !== 'object' || obj === null) return false
-    if (obj.hasOwnProperty('__proto__')) return false  // Prévention prototype pollution
+    if (Object.prototype.hasOwnProperty.call(obj, '__proto__')) return false  // Prévention prototype pollution
+
+    const user = obj as Record<string, unknown>
 
     // Vérifier id et email (obligatoires)
-    if (!(typeof obj.id === 'number' || typeof obj.id === 'string')) return false
-    if (typeof obj.email !== 'string') return false
+    if (!(typeof user.id === 'number' || typeof user.id === 'string')) return false
+    if (typeof user.email !== 'string') return false
 
-    // Vérifier firstName/firstname et lastName/lastname (au moins un format)
-    const hasFirstName = typeof obj.firstName === 'string' || typeof obj.firstname === 'string' || obj.firstname === null || obj.firstName === null
-    const hasLastName = typeof obj.lastName === 'string' || typeof obj.lastname === 'string' || obj.lastname === null || obj.lastName === null
+    return true
+}
 
-    return hasFirstName && hasLastName
+/**
+ * Sanitize une string nullable
+ */
+function sanitizeNullableString(value: unknown): string | null {
+    if (value === null || value === undefined) return null
+    if (typeof value !== 'string') return null
+    const sanitized = DOMPurify.sanitize(value).trim()
+    return sanitized || null
+}
+
+/**
+ * Sanitize une string (retourne '' si invalide)
+ */
+function sanitizeString(value: unknown): string {
+    if (typeof value !== 'string') return ''
+    return DOMPurify.sanitize(value).trim()
+}
+
+/**
+ * Sanitize le tableau d'adresses
+ * Retourne un tableau vide si les données ne sont pas un array
+ */
+function sanitizeAddresses(addresses: unknown): UserAddress[] {
+    if (!Array.isArray(addresses)) return []
+
+    return addresses
+        .filter((addr): addr is Record<string, unknown> =>
+            typeof addr === 'object' && addr !== null
+        )
+        .map(addr => ({
+            id: addr.id as number | string | undefined,
+            label: sanitizeNullableString(addr.label) ?? undefined,
+            street: sanitizeString(addr.street),
+            city: sanitizeString(addr.city),
+            postalCode: sanitizeString(addr.postalCode ?? addr.postal_code),
+            country: sanitizeString(addr.country),
+            isDefault: Boolean(addr.isDefault ?? addr.is_default ?? false),
+        }))
 }
 
 /**
  * Sanitize les données utilisateur pour prévenir les attaques XSS
- * Mappe les champs du backend (lowercase) vers le format frontend (camelCase)
+ *
+ * SÉCURITÉ: Utilise le pattern WHITELIST - seuls les champs listés explicitement
+ * sont extraits. Les champs sensibles (password, salt, token, etc.) sont ignorés
+ * même si le backend les envoie.
+ *
+ * @param user - Données brutes de l'API (peut contenir des champs sensibles)
+ * @returns User - Objet User sanitizé avec uniquement les champs autorisés
  */
-export function sanitizeUser(user: any): User {
+export function sanitizeUser(user: unknown): User {
     if (!isValidUser(user)) {
         throw new Error('Invalid user data structure')
     }
 
-    // Mapper les champs (backend peut envoyer firstname ou firstName)
-    const firstName = user.firstName ?? user.firstname ?? ''
-    const lastName = user.lastName ?? user.lastname ?? ''
+    const data = user as Record<string, unknown>
 
+    // WHITELIST - On ne garde QUE ces champs (sécurité)
+    // ⚠️ JAMAIS inclus : password, salt, token, forgottenPasswordCode,
+    //                    rememberCode, ipAddress, facebookId, googleId, etc.
     return {
-        id: user.id,
-        email: DOMPurify.sanitize(user.email),
-        firstName: DOMPurify.sanitize(firstName),
-        lastName: DOMPurify.sanitize(lastName)
+        // Identité
+        id: data.id as number | string,
+        email: sanitizeString(data.email),
+        emailVerified: Boolean(data.emailVerified ?? data.email_verified ?? false),
+
+        // Profil - gère les deux formats (camelCase et lowercase du backend)
+        title: sanitizeNullableString(data.title),
+        firstName: sanitizeNullableString(data.firstName ?? data.firstname),
+        lastName: sanitizeNullableString(data.lastName ?? data.lastname),
+        phone: sanitizeNullableString(data.phone),
+
+        // À venir - null/[] par défaut pour l'instant
+        avatarUrl: sanitizeNullableString(data.avatarUrl ?? data.avatar_url),
+        birthDate: sanitizeNullableString(data.birthDate ?? data.birth_date),
+        addresses: sanitizeAddresses(data.addresses),
+
+        // Métadonnées
+        tag: sanitizeNullableString(data.tag),
+        createdOn: sanitizeNullableString(data.createdOn ?? data.created_on),
+        lastLogin: sanitizeNullableString(data.lastLogin ?? data.last_login),
     }
 }
