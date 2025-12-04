@@ -3,7 +3,7 @@
  * Page AuthPage
  * Tunnel de connexion/inscription/mot de passe oublié
  */
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { useAuthStore } from '@/stores/auth.store'
@@ -36,6 +36,19 @@ const isSubmitting = ref(false)
  * Erreurs générales (erreurs serveur)
  */
 const errors = ref<Record<string, string>>({})
+
+/**
+ * État de succès d'inscription
+ * Quand true, affiche le message "vérifiez votre email"
+ */
+const registrationSuccess = ref(false)
+const registrationEmail = ref('')
+
+/**
+ * Cooldown pour le renvoi d'email (60 secondes)
+ */
+const resendCooldown = ref(0)
+let cooldownInterval: ReturnType<typeof setInterval> | null = null
 
 /**
  * Soumission du formulaire de connexion
@@ -85,32 +98,81 @@ const handleRegisterSubmit = async (values: {
     email: string
     password: string
     confirmPassword: string
+    birthDate?: string
 }) => {
     isSubmitting.value = true
     errors.value.general = '' // Clear previous errors
 
     try {
-        // Récupérer l'URL de redirection depuis les query params (même logique que login)
-        const redirectUrl = (route.query.redirect as string) || undefined
-
-        // Appeler le store pour s'inscrire
-        const afterLoginUrl = await authStore.register({
+        // Appeler le store pour s'inscrire (pas d'auto-login)
+        await authStore.register({
             firstName: values.firstName,
             lastName: values.lastName,
             email: values.email,
-            password: values.password
+            password: values.password,
+            passwordConfirm: values.confirmPassword,
+            birthDate: values.birthDate || null
         })
 
-        toast.success('Compte créé avec succès !')
+        // Stocker l'email pour le renvoi
+        registrationEmail.value = values.email
 
-        // Rediriger vers l'URL d'origine ou l'URL par défaut
-        router.push(redirectUrl || afterLoginUrl)
+        // Afficher l'état de succès (au lieu de rediriger)
+        registrationSuccess.value = true
+
+        toast.success('Un email de vérification a été envoyé !')
     } catch (error: any) {
         console.error('Erreur:', error)
         errors.value.general = error.message || 'Une erreur est survenue lors de la création du compte.'
     } finally {
         isSubmitting.value = false
     }
+}
+
+/**
+ * Renvoyer l'email de vérification
+ */
+const handleResendVerification = async () => {
+    if (resendCooldown.value > 0 || !registrationEmail.value) return
+
+    isSubmitting.value = true
+
+    try {
+        const result = await authStore.resendVerificationEmail(registrationEmail.value)
+
+        if (result.success) {
+            toast.success(result.message)
+
+            // Démarrer le cooldown de 60 secondes
+            resendCooldown.value = 60
+            cooldownInterval = setInterval(() => {
+                resendCooldown.value--
+                if (resendCooldown.value <= 0) {
+                    if (cooldownInterval) {
+                        clearInterval(cooldownInterval)
+                        cooldownInterval = null
+                    }
+                }
+            }, 1000)
+        } else {
+            toast.error(result.message)
+        }
+    } catch (error: any) {
+        console.error('Erreur lors du renvoi:', error)
+        toast.error(error.message || 'Impossible de renvoyer l\'email de vérification.')
+    } finally {
+        isSubmitting.value = false
+    }
+}
+
+/**
+ * Retourner au formulaire de connexion depuis l'état de succès
+ */
+const goToLoginFromSuccess = () => {
+    registrationSuccess.value = false
+    registrationEmail.value = ''
+    mode.value = 'login'
+    errors.value = {}
 }
 
 /**
@@ -139,6 +201,8 @@ const handleForgotPasswordSubmit = async (values: { email: string }) => {
 const toggleMode = () => {
     mode.value = mode.value === 'login' ? 'register' : 'login'
     errors.value = {}
+    registrationSuccess.value = false
+    registrationEmail.value = ''
 }
 
 /**
@@ -208,6 +272,16 @@ onMounted(() => {
         console.info('📧 Credentials de test : test@example.com / Test1234')
     }
 })
+
+/**
+ * Nettoyage du timer au démontage
+ */
+onUnmounted(() => {
+    if (cooldownInterval) {
+        clearInterval(cooldownInterval)
+        cooldownInterval = null
+    }
+})
 </script>
 
 <template>
@@ -220,17 +294,67 @@ onMounted(() => {
                 @forgot-password="goToForgotPassword" />
 
             <!-- Formulaire d'inscription -->
-            <RegisterForm v-else-if="mode === 'register'"
+            <RegisterForm v-else-if="mode === 'register' && !registrationSuccess"
                 :is-submitting="isSubmitting"
                 @submit="handleRegisterSubmit" />
+
+            <!-- État de succès après inscription -->
+            <div v-else-if="mode === 'register' && registrationSuccess" class="space-y-6 text-center">
+                <!-- Icône email -->
+                <div class="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                    <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                </div>
+
+                <!-- Message de confirmation -->
+                <div class="space-y-2">
+                    <h3 class="text-lg font-semibold text-neutral-900">
+                        Vérifiez votre boîte mail
+                    </h3>
+                    <p class="text-sm text-neutral-600">
+                        Un email de vérification a été envoyé à
+                        <span class="font-medium text-neutral-900">{{ registrationEmail }}</span>.
+                        Cliquez sur le lien dans l'email pour activer votre compte.
+                    </p>
+                </div>
+
+                <!-- Bouton de renvoi -->
+                <div class="space-y-3">
+                    <button
+                        type="button"
+                        :disabled="resendCooldown > 0 || isSubmitting"
+                        @click="handleResendVerification"
+                        class="w-full py-2.5 px-4 text-sm font-medium rounded-lg border border-neutral-300 text-neutral-700 hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                        <span v-if="isSubmitting">Envoi en cours...</span>
+                        <span v-else-if="resendCooldown > 0">Renvoyer l'email ({{ resendCooldown }}s)</span>
+                        <span v-else>Renvoyer l'email de vérification</span>
+                    </button>
+
+                    <button
+                        type="button"
+                        @click="goToLoginFromSuccess"
+                        class="w-full py-2.5 px-4 text-sm font-medium rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors"
+                    >
+                        Aller à la connexion
+                    </button>
+                </div>
+
+                <!-- Note -->
+                <p class="text-xs text-neutral-500">
+                    Pensez à vérifier vos spams si vous ne trouvez pas l'email.
+                </p>
+            </div>
 
             <!-- Formulaire mot de passe oublié -->
             <ForgotPasswordForm v-else-if="mode === 'forgot-password'"
                 :is-submitting="isSubmitting"
                 @submit="handleForgotPasswordSubmit" />
 
-            <!-- Toggle entre les modes -->
-            <AuthModeToggle :text="texts.toggleText" :link-text="texts.toggleLink"
+            <!-- Toggle entre les modes (masqué lors du succès d'inscription) -->
+            <AuthModeToggle v-if="!registrationSuccess" :text="texts.toggleText" :link-text="texts.toggleLink"
                 @toggle="mode === 'forgot-password' ? backToLogin() : toggleMode()" />
         </AuthFormWrapper>
     </DefaultLayout>

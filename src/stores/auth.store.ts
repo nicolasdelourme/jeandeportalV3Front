@@ -167,28 +167,88 @@ export const useAuthStore = defineStore('auth', () => {
     /**
      * Inscription d'un nouvel utilisateur
      *
-     * Note: Le backend définira le cookie HttpOnly automatiquement (auto-login)
+     * Note: L'inscription ne connecte PLUS automatiquement l'utilisateur.
+     * Un email de vérification est envoyé et l'utilisateur doit cliquer sur le lien
+     * pour activer son compte avant de pouvoir se connecter.
+     *
+     * @returns { success: true } si l'inscription a réussi
      */
-    async function register(credentials: RegisterCredentials): Promise<string> {
+    async function register(credentials: RegisterCredentials): Promise<{ success: boolean }> {
         isLoading.value = true
         error.value = null
 
         try {
+            console.log('📝 [AUTH STORE] Début de l\'inscription...')
+
             // Le service lance une exception si la réponse contient une erreur
-            // Le backend définit le cookie HttpOnly dans Set-Cookie header
-            const response = await authService.register(credentials)
+            await authService.register(credentials)
 
-            // Récupérer les infos utilisateur (auto-connexion après inscription)
-            const userProfile = await authService.getUserProfile()
-            user.value = sanitizeUser(userProfile)  // ✅ Sanitized
-            setAuthUser(userProfile)
+            console.log('✅ [AUTH STORE] Inscription réussie, email de vérification envoyé')
 
-            // Retourner l'URL de redirection
-            return response.afterLogin || '/'
+            // PAS d'auto-login : l'utilisateur doit vérifier son email
+            // On ne récupère PAS le profil utilisateur
+            // On ne stocke RIEN dans le state
+
+            return { success: true }
         } catch (err: any) {
+            console.error('❌ [AUTH STORE] Erreur lors de l\'inscription:', err)
             error.value = err instanceof AuthError ? err : new AuthError(
                 'Une erreur est survenue lors de l\'inscription',
                 'UNKNOWN_ERROR'
+            )
+            throw error.value
+        } finally {
+            isLoading.value = false
+        }
+    }
+
+    /**
+     * Vérifie l'email de l'utilisateur via le token reçu par email
+     *
+     * @param token - Token de vérification reçu par email
+     * @returns { success: boolean, message: string }
+     */
+    async function verifyEmail(token: string): Promise<{ success: boolean; message: string }> {
+        isLoading.value = true
+        error.value = null
+
+        try {
+            console.log('✅ [AUTH STORE] Vérification de l\'email...')
+            const result = await authService.verifyEmail(token)
+            console.log('✅ [AUTH STORE] Résultat vérification:', result)
+            return result
+        } catch (err: any) {
+            console.error('❌ [AUTH STORE] Erreur lors de la vérification:', err)
+            error.value = err instanceof AuthError ? err : new AuthError(
+                'Une erreur est survenue lors de la vérification',
+                'UNKNOWN_ERROR'
+            )
+            throw error.value
+        } finally {
+            isLoading.value = false
+        }
+    }
+
+    /**
+     * Renvoie l'email de vérification
+     *
+     * @param email - Email de l'utilisateur
+     * @returns { success: boolean, message: string }
+     */
+    async function resendVerificationEmail(email: string): Promise<{ success: boolean; message: string }> {
+        isLoading.value = true
+        error.value = null
+
+        try {
+            console.log('📧 [AUTH STORE] Renvoi de l\'email de vérification...')
+            const result = await authService.resendVerificationEmail(email)
+            console.log('✅ [AUTH STORE] Email renvoyé:', result)
+            return result
+        } catch (err: any) {
+            console.error('❌ [AUTH STORE] Erreur lors du renvoi:', err)
+            error.value = err instanceof AuthError ? err : new AuthError(
+                'Une erreur est survenue lors du renvoi de l\'email',
+                'NETWORK_ERROR'
             )
             throw error.value
         } finally {
@@ -260,6 +320,8 @@ export const useAuthStore = defineStore('auth', () => {
         waitForInitialization,
         login,
         register,
+        verifyEmail,
+        resendVerificationEmail,
         logout,
         refreshUser,
         clearError

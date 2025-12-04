@@ -20,6 +20,8 @@ export interface RegisterCredentials {
     lastName: string
     email: string
     password: string
+    passwordConfirm: string       // Confirmation du mot de passe (envoyé à l'API)
+    birthDate?: string | null     // Date de naissance format YYYY-MM-DD (optionnel)
 }
 
 /**
@@ -65,13 +67,17 @@ export interface User {
     firstName: string | null         // API: "firstname" (lowercase)
     lastName: string | null          // API: "lastname" (lowercase)
     phone: string | null             // API: "phone"
+    phoneStatus: string | null       // API: "phoneStatus" - "pending" | "verified" etc.
 
     // Profil (à venir)
     avatarUrl: string | null         // À venir
     birthDate: string | null         // À venir
 
-    // Adresses (à venir - sera un array)
-    addresses: UserAddress[]         // À venir - backend prévoit un array
+    // Adresses - backend renvoie "adress_array" (avec typo)
+    addresses: UserAddress[]
+
+    // Marketing/Optin
+    optinStatus: string | null       // API: "optinStatus" - "subscribed" | "unsubscribed" etc.
 
     // Métadonnées (disponible maintenant)
     tag: string | null               // API: "tag" - segmentation marketing
@@ -81,16 +87,26 @@ export interface User {
 
 /**
  * Adresse utilisateur (pour livraison/facturation)
- * Structure préparée pour le futur array d'adresses du backend
+ * Structure basée sur la réponse API "adress_array"
+ *
+ * Note: Le backend utilise "adress_array" (typo), "mainAdress" et "mainBillAdress"
  */
 export interface UserAddress {
     id?: number | string
-    label?: string              // "Domicile", "Bureau", etc.
-    street: string
-    city: string
-    postalCode: string
-    country: string
-    isDefault?: boolean
+    // Destinataire
+    title?: string | null           // API: "title" - civilité (M. / Mme)
+    firstName?: string | null       // API: "firstname" - prénom du destinataire
+    lastName?: string | null        // API: "lastname" - nom du destinataire
+    recipient?: string | null       // API: "recipient" - nom/label de l'adresse ("Maison", "Bureau")
+    // Adresse
+    line1: string                   // API: "line1" - ligne d'adresse principale
+    line2?: string | null           // API: "line2" - complément d'adresse
+    zipcode: string                 // API: "zipcode" - code postal
+    city: string                    // API: "city" - ville
+    country: string                 // API: "country" - code pays (FR, BE, etc.)
+    // Métadonnées - adresses par défaut (0 ou 1)
+    isDefaultShipping?: boolean     // API: "mainAdress" - 1 = adresse livraison par défaut
+    isDefaultBilling?: boolean      // API: "mainBillAdress" - 1 = adresse facturation par défaut
 }
 
 /**

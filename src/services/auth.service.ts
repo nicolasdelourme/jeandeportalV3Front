@@ -24,7 +24,11 @@ import {
     mockRegisterAPI,
     mockGetUserProfileAPI,
     mockLogoutAPI,
-    mockForgotPasswordAPI
+    mockForgotPasswordAPI,
+    mockVerifyEmailAPI,
+    mockResendVerificationEmailAPI,
+    mockVerifyResetCodeAPI,
+    mockCompletePasswordResetAPI
 } from '@/api/auth.mock'
 
 /**
@@ -82,6 +86,9 @@ export class AuthService {
 
     /**
      * Inscription d'un nouvel utilisateur
+     *
+     * Note: L'inscription ne connecte plus automatiquement l'utilisateur.
+     * Un email de confirmation est envoyé et l'utilisateur doit valider son email.
      */
     async register(credentials: RegisterCredentials): Promise<AuthSuccessResponse> {
         try {
@@ -91,12 +98,14 @@ export class AuthService {
                 // Utiliser le mock
                 response = await mockRegisterAPI(credentials)
             } else {
-                // Appel API réel
+                // Appel API réel - nouveaux champs ajoutés
                 response = await apiClient.post<AuthResponse>('/register', {
-                    first_name: credentials.firstName,
-                    last_name: credentials.lastName,
+                    firstname: credentials.firstName,
+                    lastname: credentials.lastName,
                     email: credentials.email,
-                    password: credentials.password
+                    password: credentials.password,
+                    passwordConfirm: credentials.passwordConfirm,
+                    birthdate: credentials.birthDate || null
                 })
             }
 
@@ -138,6 +147,65 @@ export class AuthService {
             throw new AuthError(
                 errorMessage,
                 'UNKNOWN_ERROR',
+                error.response?.status
+            )
+        }
+    }
+
+    /**
+     * Vérifie l'email de l'utilisateur via le token reçu par email
+     *
+     * @param token - Token de vérification reçu par email
+     */
+    async verifyEmail(token: string): Promise<{ success: boolean; message: string }> {
+        try {
+            if (USE_MOCK) {
+                return await mockVerifyEmailAPI(token)
+            } else {
+                // Endpoint à définir avec le backend (GET ou POST)
+                const response = await apiClient.post<{ success: boolean; message: string }>(
+                    '/verify-email',
+                    { token }
+                )
+                return response
+            }
+        } catch (error: any) {
+            logger.error('Erreur lors de la vérification de l\'email:', error)
+
+            const errorMessage = error.response?.data?.message || 'Impossible de vérifier l\'email. Le lien est peut-être expiré.'
+
+            throw new AuthError(
+                errorMessage,
+                'UNKNOWN_ERROR',
+                error.response?.status
+            )
+        }
+    }
+
+    /**
+     * Renvoie l'email de vérification
+     *
+     * @param email - Email de l'utilisateur
+     */
+    async resendVerificationEmail(email: string): Promise<{ success: boolean; message: string }> {
+        try {
+            if (USE_MOCK) {
+                return await mockResendVerificationEmailAPI(email)
+            } else {
+                const response = await apiClient.post<{ success: boolean; message: string }>(
+                    '/resend-verification',
+                    { email }
+                )
+                return response
+            }
+        } catch (error: any) {
+            logger.error('Erreur lors du renvoi de l\'email de vérification:', error)
+
+            const errorMessage = error.response?.data?.message || 'Impossible de renvoyer l\'email de vérification.'
+
+            throw new AuthError(
+                errorMessage,
+                'NETWORK_ERROR',
                 error.response?.status
             )
         }
@@ -194,25 +262,100 @@ export class AuthService {
 
     /**
      * Demande de réinitialisation de mot de passe
+     * POST /forgot-password
      */
     async forgotPassword(email: string): Promise<{ success: boolean; message: string }> {
         try {
             if (USE_MOCK) {
-                // Utiliser le mock
                 return await mockForgotPasswordAPI(email)
             } else {
-                // Appel API réel
-                const response = await apiClient.post<{ success: boolean; message: string }>(
+                const response = await apiClient.post<{ status: string }>(
                     '/forgot-password',
                     { email }
                 )
-                return response
+                // Convertir la réponse API { status: "success" } en format interne
+                return {
+                    success: response.status === 'success',
+                    message: 'Si un compte existe avec cet email, un lien de réinitialisation a été envoyé.'
+                }
             }
         } catch (error: any) {
             logger.error('Erreur lors de la réinitialisation:', error)
             throw new AuthError(
                 'Impossible d\'envoyer l\'email de réinitialisation.',
                 'NETWORK_ERROR',
+                error.response?.status
+            )
+        }
+    }
+
+    /**
+     * Vérifie la validité du code de réinitialisation
+     * POST /forgot-password/verif
+     *
+     * @param code - Code reçu par email
+     */
+    async verifyResetCode(code: string): Promise<{ success: boolean; message: string }> {
+        try {
+            if (USE_MOCK) {
+                return await mockVerifyResetCodeAPI(code)
+            } else {
+                const response = await apiClient.post<{ status: string }>(
+                    '/forgot-password/verif',
+                    { code }
+                )
+                return {
+                    success: response.status === 'success',
+                    message: 'Code valide.'
+                }
+            }
+        } catch (error: any) {
+            logger.error('Erreur lors de la vérification du code:', error)
+
+            const errorMessage = error.response?.data?.message || 'Le lien de réinitialisation est invalide ou a expiré.'
+
+            throw new AuthError(
+                errorMessage,
+                'UNKNOWN_ERROR',
+                error.response?.status
+            )
+        }
+    }
+
+    /**
+     * Finalise la réinitialisation du mot de passe
+     * POST /forgot-password/complete
+     *
+     * @param code - Code reçu par email
+     * @param password - Nouveau mot de passe
+     * @param passwordConfirm - Confirmation du nouveau mot de passe
+     */
+    async completePasswordReset(
+        code: string,
+        password: string,
+        passwordConfirm: string
+    ): Promise<{ success: boolean; message: string }> {
+        try {
+            if (USE_MOCK) {
+                return await mockCompletePasswordResetAPI(code, password, passwordConfirm)
+            } else {
+                const response = await apiClient.post<{ status: string }>(
+                    '/forgot-password/complete',
+                    { code, password, passwordConfirm }
+                )
+                return {
+                    success: response.status === 'success',
+                    message: 'Votre mot de passe a été réinitialisé avec succès.'
+                }
+            }
+        } catch (error: any) {
+            logger.error('Erreur lors de la réinitialisation du mot de passe:', error)
+
+            const errorMessage = error.response?.data?.message || 'Impossible de réinitialiser le mot de passe.'
+
+            throw new AuthError(
+                errorMessage,
+                'UNKNOWN_ERROR',
                 error.response?.status
             )
         }

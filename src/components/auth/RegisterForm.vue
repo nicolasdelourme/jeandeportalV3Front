@@ -7,12 +7,17 @@ import { ref, computed } from 'vue'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
+import { getLocalTimeZone, today } from '@internationalized/date'
+import type { DateValue } from 'reka-ui'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Calendar } from '@/components/ui/calendar'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
+import { cn } from '@/lib/utils'
 
 interface Props {
     /**
@@ -32,6 +37,7 @@ const emit = defineEmits<{
         email: string
         password: string
         confirmPassword: string
+        birthDate?: string
     }]
 }>()
 
@@ -50,7 +56,11 @@ const formSchema = toTypedSchema(z.object({
         .regex(/[A-Z]/, { message: 'Le mot de passe doit contenir au moins une majuscule' })
         .regex(/[a-z]/, { message: 'Le mot de passe doit contenir au moins une minuscule' })
         .regex(/[0-9]/, { message: 'Le mot de passe doit contenir au moins un chiffre' }),
-    confirmPassword: z.string({ required_error: 'Veuillez confirmer votre mot de passe' })
+    confirmPassword: z.string({ required_error: 'Veuillez confirmer votre mot de passe' }),
+    birthDate: z.string()
+        .regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'Format invalide (YYYY-MM-DD)' })
+        .optional()
+        .or(z.literal(''))
 }).refine((data) => data.password === data.confirmPassword, {
     message: 'Les mots de passe ne correspondent pas',
     path: ['confirmPassword']
@@ -118,10 +128,65 @@ const icons = computed(() => ({
     user: byPrefixAndName.fas?.['user'],
     envelope: byPrefixAndName.fas?.['envelope'],
     lock: byPrefixAndName.fas?.['lock'],
+    calendar: byPrefixAndName.fas?.['calendar'],
 }))
 
-const getIcon = (iconKey: 'eye' | 'eyeSlash' | 'user' | 'envelope' | 'lock'): IconDefinition => {
+const getIcon = (iconKey: 'eye' | 'eyeSlash' | 'user' | 'envelope' | 'lock' | 'calendar'): IconDefinition => {
     return icons.value[iconKey] as IconDefinition
+}
+
+/**
+ * Date de naissance sélectionnée (DateValue pour Calendar)
+ * Note: On utilise un type plus permissif pour éviter les conflits de types avec reka-ui
+ */
+const selectedBirthDate = ref<DateValue | undefined>()
+
+/**
+ * Convertit une DateValue en string YYYY-MM-DD
+ */
+const dateValueToString = (date: DateValue | undefined): string => {
+    if (!date) return ''
+    const year = date.year.toString().padStart(4, '0')
+    const month = date.month.toString().padStart(2, '0')
+    const day = date.day.toString().padStart(2, '0')
+    return `${year}-${month}-${day}`
+}
+
+/**
+ * Formate la date pour l'affichage (JJ/MM/AAAA)
+ */
+const formatDateDisplay = (date: DateValue | undefined): string => {
+    if (!date) return ''
+    const day = date.day.toString().padStart(2, '0')
+    const month = date.month.toString().padStart(2, '0')
+    const year = date.year.toString()
+    return `${day}/${month}/${year}`
+}
+
+/**
+ * Date maximale = aujourd'hui (on ne peut pas naître dans le futur)
+ */
+const maxDate = today(getLocalTimeZone())
+
+/**
+ * Date minimale = 120 ans en arrière
+ */
+const minDate = today(getLocalTimeZone()).subtract({ years: 120 })
+
+/**
+ * Handler pour la sélection de date dans le Calendar
+ * Le Calendar peut émettre DateValue | DateValue[] | undefined
+ */
+const handleDateSelect = (date: unknown, setValue: (value: string) => void) => {
+    // Gérer le cas où date est un array (ne devrait pas arriver en mode single)
+    const singleDate = Array.isArray(date) ? date[0] : date
+    if (singleDate && typeof singleDate === 'object' && 'year' in singleDate) {
+        selectedBirthDate.value = singleDate as DateValue
+        setValue(dateValueToString(singleDate as DateValue))
+    } else {
+        selectedBirthDate.value = undefined
+        setValue('')
+    }
 }
 
 const onSubmit = handleSubmit((values) => {
@@ -260,6 +325,53 @@ const onSubmit = handleSubmit((values) => {
                         </button>
                     </div>
                 </FormControl>
+                <FormMessage />
+            </FormItem>
+        </FormField>
+
+        <!-- Date de naissance (optionnel) -->
+        <FormField v-slot="{ setValue }" name="birthDate">
+            <FormItem class="gap-1">
+                <FormLabel class="text-sm font-medium text-neutral-700">
+                    Date de naissance
+                    <span class="text-neutral-400 font-normal">(optionnel)</span>
+                </FormLabel>
+                <Popover>
+                    <PopoverTrigger as-child>
+                        <FormControl>
+                            <button
+                                type="button"
+                                :class="cn(
+                                    'border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none md:text-sm',
+                                    'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                    'pl-10 text-left relative cursor-pointer',
+                                    !selectedBirthDate && 'text-muted-foreground'
+                                )"
+                            >
+                                <div class="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400">
+                                    <FontAwesomeIcon v-if="getIcon('calendar')" :icon="getIcon('calendar')" class="w-4 h-4" />
+                                </div>
+                                <span class="truncate">
+                                    {{ selectedBirthDate ? formatDateDisplay(selectedBirthDate) : 'Sélectionner une date' }}
+                                </span>
+                            </button>
+                        </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent class="w-auto p-0" align="start">
+                        <Calendar
+                            :model-value="selectedBirthDate"
+                            :max-value="maxDate"
+                            :min-value="minDate"
+                            layout="month-and-year"
+                            locale="fr"
+                            initial-focus
+                            @update:model-value="(date) => handleDateSelect(date, setValue)"
+                        />
+                    </PopoverContent>
+                </Popover>
+                <FormDescription class="text-xs text-neutral-500">
+                    Cliquez pour sélectionner une date
+                </FormDescription>
                 <FormMessage />
             </FormItem>
         </FormField>

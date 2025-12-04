@@ -19,9 +19,26 @@ const MOCK_USERS: Array<User & { password: string }> = [
         firstName: 'Jean',
         lastName: 'Dupont',
         phone: '0612345678',
+        phoneStatus: 'verified',
         avatarUrl: null,
         birthDate: null,
-        addresses: [],
+        addresses: [
+            {
+                id: 1,
+                title: 'M.',
+                firstName: 'Jean',
+                lastName: 'Dupont',
+                recipient: 'Domicile',
+                line1: '22 RUE DE MONTREUIL',
+                line2: null,
+                zipcode: '75011',
+                city: 'PARIS',
+                country: 'FR',
+                isDefaultShipping: true,
+                isDefaultBilling: true,
+            }
+        ],
+        optinStatus: 'subscribed',
         tag: 'mock_user',
         createdOn: '2024-01-15 10:00:00',
         lastLogin: null,
@@ -104,36 +121,64 @@ export async function mockLoginAPI(credentials: LoginCredentials): Promise<AuthR
     } as AuthSuccessResponse
 }
 
+// Stockage des tokens de vérification simulés (email -> token)
+const MOCK_VERIFICATION_TOKENS: Map<string, string> = new Map()
+
+// Stockage des codes de réinitialisation de mot de passe (code -> email)
+const MOCK_RESET_CODES: Map<string, string> = new Map()
+
+/**
+ * Génère un token de vérification simulé
+ */
+function generateVerificationToken(): string {
+    return `verify_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`
+}
+
+/**
+ * Génère un code de réinitialisation simulé
+ */
+function generateResetCode(): string {
+    return `reset_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`
+}
+
 /**
  * Mock Register API
  *
- * Simule le comportement avec cookies HttpOnly (auto-login après inscription)
+ * Note: L'inscription NE crée plus de session (pas d'auto-login)
+ * L'utilisateur doit valider son email avant de pouvoir se connecter
  */
 export async function mockRegisterAPI(credentials: RegisterCredentials): Promise<AuthResponse> {
+    console.log('📝 [MOCK API] mockRegisterAPI appelé avec:', {
+        email: credentials.email,
+        birthDate: credentials.birthDate
+    })
     await delay(1000) // L'inscription peut prendre un peu plus de temps
 
     // Vérifier si l'utilisateur existe déjà
     const existingUser = MOCK_USERS.find(u => u.email === credentials.email)
     if (existingUser) {
+        console.log('❌ [MOCK API] Email déjà utilisé:', credentials.email)
         return {
             status: 'error',
             message: 'Un compte existe déjà avec cet email'
         } as AuthErrorResponse
     }
 
-    // Créer le nouvel utilisateur
+    // Créer le nouvel utilisateur (emailVerified: false)
     const newUser: User & { password: string } = {
         id: MOCK_USERS.length + 1,
         email: credentials.email,
         password: credentials.password,
-        emailVerified: false,
+        emailVerified: false, // L'utilisateur doit valider son email
         title: null,
         firstName: credentials.firstName,
         lastName: credentials.lastName,
         phone: null,
+        phoneStatus: null,
         avatarUrl: null,
-        birthDate: null,
+        birthDate: credentials.birthDate || null,
         addresses: [],
+        optinStatus: null,
         tag: 'new_user',
         createdOn: new Date().toISOString().replace('T', ' ').substring(0, 19),
         lastLogin: null,
@@ -141,22 +186,26 @@ export async function mockRegisterAPI(credentials: RegisterCredentials): Promise
 
     MOCK_USERS.push(newUser)
 
-    // Créer la session (simule le cookie HttpOnly côté serveur - auto-login)
-    const expiresIn = 86400 // 1 jour par défaut
-    MOCK_SESSION = {
-        userId: Number(newUser.id),
-        expiresAt: Date.now() + expiresIn * 1000
-    }
+    // Générer un token de vérification et le stocker
+    const verificationToken = generateVerificationToken()
+    MOCK_VERIFICATION_TOKENS.set(credentials.email, verificationToken)
 
-    // Retourner une réponse de succès (comme si on était auto-connecté après inscription)
+    // Simuler l'envoi d'email (log console)
+    console.log('📧 [MOCK API] Email de vérification envoyé à:', credentials.email)
+    console.log('🔗 [MOCK API] Lien de vérification: /auth/verify-email?token=' + verificationToken)
+
+    // PAS de création de session (pas d'auto-login)
+    // L'utilisateur doit valider son email d'abord
+
+    // Retourner une réponse de succès (sans token utilisable)
     return {
         status: 'success',
         access_token: {
-            token: generateMockToken(newUser.id) // Non utilisé, juste pour compatibilité
+            token: '' // Pas de token car pas d'auto-login
         },
         type: 'Bearer',
-        expires_in: expiresIn,
-        afterLogin: '/' // Redirection vers home après inscription
+        expires_in: 0,
+        afterLogin: undefined // Pas de redirection, l'utilisateur doit vérifier son email
     } as AuthSuccessResponse
 }
 
@@ -216,21 +265,190 @@ export async function mockLogoutAPI(): Promise<{ success: boolean }> {
 
 /**
  * Mock Forgot Password API
+ *
+ * Génère un code de réinitialisation et le stocke
  */
 export async function mockForgotPasswordAPI(email: string): Promise<{ success: boolean; message: string }> {
+    console.log('🔑 [MOCK API] mockForgotPasswordAPI appelé pour:', email)
     await delay(1000)
 
     const user = MOCK_USERS.find(u => u.email === email)
     if (!user) {
         // Pour des raisons de sécurité, on ne révèle pas si l'email existe ou non
+        console.log('⚠️ [MOCK API] Email non trouvé (mais on retourne succès pour sécurité)')
         return {
             success: true,
             message: 'Si un compte existe avec cet email, un lien de réinitialisation a été envoyé.'
         }
     }
 
+    // Générer un code de réinitialisation et le stocker
+    const resetCode = generateResetCode()
+    MOCK_RESET_CODES.set(resetCode, email)
+
+    console.log('📧 [MOCK API] Email de réinitialisation envoyé à:', email)
+    console.log('🔗 [MOCK API] Lien de réinitialisation: /auth/reset-password?code=' + resetCode)
+
     return {
         success: true,
         message: 'Un email de réinitialisation a été envoyé à votre adresse.'
+    }
+}
+
+/**
+ * Mock Verify Email API
+ *
+ * Simule la vérification de l'email via le token reçu par email
+ */
+export async function mockVerifyEmailAPI(token: string): Promise<{ success: boolean; message: string }> {
+    console.log('✅ [MOCK API] mockVerifyEmailAPI appelé avec token:', token)
+    await delay(800)
+
+    // Chercher l'email associé au token
+    let foundEmail: string | null = null
+    for (const [email, storedToken] of MOCK_VERIFICATION_TOKENS.entries()) {
+        if (storedToken === token) {
+            foundEmail = email
+            break
+        }
+    }
+
+    if (!foundEmail) {
+        console.log('❌ [MOCK API] Token de vérification invalide ou expiré')
+        return {
+            success: false,
+            message: 'Le lien de vérification est invalide ou a expiré.'
+        }
+    }
+
+    // Trouver l'utilisateur et mettre à jour emailVerified
+    const user = MOCK_USERS.find(u => u.email === foundEmail)
+    if (user) {
+        user.emailVerified = true
+        // Supprimer le token utilisé
+        MOCK_VERIFICATION_TOKENS.delete(foundEmail)
+        console.log('✅ [MOCK API] Email vérifié pour:', foundEmail)
+    }
+
+    return {
+        success: true,
+        message: 'Votre email a été vérifié avec succès. Vous pouvez maintenant vous connecter.'
+    }
+}
+
+/**
+ * Mock Resend Verification Email API
+ *
+ * Simule le renvoi de l'email de vérification
+ */
+export async function mockResendVerificationEmailAPI(email: string): Promise<{ success: boolean; message: string }> {
+    console.log('📧 [MOCK API] mockResendVerificationEmailAPI appelé pour:', email)
+    await delay(1000)
+
+    // Chercher l'utilisateur
+    const user = MOCK_USERS.find(u => u.email === email)
+
+    if (!user) {
+        // Pour des raisons de sécurité, on ne révèle pas si l'email existe ou non
+        console.log('⚠️ [MOCK API] Email non trouvé (mais on retourne succès pour sécurité)')
+        return {
+            success: true,
+            message: 'Si un compte existe avec cet email, un nouveau lien de vérification a été envoyé.'
+        }
+    }
+
+    if (user.emailVerified) {
+        console.log('⚠️ [MOCK API] Email déjà vérifié')
+        return {
+            success: false,
+            message: 'Cet email est déjà vérifié. Vous pouvez vous connecter.'
+        }
+    }
+
+    // Générer un nouveau token
+    const newToken = generateVerificationToken()
+    MOCK_VERIFICATION_TOKENS.set(email, newToken)
+
+    console.log('📧 [MOCK API] Nouvel email de vérification envoyé à:', email)
+    console.log('🔗 [MOCK API] Nouveau lien: /auth/verify-email?token=' + newToken)
+
+    return {
+        success: true,
+        message: 'Un nouveau lien de vérification a été envoyé à votre adresse email.'
+    }
+}
+
+/**
+ * Mock Verify Reset Code API
+ *
+ * Vérifie la validité du code de réinitialisation
+ */
+export async function mockVerifyResetCodeAPI(code: string): Promise<{ success: boolean; message: string }> {
+    console.log('🔑 [MOCK API] mockVerifyResetCodeAPI appelé avec code:', code)
+    await delay(800)
+
+    // Vérifier si le code existe
+    const email = MOCK_RESET_CODES.get(code)
+
+    if (!email) {
+        console.log('❌ [MOCK API] Code de réinitialisation invalide ou expiré')
+        return {
+            success: false,
+            message: 'Le lien de réinitialisation est invalide ou a expiré.'
+        }
+    }
+
+    console.log('✅ [MOCK API] Code valide pour:', email)
+    return {
+        success: true,
+        message: 'Code valide.'
+    }
+}
+
+/**
+ * Mock Complete Password Reset API
+ *
+ * Finalise la réinitialisation du mot de passe
+ */
+export async function mockCompletePasswordResetAPI(
+    code: string,
+    password: string,
+    passwordConfirm: string
+): Promise<{ success: boolean; message: string }> {
+    console.log('🔑 [MOCK API] mockCompletePasswordResetAPI appelé')
+    await delay(1000)
+
+    // Vérifier que les mots de passe correspondent
+    if (password !== passwordConfirm) {
+        console.log('❌ [MOCK API] Les mots de passe ne correspondent pas')
+        return {
+            success: false,
+            message: 'Les mots de passe ne correspondent pas.'
+        }
+    }
+
+    // Vérifier si le code existe
+    const email = MOCK_RESET_CODES.get(code)
+
+    if (!email) {
+        console.log('❌ [MOCK API] Code de réinitialisation invalide ou expiré')
+        return {
+            success: false,
+            message: 'Le lien de réinitialisation est invalide ou a expiré.'
+        }
+    }
+
+    // Trouver l'utilisateur et mettre à jour son mot de passe
+    const user = MOCK_USERS.find(u => u.email === email)
+    if (user) {
+        user.password = password
+        // Supprimer le code utilisé
+        MOCK_RESET_CODES.delete(code)
+        console.log('✅ [MOCK API] Mot de passe réinitialisé pour:', email)
+    }
+
+    return {
+        success: true,
+        message: 'Votre mot de passe a été réinitialisé avec succès.'
     }
 }
