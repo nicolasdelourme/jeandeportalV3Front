@@ -4,7 +4,9 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
 import type { Address, CreateAddressDto } from '@/types/address.types'
+import type { UserAddress } from '@/types/auth.types'
 import { toast } from 'vue-sonner'
+import { useAuth } from '@/composables/useAuth'
 
 import AddressForm from './AddressForm.vue'
 import { Button } from '@/components/ui/button'
@@ -17,6 +19,11 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
+
+/**
+ * Auth store
+ */
+const { user } = useAuth()
 
 /**
  * Icônes
@@ -34,25 +41,43 @@ const getIcon = (iconKey: keyof typeof icons.value): IconDefinition => {
   return icons.value[iconKey] as IconDefinition
 }
 
-// État local (à remplacer par un store Pinia en production)
-const addresses = ref<Address[]>([
-  // Données mockées pour démonstration
-  {
-    id: '1',
-    label: 'Maison',
-    firstName: 'Jean',
-    lastName: 'Dupont',
-    street: '123 Rue de la Paix',
-    streetComplement: 'Appartement 5B',
-    postalCode: '75001',
-    city: 'Paris',
-    country: 'France',
-    phone: '06 12 34 56 78',
-    isDefault: true,
-    type: 'both',
-    createdAt: '2024-01-15'
+/**
+ * Convertit une UserAddress (format API) en Address (format composant)
+ */
+function mapUserAddressToAddress(userAddr: UserAddress, index: number): Address {
+  const isShipping = userAddr.isDefaultShipping ?? false
+  const isBilling = userAddr.isDefaultBilling ?? false
+
+  // Déterminer le type basé sur les flags
+  let type: Address['type'] = 'both'
+  if (isShipping && !isBilling) type = 'shipping'
+  else if (isBilling && !isShipping) type = 'billing'
+
+  return {
+    id: String(userAddr.id ?? index),
+    label: userAddr.recipient ?? undefined,
+    title: userAddr.title ?? undefined,
+    firstName: userAddr.firstName ?? '',
+    lastName: userAddr.lastName ?? '',
+    street: userAddr.line1,
+    streetComplement: userAddr.line2 ?? undefined,
+    postalCode: userAddr.zipcode,
+    city: userAddr.city,
+    country: userAddr.country,
+    phone: undefined, // Le backend ne renvoie pas le téléphone dans l'adresse
+    isDefaultShipping: isShipping,
+    isDefaultBilling: isBilling,
+    type,
   }
-])
+}
+
+/**
+ * Adresses mappées depuis le store utilisateur
+ */
+const addresses = computed<Address[]>(() => {
+  if (!user.value?.addresses) return []
+  return user.value.addresses.map((addr, idx) => mapUserAddressToAddress(addr, idx))
+})
 
 // État du formulaire
 const isFormOpen = ref(false)
@@ -88,42 +113,14 @@ const handleSubmit = async (data: CreateAddressDto) => {
   try {
     if (formMode.value === 'create') {
       // TODO: Appel API pour créer l'adresse
-      const newAddress: Address = {
-        id: Date.now().toString(),
-        ...data,
-        isDefault: data.isDefault || false,
-        type: data.type || 'both',
-        createdAt: new Date().toISOString()
-      }
-
-      // Si nouvelle adresse par défaut, retirer le flag des autres
-      if (newAddress.isDefault) {
-        addresses.value.forEach((addr) => (addr.isDefault = false))
-      }
-
-      addresses.value.push(newAddress)
-      toast.success('Adresse ajoutée avec succès')
+      // await addressService.create(data)
+      // await authStore.refreshUser()
+      toast.info('Fonctionnalité à venir : ajout d\'adresse')
     } else {
       // TODO: Appel API pour modifier l'adresse
-      const index = addresses.value.findIndex((a) => a.id === currentAddress.value?.id)
-      if (index !== -1 && currentAddress.value) {
-        const updatedAddress: Address = {
-          id: currentAddress.value.id,
-          ...data,
-          isDefault: data.isDefault || false,
-          type: data.type || 'both',
-          createdAt: currentAddress.value.createdAt || new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        }
-
-        // Si nouvelle adresse par défaut, retirer le flag des autres
-        if (updatedAddress.isDefault) {
-          addresses.value.forEach((addr) => (addr.isDefault = false))
-        }
-
-        addresses.value[index] = updatedAddress
-        toast.success('Adresse modifiée avec succès')
-      }
+      // await addressService.update(currentAddress.value?.id, data)
+      // await authStore.refreshUser()
+      toast.info('Fonctionnalité à venir : modification d\'adresse')
     }
 
     closeForm()
@@ -145,8 +142,9 @@ const deleteAddress = async () => {
 
   try {
     // TODO: Appel API pour supprimer l'adresse
-    addresses.value = addresses.value.filter((a) => a.id !== addressToDelete.value)
-    toast.success('Adresse supprimée avec succès')
+    // await addressService.delete(addressToDelete.value)
+    // await authStore.refreshUser()
+    toast.info('Fonctionnalité à venir : suppression d\'adresse')
   } catch (error) {
     toast.error('Impossible de supprimer cette adresse')
     console.error(error)
@@ -160,10 +158,9 @@ const deleteAddress = async () => {
 const setAsDefault = async (addressId: string) => {
   try {
     // TODO: Appel API pour définir l'adresse par défaut
-    addresses.value.forEach((addr) => {
-      addr.isDefault = addr.id === addressId
-    })
-    toast.success('Adresse par défaut mise à jour')
+    // await addressService.setDefault(addressId)
+    // await authStore.refreshUser()
+    toast.info('Fonctionnalité à venir : définir par défaut')
   } catch (error) {
     toast.error('Une erreur est survenue')
     console.error(error)
@@ -217,7 +214,7 @@ const formatFullAddress = (address: Address) => {
           :key="address.id"
           :class="[
             'relative p-4 rounded-lg border transition-all',
-            address.isDefault ? 'border-primary bg-primary/5' : 'border-border'
+            (address.isDefaultShipping || address.isDefaultBilling) ? 'border-primary bg-primary/5' : 'border-border'
           ]"
         >
           <!-- Actions en top-right -->
@@ -245,44 +242,55 @@ const formatFullAddress = (address: Address) => {
             <!-- En-tête -->
             <div class="flex items-start gap-2">
               <div class="space-y-1 flex-1">
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
                   <h4 class="font-medium text-sm" style="font-family: Roboto, sans-serif">
                     {{ address.label || 'Adresse' }}
                   </h4>
-                  <Badge v-if="address.isDefault" variant="default" class="text-xs h-5">
-                    Par défaut
+                  <Badge v-if="address.isDefaultShipping" variant="default" class="text-xs h-5">
+                    Livraison par défaut
+                  </Badge>
+                  <Badge v-if="address.isDefaultBilling" variant="secondary" class="text-xs h-5">
+                    Facturation par défaut
                   </Badge>
                 </div>
-                <Badge variant="outline" class="text-xs">
-                  {{ getAddressTypeLabel(address.type) }}
-                </Badge>
               </div>
             </div>
 
             <!-- Informations -->
             <div class="space-y-1 text-sm">
               <p class="font-medium text-neutral-700">
-                {{ address.firstName }} {{ address.lastName }}
+                {{ address.title }} {{ address.firstName }} {{ address.lastName }}
               </p>
               <p class="text-muted-foreground leading-relaxed">
                 {{ formatFullAddress(address) }}
               </p>
-              <p class="text-muted-foreground flex items-center gap-2">
+              <p v-if="address.phone" class="text-muted-foreground flex items-center gap-2">
                 <FontAwesomeIcon v-if="getIcon('phone')" :icon="getIcon('phone')" class="w-3.5" />
                 {{ address.phone }}
               </p>
             </div>
 
-            <!-- Action par défaut -->
-            <div v-if="!address.isDefault" class="pt-2">
+            <!-- Actions par défaut -->
+            <div v-if="!address.isDefaultShipping || !address.isDefaultBilling" class="pt-2 flex gap-2 flex-wrap">
               <Button
+                v-if="!address.isDefaultShipping"
                 variant="ghost"
                 size="sm"
                 @click="setAsDefault(address.id)"
                 class="text-xs h-7"
               >
                 <FontAwesomeIcon v-if="getIcon('star')" :icon="getIcon('star')" class="mr-1.5 w-3" />
-                Définir par défaut
+                Livraison par défaut
+              </Button>
+              <Button
+                v-if="!address.isDefaultBilling"
+                variant="ghost"
+                size="sm"
+                @click="setAsDefault(address.id)"
+                class="text-xs h-7"
+              >
+                <FontAwesomeIcon v-if="getIcon('star')" :icon="getIcon('star')" class="mr-1.5 w-3" />
+                Facturation par défaut
               </Button>
             </div>
           </div>

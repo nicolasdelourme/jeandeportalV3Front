@@ -39,6 +39,9 @@ function sanitizeString(value: unknown): string {
 /**
  * Sanitize le tableau d'adresses
  * Retourne un tableau vide si les données ne sont pas un array
+ *
+ * Note: Le backend utilise "adress_array" (typo) avec le format:
+ * { id, title, firstname, lastname, recipient, line1, line2, zipcode, city, country, mainAdress, mainBillAdress }
  */
 function sanitizeAddresses(addresses: unknown): UserAddress[] {
     if (!Array.isArray(addresses)) return []
@@ -49,12 +52,20 @@ function sanitizeAddresses(addresses: unknown): UserAddress[] {
         )
         .map(addr => ({
             id: addr.id as number | string | undefined,
-            label: sanitizeNullableString(addr.label) ?? undefined,
-            street: sanitizeString(addr.street),
+            // Destinataire
+            title: sanitizeNullableString(addr.title),
+            firstName: sanitizeNullableString(addr.firstname ?? addr.firstName),
+            lastName: sanitizeNullableString(addr.lastname ?? addr.lastName),
+            recipient: sanitizeNullableString(addr.recipient),
+            // Adresse
+            line1: sanitizeString(addr.line1),
+            line2: sanitizeNullableString(addr.line2),
+            zipcode: sanitizeString(addr.zipcode ?? addr.postalCode),
             city: sanitizeString(addr.city),
-            postalCode: sanitizeString(addr.postalCode ?? addr.postal_code),
             country: sanitizeString(addr.country),
-            isDefault: Boolean(addr.isDefault ?? addr.is_default ?? false),
+            // Métadonnées - adresses par défaut (valeur 1/0)
+            isDefaultShipping: Boolean(addr.mainAdress ?? addr.isDefaultShipping ?? false),
+            isDefaultBilling: Boolean(addr.mainBillAdress ?? addr.isDefaultBilling ?? false),
         }))
 }
 
@@ -89,11 +100,17 @@ export function sanitizeUser(user: unknown): User {
         firstName: sanitizeNullableString(data.firstName ?? data.firstname),
         lastName: sanitizeNullableString(data.lastName ?? data.lastname),
         phone: sanitizeNullableString(data.phone),
+        phoneStatus: sanitizeNullableString(data.phoneStatus ?? data.phone_status),
 
         // À venir - null/[] par défaut pour l'instant
         avatarUrl: sanitizeNullableString(data.avatarUrl ?? data.avatar_url),
         birthDate: sanitizeNullableString(data.birthDate ?? data.birth_date),
-        addresses: sanitizeAddresses(data.addresses),
+
+        // Adresses - backend utilise "adress_array" (avec typo)
+        addresses: sanitizeAddresses(data.addresses ?? data.adress_array),
+
+        // Marketing/Optin
+        optinStatus: sanitizeNullableString(data.optinStatus ?? data.optin_status),
 
         // Métadonnées
         tag: sanitizeNullableString(data.tag),
