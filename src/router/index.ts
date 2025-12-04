@@ -60,6 +60,18 @@ const routes: RouteRecordRaw[] = [
         },
     },
     {
+        path: "/auth/verify-email",
+        name: "verify-email",
+        component: () => import("@/views/auth/VerifyEmailPage.vue"),
+        // Pas de guestOnly - peut être accédé même si déjà connecté
+    },
+    {
+        path: "/auth/reset-password",
+        name: "reset-password",
+        component: () => import("@/views/auth/ResetPasswordPage.vue"),
+        // Pas de guestOnly - peut être accédé même si déjà connecté
+    },
+    {
         path: "/mon-compte",
         name: "account",
         component: () => import("@/views/account/AccountPage.vue"),
