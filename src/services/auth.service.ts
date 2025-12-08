@@ -4,7 +4,7 @@
  */
 
 import { apiClient } from '@/api/client'
-import type { LoginCredentials, RegisterCredentials, AuthResponse, AuthSuccessResponse, User } from '@/types/auth.types'
+import type { LoginCredentials, RegisterCredentials, AuthResponse, AuthSuccessResponse, User, VerifyEmailResponse } from '@/types/auth.types'
 import { AuthError } from '@/types/auth.types'
 import { logger } from '@/utils/logger'
 
@@ -26,7 +26,6 @@ import {
     mockLogoutAPI,
     mockForgotPasswordAPI,
     mockVerifyEmailAPI,
-    mockResendVerificationEmailAPI,
     mockVerifyResetCodeAPI,
     mockCompletePasswordResetAPI
 } from '@/api/auth.mock'
@@ -154,18 +153,18 @@ export class AuthService {
 
     /**
      * Vérifie l'email de l'utilisateur via le token reçu par email
+     * POST /register/verif-mail
      *
-     * @param token - Token de vérification reçu par email
+     * @param token - Token (hash) de vérification reçu par email
      */
-    async verifyEmail(token: string): Promise<{ success: boolean; message: string }> {
+    async verifyEmail(token: string): Promise<VerifyEmailResponse> {
         try {
             if (USE_MOCK) {
                 return await mockVerifyEmailAPI(token)
             } else {
-                // Endpoint à définir avec le backend (GET ou POST)
-                const response = await apiClient.post<{ success: boolean; message: string }>(
-                    '/verify-email',
-                    { token }
+                const response = await apiClient.post<VerifyEmailResponse>(
+                    '/register/verif-mail',
+                    { hash: token }
                 )
                 return response
             }
@@ -177,35 +176,6 @@ export class AuthService {
             throw new AuthError(
                 errorMessage,
                 'UNKNOWN_ERROR',
-                error.response?.status
-            )
-        }
-    }
-
-    /**
-     * Renvoie l'email de vérification
-     *
-     * @param email - Email de l'utilisateur
-     */
-    async resendVerificationEmail(email: string): Promise<{ success: boolean; message: string }> {
-        try {
-            if (USE_MOCK) {
-                return await mockResendVerificationEmailAPI(email)
-            } else {
-                const response = await apiClient.post<{ success: boolean; message: string }>(
-                    '/resend-verification',
-                    { email }
-                )
-                return response
-            }
-        } catch (error: any) {
-            logger.error('Erreur lors du renvoi de l\'email de vérification:', error)
-
-            const errorMessage = error.response?.data?.message || 'Impossible de renvoyer l\'email de vérification.'
-
-            throw new AuthError(
-                errorMessage,
-                'NETWORK_ERROR',
                 error.response?.status
             )
         }

@@ -192,7 +192,7 @@ export async function mockRegisterAPI(credentials: RegisterCredentials): Promise
 
     // Simuler l'envoi d'email (log console)
     console.log('📧 [MOCK API] Email de vérification envoyé à:', credentials.email)
-    console.log('🔗 [MOCK API] Lien de vérification: /auth/verify-email?token=' + verificationToken)
+    console.log('🔗 [MOCK API] Lien de vérification: /register/verif/' + verificationToken)
 
     // PAS de création de session (pas d'auto-login)
     // L'utilisateur doit valider son email d'abord
@@ -297,11 +297,12 @@ export async function mockForgotPasswordAPI(email: string): Promise<{ success: b
 
 /**
  * Mock Verify Email API
+ * POST /register/verif-mail avec { hash: token }
  *
  * Simule la vérification de l'email via le token reçu par email
  */
-export async function mockVerifyEmailAPI(token: string): Promise<{ success: boolean; message: string }> {
-    console.log('✅ [MOCK API] mockVerifyEmailAPI appelé avec token:', token)
+export async function mockVerifyEmailAPI(token: string): Promise<{ status: 'success' | 'error'; next?: string; message?: string }> {
+    console.log('✅ [MOCK API] mockVerifyEmailAPI appelé avec hash:', token)
     await delay(800)
 
     // Chercher l'email associé au token
@@ -316,7 +317,7 @@ export async function mockVerifyEmailAPI(token: string): Promise<{ success: bool
     if (!foundEmail) {
         console.log('❌ [MOCK API] Token de vérification invalide ou expiré')
         return {
-            success: false,
+            status: 'error',
             message: 'Le lien de vérification est invalide ou a expiré.'
         }
     }
@@ -331,50 +332,8 @@ export async function mockVerifyEmailAPI(token: string): Promise<{ success: bool
     }
 
     return {
-        success: true,
-        message: 'Votre email a été vérifié avec succès. Vous pouvez maintenant vous connecter.'
-    }
-}
-
-/**
- * Mock Resend Verification Email API
- *
- * Simule le renvoi de l'email de vérification
- */
-export async function mockResendVerificationEmailAPI(email: string): Promise<{ success: boolean; message: string }> {
-    console.log('📧 [MOCK API] mockResendVerificationEmailAPI appelé pour:', email)
-    await delay(1000)
-
-    // Chercher l'utilisateur
-    const user = MOCK_USERS.find(u => u.email === email)
-
-    if (!user) {
-        // Pour des raisons de sécurité, on ne révèle pas si l'email existe ou non
-        console.log('⚠️ [MOCK API] Email non trouvé (mais on retourne succès pour sécurité)')
-        return {
-            success: true,
-            message: 'Si un compte existe avec cet email, un nouveau lien de vérification a été envoyé.'
-        }
-    }
-
-    if (user.emailVerified) {
-        console.log('⚠️ [MOCK API] Email déjà vérifié')
-        return {
-            success: false,
-            message: 'Cet email est déjà vérifié. Vous pouvez vous connecter.'
-        }
-    }
-
-    // Générer un nouveau token
-    const newToken = generateVerificationToken()
-    MOCK_VERIFICATION_TOKENS.set(email, newToken)
-
-    console.log('📧 [MOCK API] Nouvel email de vérification envoyé à:', email)
-    console.log('🔗 [MOCK API] Nouveau lien: /auth/verify-email?token=' + newToken)
-
-    return {
-        success: true,
-        message: 'Un nouveau lien de vérification a été envoyé à votre adresse email.'
+        status: 'success',
+        next: '/login'
     }
 }
 

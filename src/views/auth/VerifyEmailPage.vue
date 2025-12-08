@@ -2,10 +2,11 @@
 /**
  * Page VerifyEmailPage
  * Page de callback pour la vérification de l'email
- * URL: /auth/verify-email?token=xxx
+ * URL: /register/verif/:token
  */
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { toast } from 'vue-sonner'
 import { useAuthStore } from '@/stores/auth.store'
 import DefaultLayout from '@/components/layout/DefaultLayout.vue'
 import AuthFormWrapper from '@/components/auth/AuthFormWrapper.vue'
@@ -26,7 +27,8 @@ const message = ref('')
  * Vérifie l'email au montage de la page
  */
 onMounted(async () => {
-    const token = route.query.token as string
+    // Token depuis le path param (ex: /register/verif/abc123)
+    const token = route.params.token as string
 
     if (!token) {
         isLoading.value = false
@@ -37,8 +39,13 @@ onMounted(async () => {
 
     try {
         const result = await authStore.verifyEmail(token)
-        isSuccess.value = result.success
-        message.value = result.message
+        isSuccess.value = result.status === 'success'
+
+        if (isSuccess.value) {
+            message.value = 'Votre compte a été activé avec succès. Vous pouvez maintenant vous connecter.'
+        } else {
+            message.value = result.message || 'Le lien de vérification est invalide ou a expiré.'
+        }
     } catch (error: any) {
         isSuccess.value = false
         message.value = error.message || 'Une erreur est survenue lors de la vérification.'
@@ -48,9 +55,12 @@ onMounted(async () => {
 })
 
 /**
- * Rediriger vers la page de connexion
+ * Rediriger vers la page de connexion avec toast de succès
  */
 const goToLogin = () => {
+    if (isSuccess.value) {
+        toast.success('Votre compte a été activé ! Vous pouvez vous connecter.')
+    }
     router.push('/auth?mode=login')
 }
 </script>

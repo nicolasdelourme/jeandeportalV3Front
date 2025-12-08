@@ -60,7 +60,7 @@ const routes: RouteRecordRaw[] = [
         },
     },
     {
-        path: "/auth/verify-email",
+        path: "/register/verif/:token",
         name: "verify-email",
         component: () => import("@/views/auth/VerifyEmailPage.vue"),
         // Pas de guestOnly - peut être accédé même si déjà connecté

@@ -8,7 +8,7 @@
 
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { User, LoginCredentials, RegisterCredentials } from '@/types/auth.types'
+import type { User, LoginCredentials, RegisterCredentials, VerifyEmailResponse } from '@/types/auth.types'
 import { AuthError } from '@/types/auth.types'
 import { authService } from '@/services/auth.service'
 import {
@@ -18,6 +18,7 @@ import {
 } from '@/utils/auth'
 import { logger } from '@/utils/logger'
 import { sanitizeUser } from '@/utils/sanitize'
+import { useCartStore } from '@/stores/cart.store'
 
 /**
  * Store d'authentification
@@ -204,11 +205,12 @@ export const useAuthStore = defineStore('auth', () => {
 
     /**
      * Vérifie l'email de l'utilisateur via le token reçu par email
+     * POST /register/verif-mail
      *
-     * @param token - Token de vérification reçu par email
-     * @returns { success: boolean, message: string }
+     * @param token - Token (hash) de vérification reçu par email
+     * @returns VerifyEmailResponse { status, next?, message? }
      */
-    async function verifyEmail(token: string): Promise<{ success: boolean; message: string }> {
+    async function verifyEmail(token: string): Promise<VerifyEmailResponse> {
         isLoading.value = true
         error.value = null
 
@@ -222,33 +224,6 @@ export const useAuthStore = defineStore('auth', () => {
             error.value = err instanceof AuthError ? err : new AuthError(
                 'Une erreur est survenue lors de la vérification',
                 'UNKNOWN_ERROR'
-            )
-            throw error.value
-        } finally {
-            isLoading.value = false
-        }
-    }
-
-    /**
-     * Renvoie l'email de vérification
-     *
-     * @param email - Email de l'utilisateur
-     * @returns { success: boolean, message: string }
-     */
-    async function resendVerificationEmail(email: string): Promise<{ success: boolean; message: string }> {
-        isLoading.value = true
-        error.value = null
-
-        try {
-            console.log('📧 [AUTH STORE] Renvoi de l\'email de vérification...')
-            const result = await authService.resendVerificationEmail(email)
-            console.log('✅ [AUTH STORE] Email renvoyé:', result)
-            return result
-        } catch (err: any) {
-            console.error('❌ [AUTH STORE] Erreur lors du renvoi:', err)
-            error.value = err instanceof AuthError ? err : new AuthError(
-                'Une erreur est survenue lors du renvoi de l\'email',
-                'NETWORK_ERROR'
             )
             throw error.value
         } finally {
@@ -273,6 +248,11 @@ export const useAuthStore = defineStore('auth', () => {
             // Nettoyer l'état local (même si l'appel backend a échoué)
             user.value = null
             clearAuthData()
+
+            // Réinitialiser le panier (vide le basketCode)
+            const cartStore = useCartStore()
+            cartStore.resetCart()
+
             isLoading.value = false
         }
     }
@@ -321,7 +301,6 @@ export const useAuthStore = defineStore('auth', () => {
         login,
         register,
         verifyEmail,
-        resendVerificationEmail,
         logout,
         refreshUser,
         clearError

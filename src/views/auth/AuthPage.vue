@@ -3,7 +3,7 @@
  * Page AuthPage
  * Tunnel de connexion/inscription/mot de passe oublié
  */
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { useAuthStore } from '@/stores/auth.store'
@@ -44,11 +44,6 @@ const errors = ref<Record<string, string>>({})
 const registrationSuccess = ref(false)
 const registrationEmail = ref('')
 
-/**
- * Cooldown pour le renvoi d'email (60 secondes)
- */
-const resendCooldown = ref(0)
-let cooldownInterval: ReturnType<typeof setInterval> | null = null
 
 /**
  * Soumission du formulaire de connexion
@@ -124,42 +119,6 @@ const handleRegisterSubmit = async (values: {
     } catch (error: any) {
         console.error('Erreur:', error)
         errors.value.general = error.message || 'Une erreur est survenue lors de la création du compte.'
-    } finally {
-        isSubmitting.value = false
-    }
-}
-
-/**
- * Renvoyer l'email de vérification
- */
-const handleResendVerification = async () => {
-    if (resendCooldown.value > 0 || !registrationEmail.value) return
-
-    isSubmitting.value = true
-
-    try {
-        const result = await authStore.resendVerificationEmail(registrationEmail.value)
-
-        if (result.success) {
-            toast.success(result.message)
-
-            // Démarrer le cooldown de 60 secondes
-            resendCooldown.value = 60
-            cooldownInterval = setInterval(() => {
-                resendCooldown.value--
-                if (resendCooldown.value <= 0) {
-                    if (cooldownInterval) {
-                        clearInterval(cooldownInterval)
-                        cooldownInterval = null
-                    }
-                }
-            }, 1000)
-        } else {
-            toast.error(result.message)
-        }
-    } catch (error: any) {
-        console.error('Erreur lors du renvoi:', error)
-        toast.error(error.message || 'Impossible de renvoyer l\'email de vérification.')
     } finally {
         isSubmitting.value = false
     }
@@ -273,15 +232,6 @@ onMounted(() => {
     }
 })
 
-/**
- * Nettoyage du timer au démontage
- */
-onUnmounted(() => {
-    if (cooldownInterval) {
-        clearInterval(cooldownInterval)
-        cooldownInterval = null
-    }
-})
 </script>
 
 <template>
@@ -320,27 +270,14 @@ onUnmounted(() => {
                     </p>
                 </div>
 
-                <!-- Bouton de renvoi -->
-                <div class="space-y-3">
-                    <button
-                        type="button"
-                        :disabled="resendCooldown > 0 || isSubmitting"
-                        @click="handleResendVerification"
-                        class="w-full py-2.5 px-4 text-sm font-medium rounded-lg border border-neutral-300 text-neutral-700 hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                        <span v-if="isSubmitting">Envoi en cours...</span>
-                        <span v-else-if="resendCooldown > 0">Renvoyer l'email ({{ resendCooldown }}s)</span>
-                        <span v-else>Renvoyer l'email de vérification</span>
-                    </button>
-
-                    <button
-                        type="button"
-                        @click="goToLoginFromSuccess"
-                        class="w-full py-2.5 px-4 text-sm font-medium rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors"
-                    >
-                        Aller à la connexion
-                    </button>
-                </div>
+                <!-- Bouton vers la connexion -->
+                <button
+                    type="button"
+                    @click="goToLoginFromSuccess"
+                    class="w-full py-2.5 px-4 text-sm font-medium rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors"
+                >
+                    Aller à la connexion
+                </button>
 
                 <!-- Note -->
                 <p class="text-xs text-neutral-500">

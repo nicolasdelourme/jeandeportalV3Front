@@ -46,6 +46,16 @@ export interface AuthErrorResponse {
 }
 
 /**
+ * Réponse de vérification d'email
+ * POST /register/verif-mail
+ */
+export interface VerifyEmailResponse {
+    status: 'success' | 'error'
+    next?: string     // URL de redirection (ex: "/login")
+    message?: string  // Message optionnel
+}
+
+/**
  * Union type pour toutes les réponses possibles
  */
 export type AuthResponse = AuthSuccessResponse | AuthErrorResponse
