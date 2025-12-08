@@ -24,21 +24,28 @@ class CartService {
      * @param referenceId - ID de la référence à ajouter
      * @param quantity - Quantité à ajouter (défaut: 1)
      * @param storeId - ID de la boutique (défaut: 28 pour consultations)
+     * @param basketCode - Code du panier (null pour créer un nouveau panier)
      * @returns Panier complet mis à jour
      */
     async addToCart(
         referenceId: number,
         quantity: number = CART_CONFIG.DEFAULT_QUANTITY,
-        storeId: number = CART_CONFIG.STORE_ID
+        storeId: number = CART_CONFIG.STORE_ID,
+        basketCode: string | null = null
     ): Promise<CartAPIResponse> {
         try {
-            logger.info(`🛒 [CART SERVICE] Ajout au panier: referenceId=${referenceId}, quantity=${quantity}`)
+            logger.info(`🛒 [CART SERVICE] Ajout au panier: referenceId=${referenceId}, quantity=${quantity}, storeId=${storeId}, basketCode=${basketCode ? '***' : 'null'}`)
 
+            // Construire la requête (ne pas envoyer basketCode si null)
             const request: AddToCartRequest = {
                 referenceId,
                 quantity,
                 storeId,
-            }
+                ...(basketCode && { basketCode }), // N'inclure basketCode que s'il existe
+            } as AddToCartRequest
+
+            // DEBUG: Afficher le body exact envoyé
+            console.log('🔍 [DEBUG] Request body:', JSON.stringify(request))
 
             const response = await apiClient.post<CartAPIResponse>(
                 '/addReference',
@@ -180,9 +187,7 @@ class CartService {
             itemId: apiItem.itemId,
             referenceId: apiItem.referenceId,
             reference: apiItem.reference,
-            priceId: apiItem.priceId,
             storeId: apiItem.storeId,
-            couponId: apiItem.couponId || null,
 
             // Données produit
             id: apiItem.referenceId, // Compatibilité
@@ -194,8 +199,6 @@ class CartService {
             // Tarification
             price: apiItem.price,
             priceHT: apiItem.HTPrice,
-            discountPrice: apiItem.discountPrice !== apiItem.price ? apiItem.discountPrice : null,
-            HTDiscount: apiItem.HTDiscount !== apiItem.HTPrice ? apiItem.HTDiscount : null,
             vatRate: apiItem.vat,
             currency: apiItem.currency,
 

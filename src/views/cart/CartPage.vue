@@ -193,12 +193,7 @@ function goToCheckout() {
                       {{ item.name }}
                     </h3>
                     <div class="flex items-center gap-2 mt-2">
-                      <!-- Prix réduit si applicable -->
                       <p class="font-bold text-lg text-primary">
-                        {{ formatPrice(item.discountPrice ?? item.price) }}
-                      </p>
-                      <!-- Prix barré si réduction -->
-                      <p v-if="item.discountPrice" class="text-sm text-neutral-500 line-through">
                         {{ formatPrice(item.price) }}
                       </p>
                     </div>

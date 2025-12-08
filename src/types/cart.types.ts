@@ -29,19 +29,9 @@ export interface CartItem {
   reference: string
 
   /**
-   * ID du prix appliqué (backend)
-   */
-  priceId: number
-
-  /**
    * ID de la boutique (28 pour consultations)
    */
   storeId: number
-
-  /**
-   * ID du coupon de réduction appliqué (0 ou null si aucun)
-   */
-  couponId: number | null
 
   // ===== Données Produit =====
   /**
@@ -61,32 +51,20 @@ export interface CartItem {
 
   // ===== Quantité =====
   /**
-   * ⚠️ NOUVEAU: Quantité de cet article dans le panier
-   * Avant: items uniques sans quantité
-   * Après: support des quantités multiples
+   * Quantité de cet article dans le panier
    */
   quantity: number
 
   // ===== Tarification =====
   /**
-   * Prix fort TTC (avec TVA)
+   * Prix TTC (avec TVA)
    */
   price: number
 
   /**
-   * Prix fort HT (hors TVA)
+   * Prix HT (hors TVA)
    */
   priceHT: number
-
-  /**
-   * Prix réduit TTC (null si pas de réduction)
-   */
-  discountPrice: number | null
-
-  /**
-   * Prix réduit HT (null si pas de réduction)
-   */
-  HTDiscount: number | null
 
   /**
    * Taux de TVA (5.5, 20, etc.)
@@ -100,9 +78,7 @@ export interface CartItem {
 
   // ===== Médias =====
   /**
-   * ⚠️ CHANGEMENT: Tableau d'images au lieu d'une seule
-   * Avant: image?: string
-   * Après: images: string[]
+   * Tableau d'images de l'article
    */
   images: string[]
 
@@ -157,6 +133,12 @@ export interface CartState {
    * null si pas encore chargé
    */
   receipt: CartReceipt | null
+
+  /**
+   * Code unique du panier (identifiant backend)
+   * null si nouveau panier pas encore créé
+   */
+  basketCode: string | null
 
   /**
    * État de chargement des opérations

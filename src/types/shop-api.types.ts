@@ -177,78 +177,81 @@ export interface APIRawImage {
 
 /**
  * Produit dans la structure API brute
+ * Note: Les valeurs sont maintenant des numbers au lieu de strings
  */
 export interface APIRawProduct {
-  id: string
-  referenceId: string
-  productId: string
-  productQuantity: string
+  id: number
+  referenceId: number
+  productId: number
+  productQuantity: number
   timestamp: string
-  fileId: string | null
-  type: string | null
+  fileId: number | null
+  typeId: number | null // ✅ Changed from "type" to "typeId"
   name: string
   description: string
-  buyPrice: string
-  overstock: string
-  weight: string
-  width: string
-  height: string
-  depth: string
-  physical: string // ✅ "0" ou "1" - Produit physique
-  immaterial: string // ✅ "0" ou "1" - Produit dématérialisé
-  actived: string
+  buyPrice: number | null
+  overstock: number
+  weight: number
+  width: number
+  height: number
+  depth: number
+  physical: number // ✅ 0 ou 1 - Produit physique
+  immaterial: number // ✅ 0 ou 1 - Produit dématérialisé
+  actived: number
   image_array: APIRawImage[]
   feature_array: any[]
 }
 
 /**
  * Prix dans la structure API brute
+ * Note: Les valeurs sont maintenant des numbers au lieu de strings
  */
 export interface APIRawPrice {
-  id: string
-  referenceId: string
-  storeId: string
+  id: number
+  referenceId: number
+  storeId: number
   currency: string
-  price: string // Prix TTC en centimes (ex: "1900" = 19.00€)
-  HTPrice: string // ✅ Prix HT EXACT en centimes (ex: "1801" = 18.01€)
-  promo: string
-  discountPrice: string
-  HTDiscount: string
-  vat: string // ✅ Taux de TVA réel (ex: "5.5", "20")
-  active: string
+  price: number // Prix TTC en centimes (ex: 1900 = 19.00€)
+  HTPrice: number // ✅ Prix HT EXACT en centimes (ex: 1801 = 18.01€)
+  promo: number // 0 ou 1
+  discountPrice: number
+  HTDiscount: number
+  vat: number // ✅ Taux de TVA réel (ex: 5.5, 20)
+  active: number // 0 ou 1
   timestamp: string
 }
 
 /**
  * Référence dans la structure API brute
+ * Note: Les valeurs sont maintenant des numbers au lieu de strings
  */
 export interface APIRawReference {
-  id: string
-  itemId: string
-  collectionId: string | null
+  id: number
+  itemId: number
+  collectionId: number | null
   name: string
-  subname: string
+  subname: string | null
   reference: string
-  description: string
-  tag: string // Tags séparés par des virgules
-  overstock: string
-  available: string
-  visible: string
-  actived: string
+  description: string | null
+  tag: string | null // Tags séparés par des virgules
+  overstock: number
+  available: number // 0 ou 1
+  visible: number // 0 ou 1
+  actived: number // 0 ou 1
   salestart: string
   salestop: string
   timestamp: string
   product_array: APIRawProduct[]
   price_array: APIRawPrice[]
   image_array: APIRawImage[]
-  stock: number // ✅ Stock disponible
 }
 
 /**
  * Item dans la structure API brute (niveau parent des références)
+ * Note: Les champs booléens sont maintenant des numbers (0/1) au lieu de strings
  */
 export interface APIRawItem {
-  id: string
+  id: number // ✅ Changed: number instead of string
   name: string
   subname: string | null
   description: string | null
@@ -257,14 +260,14 @@ export interface APIRawItem {
   seoTitle: string | null
   seoMetaDescription: string | null
   view: string | null
-  available: string
-  visible: string
-  actived: string
-  priorityDeprecated: string
+  available: number // ✅ Changed: 0 or 1 (number)
+  visible: number // ✅ Changed: 0 or 1 (number)
+  actived: number // ✅ Changed: 0 or 1 (number)
+  priorityDeprecated: number
   timestamp: string
-  storeId: string
-  itemId: string
-  priority: string
+  storeId: number
+  itemId: number
+  priority: number // ✅ Changed: number instead of string
   saleStart: string
   saleStop: string
   featurePerEntity_array: any[]
@@ -276,7 +279,7 @@ export interface APIRawItem {
 }
 
 /**
- * Réponse brute de l'API Store
+ * Réponse brute de l'API Store (ancienne structure - deprecated)
  */
 export interface APIRawStoreResponse {
   id: string
@@ -299,9 +302,9 @@ export interface APIRawStoreResponse {
 }
 
 /**
- * Réponse brute de l'API (nouvelle structure)
+ * Réponse brute de l'API (nouvelle structure: tableau d'items directement)
  */
-export type APIRawResponse = APIRawStoreResponse
+export type APIRawResponse = APIRawItem[]
 
 /**
  * Mapper un item API vers ses références (nouvelle structure)
@@ -326,71 +329,72 @@ export function mapAPIItemToShopReferences(apiItem: APIRawItem): ShopReference[]
     const products: ShopProduct[] = productArray.map((apiProduct) => {
       // Trouver les prix de cette référence
       const productPrices: ShopPrice[] = priceArray
-        .filter((p) => p && p.referenceId === apiRef.id && p.active === '1')
+        .filter((p) => p && p.referenceId === apiRef.id && p.active === 1) // ✅ Compare with number
         .map((apiPrice) => ({
-          id: apiPrice.id || '',
-          amount: parseFloat(apiPrice.price || '0') / 100, // TTC en euros
-          htAmount: parseFloat(apiPrice.HTPrice || '0') / 100, // ✅ HT EXACT en euros
-          vatRate: parseFloat(apiPrice.vat || '0'), // ✅ Taux TVA réel
+          id: String(apiPrice.id || ''),
+          amount: (apiPrice.price || 0) / 100, // TTC en euros (already number)
+          htAmount: (apiPrice.HTPrice || 0) / 100, // ✅ HT EXACT en euros
+          vatRate: apiPrice.vat || 0, // ✅ Taux TVA réel (already number)
           currency: (apiPrice.currency || 'EUR').toUpperCase(),
           label: undefined, // Pas de label dans l'API
-          isPromo: apiPrice.promo === '1',
+          isPromo: apiPrice.promo === 1, // ✅ Compare with number
           originalAmount:
-            apiPrice.promo === '1' ? parseFloat(apiPrice.discountPrice || '0') / 100 : undefined,
+            apiPrice.promo === 1 ? (apiPrice.discountPrice || 0) / 100 : undefined,
         }))
 
       return {
-        id: apiProduct.id || '',
+        id: String(apiProduct.id || ''),
         name: apiProduct.name || '',
         description: apiProduct.description || '',
         images: itemImages, // ✅ Images depuis l'item
         prices: productPrices,
-        physical: apiProduct.physical === '1', // ✅ Type produit
-        immaterial: apiProduct.immaterial === '1', // ✅ Type produit
-        weight: parseFloat(apiProduct.weight || '0'),
-        width: parseFloat(apiProduct.width || '0'),
-        height: parseFloat(apiProduct.height || '0'),
-        depth: parseFloat(apiProduct.depth || '0'),
+        physical: apiProduct.physical === 1, // ✅ Compare with number
+        immaterial: apiProduct.immaterial === 1, // ✅ Compare with number
+        weight: apiProduct.weight || 0,
+        width: apiProduct.width || 0,
+        height: apiProduct.height || 0,
+        depth: apiProduct.depth || 0,
       }
     })
 
     return {
-      id: apiRef.id,
+      id: String(apiRef.id),
       name: apiItem.name || '', // ✅ Nom depuis l'item
       subname: apiItem.subname || '', // ✅ Subname depuis l'item
       description: apiItem.description || '', // ✅ Description depuis l'item
       technicalReference: apiRef.reference || '',
       images: itemImages, // ✅ Images depuis l'item
       products,
-      collectionId: apiRef.collectionId || 'uncategorized',
+      collectionId: apiRef.collectionId ? String(apiRef.collectionId) : 'uncategorized',
       tags: itemTags, // ✅ Tags depuis l'item
-      stock: apiRef.stock || 0, // ✅ Stock
-      visible: apiItem.visible === '1',
-      available: apiItem.available === '1',
+      stock: apiRef.overstock || 0, // ✅ Stock (using overstock field)
+      visible: apiItem.visible === 1, // ✅ Compare with number
+      available: apiItem.available === 1, // ✅ Compare with number
       timestamp: apiItem.timestamp || '',
-      priority: parseInt(apiItem.priority || '0'),
+      priority: apiItem.priority || 0, // ✅ Already number
     }
   })
 }
 
 /**
  * Mapper la réponse API brute vers notre modèle normalisé
+ * Note: La réponse API est maintenant directement un tableau d'items
  */
 export function mapAPIResponseToShopCatalog(apiResponse: APIRawResponse): ShopCatalogResponse {
   try {
-    // Vérifier que c'est bien un objet avec item_array
-    if (!apiResponse || !Array.isArray(apiResponse.item_array)) {
-      console.error('❌ Invalid API response structure. Expected { item_array: [...] }')
+    // Vérifier que c'est bien un tableau d'items
+    if (!apiResponse || !Array.isArray(apiResponse)) {
+      console.error('❌ Invalid API response structure. Expected array of items')
       return { references: [] }
     }
 
-    console.log(`📊 Processing ${apiResponse.item_array.length} items from API`)
+    console.log(`📊 Processing ${apiResponse.length} items from API`)
 
     // Filtrer les items visibles et actifs, puis mapper vers références et aplatir
-    const references = apiResponse.item_array
+    const references = apiResponse
       .filter((item) => {
-        // Filtrer les items invisibles ou inactifs
-        if (item.visible !== '1' || item.actived !== '1') {
+        // Filtrer les items invisibles ou inactifs (comparaison avec number)
+        if (item.visible !== 1 || item.actived !== 1) {
           return false
         }
         return true
@@ -405,7 +409,7 @@ export function mapAPIResponseToShopCatalog(apiResponse: APIRawResponse): ShopCa
       })
       .filter((ref) => ref !== null && ref !== undefined)
 
-    console.log(`✅ Successfully mapped ${references.length} references from ${apiResponse.item_array.length} items`)
+    console.log(`✅ Successfully mapped ${references.length} references from ${apiResponse.length} items`)
 
     return { references }
   } catch (err) {

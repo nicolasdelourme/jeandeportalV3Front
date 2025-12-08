@@ -136,12 +136,7 @@ function formatPrice(price: number): string {
                 {{ item.name }}
               </p>
               <div class="flex items-center gap-2 mt-1">
-                <!-- Prix réduit si applicable -->
                 <p class="font-semibold text-sm text-primary">
-                  {{ formatPrice(item.discountPrice ?? item.price) }}
-                </p>
-                <!-- Prix barré si réduction -->
-                <p v-if="item.discountPrice" class="text-xs text-neutral-500 line-through">
                   {{ formatPrice(item.price) }}
                 </p>
               </div>

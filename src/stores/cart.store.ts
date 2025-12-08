@@ -23,6 +23,7 @@ function createEmptyCartState(): CartState {
   return {
     items: [],
     receipt: null,
+    basketCode: null,
     isLoading: false,
     isSynced: false,
     lastSyncTimestamp: 0,
@@ -74,6 +75,11 @@ export const useCartStore = defineStore('cart', () => {
   const isSynced = computed(() => cartState.value.isSynced)
 
   /**
+   * Code du panier (identifiant backend)
+   */
+  const basketCode = computed(() => cartState.value.basketCode)
+
+  /**
    * ⚠️ CHANGEMENT: Nombre d'articles = somme des quantités
    * Avant: items.length (items uniques)
    * Après: sum(item.quantity)
@@ -96,9 +102,8 @@ export const useCartStore = defineStore('cart', () => {
 
     // Sinon, calcul local (fallback)
     return cartState.value.items.reduce((total, item) => {
-      const price = item.discountPrice ?? item.price
       const quantity = item.quantity || 0
-      return total + price * quantity
+      return total + item.price * quantity
     }, 0)
   })
 
@@ -108,9 +113,8 @@ export const useCartStore = defineStore('cart', () => {
    */
   const subtotalExclVAT = computed(() => {
     return cartState.value.items.reduce((total, item) => {
-      const priceHT = item.HTDiscount ?? item.priceHT
       const quantity = item.quantity || 0
-      return total + priceHT * quantity
+      return total + item.priceHT * quantity
     }, 0)
   })
 
@@ -136,9 +140,7 @@ export const useCartStore = defineStore('cart', () => {
 
     cartState.value.items.forEach((item) => {
       const vatRate = item.vatRate || 0
-      const priceTTC = item.discountPrice ?? item.price
-      const priceHT = item.HTDiscount ?? item.priceHT
-      const vatAmount = (priceTTC - priceHT) * (item.quantity || 0)
+      const vatAmount = (item.price - item.priceHT) * (item.quantity || 0)
 
       const key = vatRate.toString()
       vatMap[key] = (vatMap[key] || 0) + vatAmount
@@ -183,10 +185,11 @@ export const useCartStore = defineStore('cart', () => {
 
       cartState.value.items = mapped.items
       cartState.value.receipt = mapped.receipt
+      cartState.value.basketCode = response.basketCode
       cartState.value.isSynced = true
       cartState.value.lastSyncTimestamp = Date.now()
 
-      console.log(`✅ [CART STORE] Panier synchronisé: ${mapped.items.length} items`)
+      console.log(`✅ [CART STORE] Panier synchronisé: ${mapped.items.length} items, basketCode=${response.basketCode ? '***' : 'null'}`)
     } catch (error) {
       console.error('❌ [CART STORE] Erreur lors de la synchronisation:', error)
       toast.error('Impossible de charger le panier')
@@ -214,9 +217,7 @@ export const useCartStore = defineStore('cart', () => {
   }
 
   /**
-   * ⚠️ CHANGEMENT: addItem devient async et appelle le backend
-   * Avant: Ajout local immédiat en localStorage
-   * Après: Appel API puis mise à jour du store
+   * Ajoute un article au panier via le backend
    *
    * @param referenceId - ID de la référence à ajouter
    * @param quantity - Quantité à ajouter (défaut: 1)
@@ -225,13 +226,20 @@ export const useCartStore = defineStore('cart', () => {
     cartState.value.isLoading = true
 
     try {
-      console.log(`🛒 [CART STORE] Ajout au panier: referenceId=${referenceId}, quantity=${quantity}`)
+      console.log(`🛒 [CART STORE] Ajout au panier: referenceId=${referenceId}, quantity=${quantity}, basketCode=${cartState.value.basketCode ? '***' : 'null'}`)
 
-      const response = await cartService.addToCart(referenceId, quantity)
+      // Passer le basketCode actuel (null si premier ajout → création du panier)
+      const response = await cartService.addToCart(
+        referenceId,
+        quantity,
+        CART_CONFIG.STORE_ID,
+        cartState.value.basketCode
+      )
       const mapped = cartService.mapAPIResponse(response)
 
       cartState.value.items = mapped.items
       cartState.value.receipt = mapped.receipt
+      cartState.value.basketCode = response.basketCode // Stocker le code retourné (important pour premier ajout)
       cartState.value.isSynced = true
       cartState.value.lastSyncTimestamp = Date.now()
 
@@ -345,11 +353,21 @@ export const useCartStore = defineStore('cart', () => {
     return updateItemQuantity(referenceId, newQuantity)
   }
 
+  /**
+   * Réinitialise le panier (utilisé lors de la déconnexion)
+   * Vide les items et le basketCode
+   */
+  function resetCart(): void {
+    console.log('🛒 [CART STORE] Réinitialisation du panier (déconnexion)')
+    cartState.value = createEmptyCartState()
+  }
+
   // === Return (API publique du store) ===
   return {
     // State
     items,
     receipt,
+    basketCode,
     isLoading,
     isSynced,
     itemCount,
@@ -372,5 +390,6 @@ export const useCartStore = defineStore('cart', () => {
     clearCart,
     increaseQuantity,
     decreaseQuantity,
+    resetCart,
   }
 })

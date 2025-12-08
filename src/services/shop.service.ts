@@ -70,10 +70,17 @@ class ShopService {
 
       clearTimeout(timeoutId)
 
-      // Validation basique de la structure (nouvelle structure: objet avec item_array)
-      if (!rawData || typeof rawData !== 'object' || !Array.isArray(rawData.item_array)) {
-        throw new ShopAPIError('Structure de réponse API invalide: attendu { item_array: [...] }')
+      // Validation basique de la structure (nouvelle structure: tableau d'items directement)
+      if (!rawData || !Array.isArray(rawData)) {
+        console.error('🔍 [DEBUG] Invalid response structure:', {
+          type: typeof rawData,
+          isArray: Array.isArray(rawData),
+          sample: rawData
+        })
+        throw new ShopAPIError('Structure de réponse API invalide: attendu un tableau d\'items')
       }
+
+      console.log(`📡 Received ${rawData.length} items from API`)
 
       // Mapper les données brutes vers notre modèle normalisé
       const data = mapAPIResponseToShopCatalog(rawData)

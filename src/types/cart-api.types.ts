@@ -14,6 +14,12 @@ export interface CartAPIResponse {
     length: number
 
     /**
+     * Code unique du panier (pour identifier le panier)
+     * Retourné par le backend, à renvoyer lors des ajouts
+     */
+    basketCode: string
+
+    /**
      * Récapitulatif du panier (totaux, TVA, remises)
      */
     receipt: CartReceiptAPI
@@ -74,29 +80,14 @@ export interface CartAPIItem {
     name: string
 
     /**
-     * ID du prix appliqué
-     */
-    priceId: number
-
-    /**
-     * Prix fort TTC
+     * Prix TTC
      */
     price: number
 
     /**
-     * Prix fort HT
+     * Prix HT
      */
     HTPrice: number
-
-    /**
-     * Prix réduit TTC (avec réductions)
-     */
-    discountPrice: number
-
-    /**
-     * Prix réduit HT (avec réductions)
-     */
-    HTDiscount: number
 
     /**
      * Taux de TVA (ex: 5.5, 20)
@@ -112,11 +103,6 @@ export interface CartAPIItem {
      * Quantité de cette référence dans le panier
      */
     quantity: number
-
-    /**
-     * ID du coupon de réduction appliqué (0 si aucun)
-     */
-    couponId: number
 
     /**
      * ID de la boutique (28 pour consultations)
@@ -208,6 +194,11 @@ export interface AddToCartRequest {
      * ID de la boutique (défaut: 28 pour consultations)
      */
     storeId?: number
+
+    /**
+     * Code du panier (null pour créer un nouveau panier)
+     */
+    basketCode: string | null
 }
 
 /**
