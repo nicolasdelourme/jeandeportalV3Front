@@ -4,7 +4,7 @@
  */
 
 import { apiClient } from '@/api/client'
-import type { LoginCredentials, RegisterCredentials, AuthResponse, AuthSuccessResponse, User, VerifyEmailResponse } from '@/types/auth.types'
+import type { LoginCredentials, RegisterCredentials, AuthResponse, AuthSuccessResponse, User, VerifyEmailResponse, ResetPasswordResponse } from '@/types/auth.types'
 import { AuthError } from '@/types/auth.types'
 import { logger } from '@/utils/logger'
 
@@ -263,21 +263,18 @@ export class AuthService {
      * Vérifie la validité du code de réinitialisation
      * POST /forgot-password/verif
      *
-     * @param code - Code reçu par email
+     * @param hash - Token (hash) reçu par email
      */
-    async verifyResetCode(code: string): Promise<{ success: boolean; message: string }> {
+    async verifyResetCode(hash: string): Promise<ResetPasswordResponse> {
         try {
             if (USE_MOCK) {
-                return await mockVerifyResetCodeAPI(code)
+                return await mockVerifyResetCodeAPI(hash)
             } else {
-                const response = await apiClient.post<{ status: string }>(
+                const response = await apiClient.post<ResetPasswordResponse>(
                     '/forgot-password/verif',
-                    { code }
+                    { hash }
                 )
-                return {
-                    success: response.status === 'success',
-                    message: 'Code valide.'
-                }
+                return response
             }
         } catch (error: any) {
             logger.error('Erreur lors de la vérification du code:', error)
@@ -296,27 +293,24 @@ export class AuthService {
      * Finalise la réinitialisation du mot de passe
      * POST /forgot-password/complete
      *
-     * @param code - Code reçu par email
+     * @param hash - Token (hash) reçu par email
      * @param password - Nouveau mot de passe
      * @param passwordConfirm - Confirmation du nouveau mot de passe
      */
     async completePasswordReset(
-        code: string,
+        hash: string,
         password: string,
         passwordConfirm: string
-    ): Promise<{ success: boolean; message: string }> {
+    ): Promise<ResetPasswordResponse> {
         try {
             if (USE_MOCK) {
-                return await mockCompletePasswordResetAPI(code, password, passwordConfirm)
+                return await mockCompletePasswordResetAPI(hash, password, passwordConfirm)
             } else {
-                const response = await apiClient.post<{ status: string }>(
+                const response = await apiClient.post<ResetPasswordResponse>(
                     '/forgot-password/complete',
-                    { code, password, passwordConfirm }
+                    { hash, password, passwordConfirm }
                 )
-                return {
-                    success: response.status === 'success',
-                    message: 'Votre mot de passe a été réinitialisé avec succès.'
-                }
+                return response
             }
         } catch (error: any) {
             logger.error('Erreur lors de la réinitialisation du mot de passe:', error)

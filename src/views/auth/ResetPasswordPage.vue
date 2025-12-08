@@ -2,13 +2,14 @@
 /**
  * Page ResetPasswordPage
  * Page de réinitialisation du mot de passe
- * URL: /auth/reset-password?code=xxx
+ * URL: /auth/lostPassword/:token
  */
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
+import { toast } from 'vue-sonner'
 import { authService } from '@/services/auth.service'
 import DefaultLayout from '@/components/layout/DefaultLayout.vue'
 import AuthFormWrapper from '@/components/auth/AuthFormWrapper.vue'
@@ -23,9 +24,9 @@ const route = useRoute()
 const router = useRouter()
 
 /**
- * Code de réinitialisation (depuis query params)
+ * Token de réinitialisation (depuis path params)
  */
-const resetCode = ref('')
+const resetToken = ref('')
 
 /**
  * États de la page
@@ -126,25 +127,26 @@ const pageTitle = computed(() => {
 })
 
 /**
- * Vérifie le code au montage de la page
+ * Vérifie le token au montage de la page
  */
 onMounted(async () => {
-    const code = route.query.code as string
+    // Token depuis le path param (ex: /auth/lostPassword/abc123)
+    const token = route.params.token as string
 
-    if (!code) {
+    if (!token) {
         isVerifying.value = false
         isCodeValid.value = false
-        errorMessage.value = 'Le lien de réinitialisation est invalide. Aucun code fourni.'
+        errorMessage.value = 'Le lien de réinitialisation est invalide. Aucun token fourni.'
         return
     }
 
-    resetCode.value = code
+    resetToken.value = token
 
     try {
-        const result = await authService.verifyResetCode(code)
-        isCodeValid.value = result.success
-        if (!result.success) {
-            errorMessage.value = result.message
+        const result = await authService.verifyResetCode(token)
+        isCodeValid.value = result.status === 'success'
+        if (result.status !== 'success') {
+            errorMessage.value = result.message || 'Le lien de réinitialisation est invalide ou a expiré.'
         }
     } catch (error: any) {
         isCodeValid.value = false
@@ -163,15 +165,16 @@ const onSubmit = handleSubmit(async (formValues) => {
 
     try {
         const result = await authService.completePasswordReset(
-            resetCode.value,
+            resetToken.value,
             formValues.password,
             formValues.confirmPassword
         )
 
-        if (result.success) {
+        if (result.status === 'success') {
             isSuccess.value = true
+            toast.success('Mot de passe réinitialisé avec succès !')
         } else {
-            errorMessage.value = result.message
+            errorMessage.value = result.message || 'Une erreur est survenue.'
         }
     } catch (error: any) {
         errorMessage.value = error.message || 'Une erreur est survenue lors de la réinitialisation.'

@@ -66,7 +66,7 @@ const routes: RouteRecordRaw[] = [
         // Pas de guestOnly - peut être accédé même si déjà connecté
     },
     {
-        path: "/auth/reset-password",
+        path: "/auth/lostPassword/:token",
         name: "reset-password",
         component: () => import("@/views/auth/ResetPasswordPage.vue"),
         // Pas de guestOnly - peut être accédé même si déjà connecté

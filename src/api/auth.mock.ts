@@ -287,7 +287,7 @@ export async function mockForgotPasswordAPI(email: string): Promise<{ success: b
     MOCK_RESET_CODES.set(resetCode, email)
 
     console.log('📧 [MOCK API] Email de réinitialisation envoyé à:', email)
-    console.log('🔗 [MOCK API] Lien de réinitialisation: /auth/reset-password?code=' + resetCode)
+    console.log('🔗 [MOCK API] Lien de réinitialisation: /auth/lostPassword/' + resetCode)
 
     return {
         success: true,
@@ -339,41 +339,42 @@ export async function mockVerifyEmailAPI(token: string): Promise<{ status: 'succ
 
 /**
  * Mock Verify Reset Code API
+ * POST /forgot-password/verif avec { hash }
  *
  * Vérifie la validité du code de réinitialisation
  */
-export async function mockVerifyResetCodeAPI(code: string): Promise<{ success: boolean; message: string }> {
-    console.log('🔑 [MOCK API] mockVerifyResetCodeAPI appelé avec code:', code)
+export async function mockVerifyResetCodeAPI(hash: string): Promise<{ status: 'success' | 'error'; message?: string }> {
+    console.log('🔑 [MOCK API] mockVerifyResetCodeAPI appelé avec hash:', hash)
     await delay(800)
 
     // Vérifier si le code existe
-    const email = MOCK_RESET_CODES.get(code)
+    const email = MOCK_RESET_CODES.get(hash)
 
     if (!email) {
         console.log('❌ [MOCK API] Code de réinitialisation invalide ou expiré')
         return {
-            success: false,
+            status: 'error',
             message: 'Le lien de réinitialisation est invalide ou a expiré.'
         }
     }
 
     console.log('✅ [MOCK API] Code valide pour:', email)
     return {
-        success: true,
-        message: 'Code valide.'
+        status: 'success'
     }
 }
 
 /**
  * Mock Complete Password Reset API
+ * POST /forgot-password/complete avec { hash, password, passwordConfirm }
  *
  * Finalise la réinitialisation du mot de passe
  */
 export async function mockCompletePasswordResetAPI(
-    code: string,
+    hash: string,
     password: string,
     passwordConfirm: string
-): Promise<{ success: boolean; message: string }> {
+): Promise<{ status: 'success' | 'error'; next?: string; message?: string }> {
     console.log('🔑 [MOCK API] mockCompletePasswordResetAPI appelé')
     await delay(1000)
 
@@ -381,18 +382,18 @@ export async function mockCompletePasswordResetAPI(
     if (password !== passwordConfirm) {
         console.log('❌ [MOCK API] Les mots de passe ne correspondent pas')
         return {
-            success: false,
+            status: 'error',
             message: 'Les mots de passe ne correspondent pas.'
         }
     }
 
     // Vérifier si le code existe
-    const email = MOCK_RESET_CODES.get(code)
+    const email = MOCK_RESET_CODES.get(hash)
 
     if (!email) {
         console.log('❌ [MOCK API] Code de réinitialisation invalide ou expiré')
         return {
-            success: false,
+            status: 'error',
             message: 'Le lien de réinitialisation est invalide ou a expiré.'
         }
     }
@@ -402,12 +403,12 @@ export async function mockCompletePasswordResetAPI(
     if (user) {
         user.password = password
         // Supprimer le code utilisé
-        MOCK_RESET_CODES.delete(code)
+        MOCK_RESET_CODES.delete(hash)
         console.log('✅ [MOCK API] Mot de passe réinitialisé pour:', email)
     }
 
     return {
-        success: true,
-        message: 'Votre mot de passe a été réinitialisé avec succès.'
+        status: 'success',
+        next: '/login'
     }
 }

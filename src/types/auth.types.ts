@@ -56,6 +56,16 @@ export interface VerifyEmailResponse {
 }
 
 /**
+ * Réponse de réinitialisation de mot de passe
+ * POST /forgot-password/verif et /forgot-password/complete
+ */
+export interface ResetPasswordResponse {
+    status: 'success' | 'error'
+    next?: string     // URL de redirection (ex: "/login")
+    message?: string  // Message optionnel
+}
+
+/**
  * Union type pour toutes les réponses possibles
  */
 export type AuthResponse = AuthSuccessResponse | AuthErrorResponse
