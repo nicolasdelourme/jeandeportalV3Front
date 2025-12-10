@@ -11,7 +11,7 @@ import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
 import { CartError } from '@/types/cart.types'
 
 interface Props {
-  /** ID de la référence produit */
+  /** ID de la référence produit (reference_array[].id du catalogue) */
   referenceId: number
   /** Nom du produit (pour feedback visuel optionnel) */
   productName?: string
@@ -64,9 +64,11 @@ async function addToCart() {
 }
 
 /**
- * Vérifie si le produit est dans le panier
+ * Note: La vérification isInCart est désactivée car le panier stocke les priceId
+ * et non les referenceId. Pour activer cette fonctionnalité, il faudrait mapper
+ * les referenceId aux priceId du catalogue.
  */
-const isInCart = computed(() => cartStore.hasItem(props.referenceId))
+const isInCart = computed(() => false)
 </script>
 
 <template>

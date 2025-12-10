@@ -130,9 +130,13 @@ const subnameText = computed(() => {
 
 /**
  * Vérifier si le produit est déjà dans le panier
+ * (Vérifie si l'un des prix de cette référence est dans le panier)
  */
 const isInCart = computed(() => {
-  return cartStore.hasItem(Number(props.reference.id))
+  const allPriceIds = props.reference.products.flatMap((product) =>
+    product.prices.map((price) => Number(price.id))
+  )
+  return allPriceIds.some((priceId) => cartStore.hasItem(priceId))
 })
 
 /**

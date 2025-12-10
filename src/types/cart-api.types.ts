@@ -1,43 +1,47 @@
 /**
  * Types pour l'API Backend du Panier
- * Structure des réponses de https://jeandeportal.fr/api/*
+ * Structure des réponses de https://api.jeandeportal.fr/*
  */
 
 /**
  * Réponse complète du panier depuis le backend
- * Retourné par /api/fetchBasket et /api/addReference
+ * Retourné par /fetchBasket et /addReference
  */
 export interface CartAPIResponse {
     /**
-     * Nombre total de références dans le panier
+     * Statut de la réponse
      */
-    length: number
+    status: 'success' | 'error'
 
     /**
+     * Données du panier
+     */
+    basket: BasketData
+
+    /**
+     * Message d'erreur (si status = 'error')
+     */
+    message?: string
+}
+
+/**
+ * Données du panier (objet imbriqué)
+ */
+export interface BasketData {
+    /**
      * Code unique du panier (pour identifier le panier)
-     * Retourné par le backend, à renvoyer lors des ajouts
      */
     basketCode: string
 
     /**
-     * Récapitulatif du panier (totaux, TVA, remises)
-     */
-    receipt: CartReceiptAPI
-
-    /**
-     * Liste des articles du panier
-     */
-    referenceList: CartAPIItem[]
-}
-
-/**
- * Récapitulatif du panier
- */
-export interface CartReceiptAPI {
-    /**
      * Nombre de références distinctes
      */
     referenceNumber: number
+
+    /**
+     * Nombre total d'articles (somme des quantités)
+     */
+    count: number
 
     /**
      * Montant total de TVA
@@ -52,7 +56,12 @@ export interface CartReceiptAPI {
     /**
      * Total TTC avec remises appliquées
      */
-    discountotal: number
+    discountTotal: number
+
+    /**
+     * Liste des articles du panier
+     */
+    referenceList: CartAPIItem[]
 }
 
 /**
@@ -65,19 +74,29 @@ export interface CartAPIItem {
     itemId: number
 
     /**
-     * ID de la référence produit
+     * ID du prix (référence pour le backend)
      */
-    referenceId: number
+    priceId: number
 
     /**
-     * Référence technique (SKU unique pour facture)
+     * ID de la boutique (28 pour consultations)
      */
-    reference: string
+    storeId: number
 
     /**
      * Nom commercial de l'article
      */
     name: string
+
+    /**
+     * Quantité de cette référence dans le panier
+     */
+    quantity: number
+
+    /**
+     * ID du coupon appliqué (-1 si aucun)
+     */
+    couponId: number
 
     /**
      * Prix TTC
@@ -90,6 +109,16 @@ export interface CartAPIItem {
     HTPrice: number
 
     /**
+     * Prix TTC avec remise
+     */
+    discountPrice: number
+
+    /**
+     * Prix HT avec remise
+     */
+    HTDiscount: number
+
+    /**
      * Taux de TVA (ex: 5.5, 20)
      */
     vat: number
@@ -98,16 +127,6 @@ export interface CartAPIItem {
      * Devise (toujours "EUR" pour l'instant)
      */
     currency: string
-
-    /**
-     * Quantité de cette référence dans le panier
-     */
-    quantity: number
-
-    /**
-     * ID de la boutique (28 pour consultations)
-     */
-    storeId: number
 
     /**
      * Tableau d'images associées à l'article
@@ -177,11 +196,11 @@ export interface CartImageAPI {
 
 /**
  * Requête pour ajouter une référence au panier
- * POST /api/addReference
+ * POST /addReference
  */
 export interface AddToCartRequest {
     /**
-     * ID de la référence à ajouter
+     * ID de la référence à ajouter (reference_array[].id du catalogue)
      */
     referenceId: number
 
@@ -198,21 +217,68 @@ export interface AddToCartRequest {
     /**
      * Code du panier (null pour créer un nouveau panier)
      */
-    basketCode: string | null
+    basketCode?: string | null
+}
+
+/**
+ * Requête pour récupérer le panier
+ * POST /fetchBasket
+ */
+export interface FetchCartRequest {
+    /**
+     * Code du panier à récupérer
+     */
+    basketCode: string
+
+    /**
+     * ID de la boutique (peut être requis par le backend)
+     */
+    storeId?: number
 }
 
 /**
  * Requête pour modifier la quantité d'une référence
- * POST /api/basketChangeQuantityReference
+ * POST /basketChangeQuantityReference
  */
 export interface UpdateQuantityRequest {
     /**
-     * ID de la référence à modifier
+     * ID du prix à modifier
      */
-    referenceId: number
+    priceId: number
 
     /**
      * Nouvelle quantité (0 = supprimer)
      */
     quantity: number
+
+    /**
+     * Code du panier
+     */
+    basketCode: string
+}
+
+/**
+ * Requête pour supprimer une référence du panier
+ * POST /deleteReference
+ */
+export interface DeleteReferenceRequest {
+    /**
+     * ID de la référence à supprimer
+     */
+    referenceId: number
+
+    /**
+     * Quantité à supprimer (généralement 1)
+     */
+    quantity: number
+
+    /**
+     * ID de la boutique
+     */
+    storeId: number
+
+    /**
+     * Code du panier
+     */
+    basketCode: string
 }

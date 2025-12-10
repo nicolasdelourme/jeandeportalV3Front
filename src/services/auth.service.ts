@@ -221,8 +221,8 @@ export class AuthService {
                 // Utiliser le mock
                 await mockLogoutAPI()
             } else {
-                // Appel API réel
-                await apiClient.post('/logout')
+                // Appel API réel (GET, pas POST!)
+                await apiClient.get('/logout')
             }
         } catch (error: any) {
             logger.error('Erreur lors de la déconnexion:', error)

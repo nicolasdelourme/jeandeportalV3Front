@@ -45,17 +45,7 @@ const handleViewDetails = (reference: ShopReference) => {
 
 const handleAddToCart = async (reference: ShopReference) => {
   try {
-    // Obtenir tous les prix avec leurs infos complètes
-    const allPrices = reference.products.flatMap((product) =>
-      product.prices
-    )
-
-    // Trouver le prix minimum (avec ses infos HT et TVA)
-    const minPriceObj = allPrices.length > 0
-      ? allPrices.reduce((min, price) => price.amount < min.amount ? price : min, allPrices[0]!)
-      : null
-
-    // Ajouter au panier (le backend gérera les détails du produit)
+    // Ajouter au panier avec le referenceId (ID de la référence dans le catalogue)
     await cartStore.addItem(Number(reference.id))
 
     toast.success(`${reference.name} ajouté au panier`)

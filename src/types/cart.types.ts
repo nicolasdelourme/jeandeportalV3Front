@@ -18,15 +18,9 @@ export interface CartItem {
   itemId: number
 
   /**
-   * ID de la référence produit (backend)
+   * ID du prix (identifiant unique pour le backend)
    */
-  referenceId: number
-
-  /**
-   * Référence technique/SKU (backend)
-   * Apparaît sur la facture
-   */
-  reference: string
+  priceId: number
 
   /**
    * ID de la boutique (28 pour consultations)
@@ -35,7 +29,7 @@ export interface CartItem {
 
   // ===== Données Produit =====
   /**
-   * ID du produit (compatibilité, = referenceId)
+   * ID du produit (compatibilité, = priceId)
    */
   id: string | number
 
@@ -55,6 +49,11 @@ export interface CartItem {
    */
   quantity: number
 
+  /**
+   * ID du coupon appliqué (-1 si aucun)
+   */
+  couponId?: number
+
   // ===== Tarification =====
   /**
    * Prix TTC (avec TVA)
@@ -65,6 +64,16 @@ export interface CartItem {
    * Prix HT (hors TVA)
    */
   priceHT: number
+
+  /**
+   * Prix TTC avec remise
+   */
+  discountPrice?: number
+
+  /**
+   * Prix HT avec remise
+   */
+  discountPriceHT?: number
 
   /**
    * Taux de TVA (5.5, 20, etc.)
@@ -182,20 +191,23 @@ export const CART_CONFIG = {
 } as const
 
 /**
+ * Codes d'erreur du panier
+ */
+export type CartErrorCode =
+  | 'ITEM_ALREADY_IN_CART'
+  | 'ITEM_NOT_FOUND'
+  | 'API_ERROR'
+  | 'INVALID_QUANTITY'
+  | 'SYNC_ERROR'
+  | 'BASKET_NOT_FOUND' // Panier expiré ou invalide côté backend
+
+/**
  * Erreurs du panier
  */
 export class CartError extends Error {
-  code: 'ITEM_ALREADY_IN_CART' | 'ITEM_NOT_FOUND' | 'API_ERROR' | 'INVALID_QUANTITY' | 'SYNC_ERROR'
+  code: CartErrorCode
 
-  constructor(
-    message: string,
-    code:
-      | 'ITEM_ALREADY_IN_CART'
-      | 'ITEM_NOT_FOUND'
-      | 'API_ERROR'
-      | 'INVALID_QUANTITY'
-      | 'SYNC_ERROR',
-  ) {
+  constructor(message: string, code: CartErrorCode) {
     super(message)
     this.name = 'CartError'
     this.code = code
@@ -212,7 +224,7 @@ export type QuantityOperation = 'increase' | 'decrease' | 'set' | 'remove'
  */
 export interface QuantityUpdatePayload {
   itemId: number
-  referenceId: number
+  priceId: number
   operation: QuantityOperation
   value?: number
 }

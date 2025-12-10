@@ -41,14 +41,38 @@ class ApiClient {
         this.axiosInstance.interceptors.response.use(
             (response) => response,
             async (error) => {
+                // DEBUG: Log immédiat pour voir TOUTES les erreurs
+                console.log('🚨 [API CLIENT] ERREUR INTERCEPTÉE:', {
+                    url: error.config?.url,
+                    status: error.response?.status,
+                    message: error.message
+                })
+
                 const requestUrl = error.config?.url || ''
 
-                // Ne pas rediriger pour les endpoints d'auth (login, register, etc.)
-                const isAuthEndpoint = ['/login', '/register', '/logout', '/me', '/forgot-password'].some(
-                    endpoint => requestUrl.includes(endpoint)
-                )
+                // Ne pas rediriger pour les endpoints d'auth et les endpoints publics (panier)
+                // Le panier fonctionne pour les utilisateurs non connectés (basketCode provisoire)
+                const publicEndpoints = [
+                    // Auth endpoints
+                    '/login', '/register', '/logout', '/me', '/forgot-password',
+                    // Cart endpoints (accessibles sans auth - le backend gère les paniers anonymes)
+                    '/addReference', '/fetchBasket', '/basketChangeQuantityReference', '/deleteReference',
+                    // Shop endpoints
+                    '/fetchStore',
+                ]
+                const isPublicEndpoint = publicEndpoints.some(endpoint => requestUrl.includes(endpoint))
 
-                if (error.response?.status === 401 && !isAuthEndpoint) {
+                // Log pour debug (sans bloquer)
+                if (error.response?.status === 401) {
+                    console.log('🔍 [API CLIENT] Intercepteur 401:', {
+                        requestUrl,
+                        status: error.response?.status,
+                        isPublicEndpoint,
+                        willRedirect: !isPublicEndpoint
+                    })
+                }
+
+                if (error.response?.status === 401 && !isPublicEndpoint) {
                     // Session expirée ou invalide - nettoyage des données utilisateur
                     clearAuthData()
 

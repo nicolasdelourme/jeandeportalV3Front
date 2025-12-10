@@ -17,6 +17,11 @@ import { decodeHtmlEntities } from '@/utils/html.utils'
 import { toast } from 'vue-sonner'
 
 /**
+ * Clé localStorage pour le basketCode
+ */
+const BASKET_CODE_KEY = 'jdp_basket_code'
+
+/**
  * Crée un état de panier vide
  */
 function createEmptyCartState(): CartState {
@@ -27,6 +32,40 @@ function createEmptyCartState(): CartState {
     isLoading: false,
     isSynced: false,
     lastSyncTimestamp: 0,
+  }
+}
+
+/**
+ * Sauvegarde le basketCode en localStorage
+ */
+function saveBasketCode(code: string | null): void {
+  try {
+    if (code) {
+      localStorage.setItem(BASKET_CODE_KEY, code)
+      console.log('🛒 [CART STORE] BasketCode sauvegardé:', code.substring(0, 8) + '...')
+      // Vérification immédiate
+      const verify = localStorage.getItem(BASKET_CODE_KEY)
+      console.log('🔍 [DEBUG] Vérification localStorage:', verify ? 'OK' : 'ÉCHEC')
+    } else {
+      localStorage.removeItem(BASKET_CODE_KEY)
+      console.log('🛒 [CART STORE] BasketCode supprimé du localStorage')
+    }
+  } catch (error) {
+    console.error('❌ Erreur lors de la sauvegarde du basketCode:', error)
+  }
+}
+
+/**
+ * Charge le basketCode depuis localStorage
+ */
+function loadBasketCode(): string | null {
+  try {
+    const code = localStorage.getItem(BASKET_CODE_KEY)
+    console.log('🔍 [DEBUG] loadBasketCode:', code ? code.substring(0, 8) + '...' : 'null')
+    return code
+  } catch (error) {
+    console.error('❌ Erreur lors du chargement du basketCode:', error)
+    return null
   }
 }
 
@@ -155,17 +194,24 @@ export const useCartStore = defineStore('cart', () => {
   const isEmpty = computed(() => cartState.value.items.length === 0)
 
   /**
-   * Trouve un article par referenceId
+   * Trouve un article par priceId
    */
-  const findItem = (referenceId: number): CartItem | undefined => {
-    return cartState.value.items.find(item => item.referenceId === referenceId)
+  const findItem = (priceId: number): CartItem | undefined => {
+    return cartState.value.items.find(item => item.priceId === priceId)
+  }
+
+  /**
+   * Trouve un article par itemId (= referenceId pour l'API)
+   */
+  const findItemByItemId = (itemId: number): CartItem | undefined => {
+    return cartState.value.items.find(item => item.itemId === itemId)
   }
 
   /**
    * Vérifie si un produit est dans le panier
    */
-  const hasItem = (referenceId: number): boolean => {
-    return findItem(referenceId) !== undefined
+  const hasItem = (priceId: number): boolean => {
+    return findItem(priceId) !== undefined
   }
 
   // === Actions ===
@@ -173,23 +219,31 @@ export const useCartStore = defineStore('cart', () => {
   /**
    * Synchronise le panier avec le backend
    * Charge le panier complet depuis l'API
+   * Note: Nécessite un basketCode existant, sinon ne fait rien
    */
   async function syncWithBackend(): Promise<void> {
+    // Si pas de basketCode, pas de panier à synchroniser
+    if (!cartState.value.basketCode) {
+      console.log('🛒 [CART STORE] Pas de basketCode, pas de synchronisation nécessaire')
+      cartState.value.isSynced = true
+      return
+    }
+
     cartState.value.isLoading = true
 
     try {
       console.log('🔄 [CART STORE] Synchronisation avec le backend...')
 
-      const response = await cartService.fetchCart()
+      const response = await cartService.fetchCart(cartState.value.basketCode)
       const mapped = cartService.mapAPIResponse(response)
 
       cartState.value.items = mapped.items
       cartState.value.receipt = mapped.receipt
-      cartState.value.basketCode = response.basketCode
+      cartState.value.basketCode = mapped.basketCode
       cartState.value.isSynced = true
       cartState.value.lastSyncTimestamp = Date.now()
 
-      console.log(`✅ [CART STORE] Panier synchronisé: ${mapped.items.length} items, basketCode=${response.basketCode ? '***' : 'null'}`)
+      console.log(`✅ [CART STORE] Panier synchronisé: ${mapped.items.length} items, basketCode=${mapped.basketCode ? '***' : 'null'}`)
     } catch (error) {
       console.error('❌ [CART STORE] Erreur lors de la synchronisation:', error)
       toast.error('Impossible de charger le panier')
@@ -207,19 +261,41 @@ export const useCartStore = defineStore('cart', () => {
     // Vider l'ancien panier localStorage (migration)
     clearOldLocalStorageCart()
 
-    // Charger le panier depuis le backend
+    // Charger le basketCode depuis localStorage (persistance entre sessions)
+    const savedBasketCode = loadBasketCode()
+    if (savedBasketCode) {
+      cartState.value.basketCode = savedBasketCode
+      console.log('🛒 [CART STORE] BasketCode restauré:', savedBasketCode.substring(0, 8) + '...')
+    }
+
+    // Charger le panier depuis le backend (si on a un basketCode)
     try {
       await syncWithBackend()
-    } catch (error) {
-      // En cas d'erreur, panier vide (normal pour utilisateur non connecté sans session)
-      console.info('🛒 [CART STORE] Panier vide ou non accessible (normal si pas de session)')
+    } catch (error: any) {
+      // Debug: voir l'erreur complète
+      console.log('🔍 [DEBUG] initialize error:', {
+        name: error?.name,
+        code: error?.code,
+        message: error?.message,
+        isCartError: error instanceof CartError
+      })
+
+      // Si le panier n'existe plus côté backend, supprimer le basketCode local
+      if (error?.code === 'BASKET_NOT_FOUND') {
+        console.warn('🛒 [CART STORE] Panier expiré/invalide, suppression du basketCode local')
+        cartState.value.basketCode = null
+        saveBasketCode(null)
+      } else {
+        // Autre erreur - garder le basketCode au cas où c'est temporaire
+        console.info('🛒 [CART STORE] Erreur de synchronisation (réseau?), basketCode conservé')
+      }
     }
   }
 
   /**
    * Ajoute un article au panier via le backend
    *
-   * @param referenceId - ID de la référence à ajouter
+   * @param referenceId - ID de la référence à ajouter (reference_array[].id du catalogue)
    * @param quantity - Quantité à ajouter (défaut: 1)
    */
   async function addItem(referenceId: number, quantity: number = CART_CONFIG.DEFAULT_QUANTITY): Promise<void> {
@@ -237,11 +313,24 @@ export const useCartStore = defineStore('cart', () => {
       )
       const mapped = cartService.mapAPIResponse(response)
 
+      console.log('🔍 [DEBUG] addItem response mapped:', {
+        itemsCount: mapped.items.length,
+        basketCode: mapped.basketCode ? mapped.basketCode.substring(0, 8) + '...' : 'NULL',
+        receipt: mapped.receipt
+      })
+
       cartState.value.items = mapped.items
       cartState.value.receipt = mapped.receipt
-      cartState.value.basketCode = response.basketCode // Stocker le code retourné (important pour premier ajout)
+      cartState.value.basketCode = mapped.basketCode
       cartState.value.isSynced = true
       cartState.value.lastSyncTimestamp = Date.now()
+
+      // Sauvegarder le basketCode en localStorage (important pour premier ajout)
+      if (mapped.basketCode) {
+        saveBasketCode(mapped.basketCode)
+      } else {
+        console.error('❌ [CART STORE] ATTENTION: basketCode est null/undefined dans la réponse!')
+      }
 
       toast.success('Article ajouté au panier')
       console.log('✅ [CART STORE] Article ajouté')
@@ -257,20 +346,25 @@ export const useCartStore = defineStore('cart', () => {
   /**
    * ⚠️ NOUVEAU: Met à jour la quantité d'un article
    *
-   * @param referenceId - ID de la référence à modifier
+   * @param priceId - ID du prix à modifier
    * @param quantity - Nouvelle quantité (0 = supprimer)
    */
-  async function updateItemQuantity(referenceId: number, quantity: number): Promise<void> {
+  async function updateItemQuantity(priceId: number, quantity: number): Promise<void> {
+    if (!cartState.value.basketCode) {
+      throw new CartError('Pas de panier actif', 'SYNC_ERROR')
+    }
+
     cartState.value.isLoading = true
 
     try {
-      console.log(`🛒 [CART STORE] Mise à jour quantité: referenceId=${referenceId}, quantity=${quantity}`)
+      console.log(`🛒 [CART STORE] Mise à jour quantité: priceId=${priceId}, quantity=${quantity}`)
 
-      const response = await cartService.updateQuantity(referenceId, quantity)
+      const response = await cartService.updateQuantity(priceId, quantity, cartState.value.basketCode)
       const mapped = cartService.mapAPIResponse(response)
 
       cartState.value.items = mapped.items
       cartState.value.receipt = mapped.receipt
+      cartState.value.basketCode = mapped.basketCode
       cartState.value.lastSyncTimestamp = Date.now()
 
       if (quantity === 0) {
@@ -290,19 +384,57 @@ export const useCartStore = defineStore('cart', () => {
   }
 
   /**
-   * ⚠️ CHANGEMENT: removeItem devient async et appelle le backend
+   * Supprime un article du panier via POST /deleteReference
    *
-   * @param referenceId - ID de la référence à supprimer
+   * @param itemId - ID de l'item à supprimer (= referenceId pour l'API)
+   * @param quantity - Quantité à supprimer (défaut: quantité totale de l'article)
    */
-  async function removeItem(referenceId: number): Promise<void> {
-    return updateItemQuantity(referenceId, 0)
+  async function removeItem(itemId: number, quantity?: number): Promise<void> {
+    if (!cartState.value.basketCode) {
+      throw new CartError('Pas de panier actif', 'SYNC_ERROR')
+    }
+
+    const item = findItemByItemId(itemId)
+    if (!item) {
+      throw new CartError('Article non trouvé', 'ITEM_NOT_FOUND')
+    }
+
+    // Par défaut, supprimer toute la quantité
+    const quantityToRemove = quantity ?? item.quantity
+
+    cartState.value.isLoading = true
+
+    try {
+      console.log(`🛒 [CART STORE] Suppression: itemId=${itemId}, quantity=${quantityToRemove}`)
+
+      const response = await cartService.deleteReference(
+        itemId, // referenceId = itemId
+        quantityToRemove,
+        cartState.value.basketCode
+      )
+      const mapped = cartService.mapAPIResponse(response)
+
+      cartState.value.items = mapped.items
+      cartState.value.receipt = mapped.receipt
+      cartState.value.basketCode = mapped.basketCode
+      cartState.value.lastSyncTimestamp = Date.now()
+
+      toast.success('Article retiré du panier')
+      console.log('✅ [CART STORE] Article supprimé')
+    } catch (error: any) {
+      console.error('❌ [CART STORE] Erreur lors de la suppression:', error)
+      toast.error(error.message || 'Impossible de supprimer l\'article')
+      throw error
+    } finally {
+      cartState.value.isLoading = false
+    }
   }
 
   /**
    * ⚠️ CHANGEMENT: clearCart appelle le backend pour supprimer tous les items
    */
   async function clearCart(): Promise<void> {
-    if (cartState.value.items.length === 0) {
+    if (cartState.value.items.length === 0 || !cartState.value.basketCode) {
       return
     }
 
@@ -311,11 +443,12 @@ export const useCartStore = defineStore('cart', () => {
     try {
       console.log('🛒 [CART STORE] Vidage du panier')
 
-      const response = await cartService.clearCart(cartState.value.items)
+      const response = await cartService.clearCart(cartState.value.items, cartState.value.basketCode)
       const mapped = cartService.mapAPIResponse(response)
 
       cartState.value.items = mapped.items
       cartState.value.receipt = mapped.receipt
+      cartState.value.basketCode = mapped.basketCode
       cartState.value.lastSyncTimestamp = Date.now()
 
       toast.success('Panier vidé')
@@ -332,34 +465,40 @@ export const useCartStore = defineStore('cart', () => {
   /**
    * Augmente la quantité d'un article de 1
    */
-  async function increaseQuantity(referenceId: number): Promise<void> {
-    const item = findItem(referenceId)
+  async function increaseQuantity(priceId: number): Promise<void> {
+    const item = findItem(priceId)
     if (!item) {
       throw new CartError('Article non trouvé', 'ITEM_NOT_FOUND')
     }
-    return updateItemQuantity(referenceId, item.quantity + 1)
+    return updateItemQuantity(priceId, item.quantity + 1)
   }
 
   /**
    * Diminue la quantité d'un article de 1
    */
-  async function decreaseQuantity(referenceId: number): Promise<void> {
-    const item = findItem(referenceId)
+  async function decreaseQuantity(priceId: number): Promise<void> {
+    const item = findItem(priceId)
     if (!item) {
       throw new CartError('Article non trouvé', 'ITEM_NOT_FOUND')
     }
 
     const newQuantity = Math.max(0, item.quantity - 1)
-    return updateItemQuantity(referenceId, newQuantity)
+    return updateItemQuantity(priceId, newQuantity)
   }
 
   /**
-   * Réinitialise le panier (utilisé lors de la déconnexion)
-   * Vide les items et le basketCode
+   * Réinitialise le panier lors de la déconnexion
+   *
+   * Efface le basketCode du localStorage pour qu'un autre utilisateur
+   * sur le même appareil puisse créer un nouveau panier.
+   *
+   * Note: Si un utilisateur anonyme a un panier et se connecte,
+   * le backend gère l'association du panier au compte.
    */
   function resetCart(): void {
     console.log('🛒 [CART STORE] Réinitialisation du panier (déconnexion)')
     cartState.value = createEmptyCartState()
+    saveBasketCode(null) // Effacer le basketCode du localStorage
   }
 
   // === Return (API publique du store) ===
@@ -379,6 +518,7 @@ export const useCartStore = defineStore('cart', () => {
 
     // Getters
     findItem,
+    findItemByItemId,
     hasItem,
 
     // Actions

@@ -158,13 +158,13 @@ const handleBack = () => {
 }
 
 const handleAddToCart = async () => {
-  if (!reference.value || !selectedPrice.value) {
-    toast.error('Veuillez sélectionner un produit et un prix')
+  if (!reference.value) {
+    toast.error('Produit non trouvé')
     return
   }
 
   try {
-    // Ajouter au panier (le backend gérera les détails du produit)
+    // Ajouter au panier avec le referenceId (ID de la référence dans le catalogue)
     await cartStore.addItem(Number(reference.value.id))
 
     toast.success(`${decodeHTMLEntities(reference.value.name)} ajouté au panier`)

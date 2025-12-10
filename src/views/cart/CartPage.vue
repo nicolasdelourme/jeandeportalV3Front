@@ -35,12 +35,14 @@ function formatPrice(price: number): string {
 }
 
 /**
- * Supprime un article (appel API backend)
+ * Supprime un article (appel API backend via /deleteReference)
+ * @param itemId - ID de l'item (= referenceId pour l'API)
+ * @param productName - Nom du produit pour le message de confirmation
  */
-async function removeItem(referenceId: number, productName: string) {
+async function removeItem(itemId: number, productName: string) {
   if (confirm(`Voulez-vous vraiment retirer "${productName}" du panier ?`)) {
     try {
-      await cartStore.removeItem(referenceId)
+      await cartStore.removeItem(itemId)
       // Toast géré par le store
     } catch (error) {
       // Toast d'erreur géré par le store
@@ -65,9 +67,9 @@ async function clearCart() {
 /**
  * Augmente la quantité d'un article
  */
-async function increaseQuantity(referenceId: number) {
+async function increaseQuantity(priceId: number) {
   try {
-    await cartStore.increaseQuantity(referenceId)
+    await cartStore.increaseQuantity(priceId)
   } catch (error) {
     // Toast d'erreur géré par le store
   }
@@ -76,9 +78,9 @@ async function increaseQuantity(referenceId: number) {
 /**
  * Diminue la quantité d'un article
  */
-async function decreaseQuantity(referenceId: number) {
+async function decreaseQuantity(priceId: number) {
   try {
-    await cartStore.decreaseQuantity(referenceId)
+    await cartStore.decreaseQuantity(priceId)
   } catch (error) {
     // Toast d'erreur géré par le store
   }
@@ -204,7 +206,7 @@ function goToCheckout() {
                     <!-- Contrôles quantité -->
                     <div class="flex items-center gap-2 border border-neutral-300 rounded-md">
                       <Button
-                        @click="decreaseQuantity(item.referenceId)"
+                        @click="decreaseQuantity(item.priceId)"
                         variant="ghost"
                         size="sm"
                         class="h-8 w-8 p-0"
@@ -214,7 +216,7 @@ function goToCheckout() {
                       </Button>
                       <span class="px-3 font-medium">{{ item.quantity }}</span>
                       <Button
-                        @click="increaseQuantity(item.referenceId)"
+                        @click="increaseQuantity(item.priceId)"
                         variant="ghost"
                         size="sm"
                         class="h-8 w-8 p-0"
@@ -226,7 +228,7 @@ function goToCheckout() {
 
                     <!-- Bouton suppression -->
                     <Button
-                      @click="removeItem(item.referenceId, item.name)"
+                      @click="removeItem(item.itemId, item.name)"
                       variant="ghost"
                       size="sm"
                       class="text-red-600 hover:text-red-700"

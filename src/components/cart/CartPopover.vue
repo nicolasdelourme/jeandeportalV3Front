@@ -25,11 +25,12 @@ const icons = computed(() => ({
 }))
 
 /**
- * Supprime un article du panier (appel API backend)
+ * Supprime un article du panier (appel API backend via /deleteReference)
+ * @param itemId - ID de l'item (= referenceId pour l'API)
  */
-async function handleRemoveItem(referenceId: number, productName: string) {
+async function handleRemoveItem(itemId: number) {
   try {
-    await cartStore.removeItem(referenceId)
+    await cartStore.removeItem(itemId)
     // Toast géré par le store
   } catch (error) {
     // Toast d'erreur géré par le store
@@ -144,7 +145,7 @@ function formatPrice(price: number): string {
 
             <!-- Bouton supprimer -->
             <button
-              @click="handleRemoveItem(item.referenceId, item.name)"
+              @click="handleRemoveItem(item.itemId)"
               class="flex-shrink-0 text-neutral-400 hover:text-red-600 transition-colors p-1"
               title="Retirer du panier"
               :disabled="cartStore.isLoading"

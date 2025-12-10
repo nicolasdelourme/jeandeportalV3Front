@@ -149,6 +149,19 @@ export const useAuthStore = defineStore('auth', () => {
             setAuthUser(userProfile)
             console.log('✅ [AUTH STORE] User défini dans le store:', user.value)
 
+            // Synchroniser le panier anonyme avec le compte utilisateur
+            // Le backend associera le panier (via basketCode) au compte connecté
+            const cartStore = useCartStore()
+            if (cartStore.basketCode) {
+                console.log('🛒 [AUTH STORE] Synchronisation du panier anonyme avec le compte...')
+                try {
+                    await cartStore.syncWithBackend()
+                    console.log('✅ [AUTH STORE] Panier synchronisé avec le compte')
+                } catch (err) {
+                    console.warn('⚠️ [AUTH STORE] Erreur lors de la sync panier (non bloquant):', err)
+                }
+            }
+
             // Retourner l'URL de redirection
             const redirectUrl = response.afterLogin || '/'
             console.log('🔀 [AUTH STORE] URL de redirection:', redirectUrl)
@@ -238,22 +251,32 @@ export const useAuthStore = defineStore('auth', () => {
      */
     async function logout(): Promise<void> {
         isLoading.value = true
+        console.log('🚪 [AUTH STORE] Début du logout...')
 
         try {
             // Appeler le backend pour supprimer le cookie HttpOnly
+            console.log('🚪 [AUTH STORE] Appel de /logout...')
             await authService.logout()
+            console.log('✅ [AUTH STORE] /logout appelé avec succès')
         } catch (err) {
+            console.error('❌ [AUTH STORE] Erreur lors du logout backend:', err)
             logger.error('Erreur lors de la déconnexion côté serveur:', err)
         } finally {
             // Nettoyer l'état local (même si l'appel backend a échoué)
+            console.log('🧹 [AUTH STORE] Nettoyage de l\'état local...')
             user.value = null
             clearAuthData()
 
             // Réinitialiser le panier (vide le basketCode)
             const cartStore = useCartStore()
             cartStore.resetCart()
+            console.log('✅ [AUTH STORE] Logout terminé')
 
             isLoading.value = false
+
+            // Force page reload to get fresh session cookies from backend
+            // (workaround si le backend ne clear pas correctement les cookies)
+            window.location.href = '/auth'
         }
     }
 
