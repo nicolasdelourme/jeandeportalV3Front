@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8"/>
+		<link rel="icon" type="image/png" href="/favicon.png"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+
+		<!-- Security: Force HTTPS -->
+		<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+
+		<!-- Security: Content Security Policy -->
+		<meta http-equiv="Content-Security-Policy" content="
+			default-src 'self';
+			script-src 'self' 'unsafe-inline' https://kit.fontawesome.com;
+			style-src 'self' 'unsafe-inline';
+			img-src 'self' data: https:;
+			font-src 'self' data: https://ka-f.fontawesome.com;
+			connect-src 'self' https://jeandeportal.fr https://api.jeandeportal.fr;
+			frame-ancestors 'none';
+			base-uri 'self';
+			form-action 'self';
+		">
+
+		<title>Éditions Jean de Portal</title>
+		<script type="module" crossorigin src="/assets/index-BZ-td3eY.js"></script>
+		<link rel="stylesheet" crossorigin href="/assets/index-QtLds8FH.css">
+	</head>
+	<body>
+		<div id="app"></div>
+	</body>
+</html>
