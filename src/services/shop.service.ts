@@ -4,7 +4,7 @@
  */
 
 import { apiClient } from '@/api/client'
-import type { ShopCatalogResponse, APIRawResponse } from '@/types/shop-api.types'
+import type { ShopCatalogResponse, APIRawStoreResponse } from '@/types/shop-api.types'
 import { ShopAPIError, mapAPIResponseToShopCatalog } from '@/types/shop-api.types'
 import { mockFetchCatalogAPI } from '@/api/shop.mock'
 
@@ -61,7 +61,7 @@ class ShopService {
       // Cela évite les problèmes de conversion de path sur Git Bash Windows
       // et utilise automatiquement le proxy Vite en dev
       // Note: apiClient.get() retourne directement les données (pas besoin de .data)
-      const rawData = await apiClient.get<APIRawResponse>(
+      const rawData = await apiClient.get<APIRawStoreResponse>(
         API_CONFIG.ENDPOINTS.CATALOG,
         {
           signal: this.abortController.signal,
@@ -70,17 +70,17 @@ class ShopService {
 
       clearTimeout(timeoutId)
 
-      // Validation basique de la structure (nouvelle structure: tableau d'items directement)
-      if (!rawData || !Array.isArray(rawData)) {
+      // Validation basique de la structure (nouvelle structure avec category_array)
+      if (!rawData || !rawData.category_array) {
         console.error('🔍 [DEBUG] Invalid response structure:', {
           type: typeof rawData,
-          isArray: Array.isArray(rawData),
+          hasCategories: rawData && 'category_array' in rawData,
           sample: rawData
         })
-        throw new ShopAPIError('Structure de réponse API invalide: attendu un tableau d\'items')
+        throw new ShopAPIError('Structure de réponse API invalide: attendu un objet avec category_array')
       }
 
-      console.log(`📡 Received ${rawData.length} items from API`)
+      console.log(`📡 Received store "${rawData.name}" with ${rawData.category_array.length} categories`)
 
       // Mapper les données brutes vers notre modèle normalisé
       const data = mapAPIResponseToShopCatalog(rawData)
