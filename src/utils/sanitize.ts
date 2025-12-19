@@ -51,7 +51,8 @@ function sanitizeAddresses(addresses: unknown): UserAddress[] {
             typeof addr === 'object' && addr !== null
         )
         .map(addr => ({
-            id: addr.id as number | string | undefined,
+            // L'API renvoie "adressId" (avec typo), fallback sur "id"
+            id: (addr.adressId ?? addr.id) as number | string | undefined,
             // Destinataire
             title: sanitizeNullableString(addr.title),
             firstName: sanitizeNullableString(addr.firstname ?? addr.firstName),
