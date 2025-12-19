@@ -72,6 +72,12 @@ const routes: RouteRecordRaw[] = [
         // Pas de guestOnly - peut être accédé même si déjà connecté
     },
     {
+        path: "/changement/finalisation/:hash",
+        name: "validate-email-change",
+        component: () => import("@/views/auth/ValidateEmailChangePage.vue"),
+        // Pas de guestOnly - peut être accédé même si déjà connecté
+    },
+    {
         path: "/mon-compte",
         name: "account",
         component: () => import("@/views/account/AccountPage.vue"),
@@ -109,6 +115,14 @@ const routes: RouteRecordRaw[] = [
         path: "/panier",
         name: "cart",
         component: () => import("@/views/cart/CartPage.vue"),
+    },
+    {
+        path: "/commander",
+        name: "checkout",
+        component: () => import("@/views/checkout/CheckoutPage.vue"),
+        meta: {
+            requiresAuth: true,
+        },
     },
     {
         path: "/:pathMatch(.*)*",

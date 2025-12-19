@@ -66,6 +66,40 @@ export interface ResetPasswordResponse {
 }
 
 /**
+ * Requête de modification d'email
+ * POST /accountKey/modification
+ */
+export interface ChangeEmailRequest {
+    email: string  // Nouveau mail souhaité
+}
+
+/**
+ * Réponse de demande de modification d'email
+ * POST /accountKey/modification
+ */
+export interface ChangeEmailResponse {
+    status: 'success' | 'error'
+    message?: string
+}
+
+/**
+ * Requête de validation de modification d'email
+ * POST /accountKey/validation
+ */
+export interface ValidateEmailChangeRequest {
+    modificationCode: string  // Hash reçu par email
+}
+
+/**
+ * Réponse de validation de modification d'email
+ * POST /accountKey/validation
+ */
+export interface ValidateEmailChangeResponse {
+    status: 'success' | 'error'
+    message?: string
+}
+
+/**
  * Union type pour toutes les réponses possibles
  */
 export type AuthResponse = AuthSuccessResponse | AuthErrorResponse

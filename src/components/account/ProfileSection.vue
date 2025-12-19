@@ -18,6 +18,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
 import AddressManagement from './AddressManagement.vue'
 import PasswordChangeDialog from './PasswordChangeDialog.vue'
+import ChangeEmailDialog from './ChangeEmailDialog.vue'
 import { useAuth } from '@/composables/useAuth'
 import { useUserDisplay } from '@/composables/useUserDisplay'
 
@@ -36,6 +37,11 @@ const isSubmitting = ref(false)
  * État du dialog de changement de mot de passe
  */
 const isPasswordDialogOpen = ref(false)
+
+/**
+ * État du dialog de changement d'email
+ */
+const isEmailDialogOpen = ref(false)
 
 /**
  * Schéma de validation
@@ -194,7 +200,7 @@ const onSubmit = handleSubmit(async (values) => {
             </CardContent>
         </Card>
 
-        <!-- Sécurité / Mot de passe -->
+        <!-- Sécurité / Mot de passe et Email -->
         <Card>
             <CardHeader>
                 <CardTitle style="font-family: Roboto, sans-serif;">Sécurité</CardTitle>
@@ -202,7 +208,8 @@ const onSubmit = handleSubmit(async (values) => {
                     Gérez la sécurité de votre compte
                 </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent class="space-y-6">
+                <!-- Mot de passe -->
                 <div class="flex items-center justify-between">
                     <div>
                         <h3 class="text-sm font-medium text-neutral-700" style="font-family: Roboto, sans-serif;">
@@ -217,6 +224,24 @@ const onSubmit = handleSubmit(async (values) => {
                         Changer le mot de passe
                     </Button>
                 </div>
+
+                <Separator />
+
+                <!-- Adresse email de connexion -->
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-medium text-neutral-700" style="font-family: Roboto, sans-serif;">
+                            Adresse email de connexion
+                        </h3>
+                        <p class="text-sm text-muted-foreground mt-1">
+                            Modifiez l'adresse email utilisée pour vous connecter
+                        </p>
+                    </div>
+                    <Button variant="outline" @click="isEmailDialogOpen = true">
+                        <FontAwesomeIcon :icon="['fas', 'envelope']" class="mr-2" />
+                        Modifier l'email
+                    </Button>
+                </div>
             </CardContent>
         </Card>
 
@@ -225,5 +250,8 @@ const onSubmit = handleSubmit(async (values) => {
 
         <!-- Dialog de changement de mot de passe -->
         <PasswordChangeDialog v-model:open="isPasswordDialogOpen" />
+
+        <!-- Dialog de changement d'email -->
+        <ChangeEmailDialog v-model:open="isEmailDialogOpen" />
     </div>
 </template>

@@ -4,7 +4,7 @@
  */
 
 import { apiClient } from '@/api/client'
-import type { LoginCredentials, RegisterCredentials, AuthResponse, AuthSuccessResponse, User, VerifyEmailResponse, ResetPasswordResponse } from '@/types/auth.types'
+import type { LoginCredentials, RegisterCredentials, AuthResponse, AuthSuccessResponse, User, VerifyEmailResponse, ResetPasswordResponse, ChangeEmailResponse, ValidateEmailChangeResponse } from '@/types/auth.types'
 import { AuthError } from '@/types/auth.types'
 import { logger } from '@/utils/logger'
 
@@ -27,7 +27,9 @@ import {
     mockForgotPasswordAPI,
     mockVerifyEmailAPI,
     mockVerifyResetCodeAPI,
-    mockCompletePasswordResetAPI
+    mockCompletePasswordResetAPI,
+    mockRequestEmailChangeAPI,
+    mockValidateEmailChangeAPI
 } from '@/api/auth.mock'
 
 /**
@@ -316,6 +318,89 @@ export class AuthService {
             logger.error('Erreur lors de la réinitialisation du mot de passe:', error)
 
             const errorMessage = error.response?.data?.message || 'Impossible de réinitialiser le mot de passe.'
+
+            throw new AuthError(
+                errorMessage,
+                'UNKNOWN_ERROR',
+                error.response?.status
+            )
+        }
+    }
+
+    /**
+     * Demande de modification d'email
+     * POST /accountKey/modification
+     * Envoie un email avec un lien de validation (valable 15 min)
+     *
+     * @param newEmail - Nouvel email souhaité
+     */
+    async requestEmailChange(newEmail: string): Promise<ChangeEmailResponse> {
+        try {
+            console.log('🔍 [DEBUG] requestEmailChange appelé avec:', newEmail)
+            console.log('🔍 [DEBUG] USE_MOCK:', USE_MOCK)
+
+            if (USE_MOCK) {
+                console.log('🔍 [DEBUG] Utilisation du mock')
+                return await mockRequestEmailChangeAPI(newEmail)
+            } else {
+                console.log('🔍 [DEBUG] Appel API réel: POST /accountKey/modification')
+                const response = await apiClient.post<any>(
+                    '/accountKey/modification',
+                    { email: newEmail }
+                )
+                console.log('🔍 [DEBUG] Réponse API:', response)
+
+                // L'API peut retourner { status: "success" } ou { email: ["error", "message"] }
+                if (response.status === 'success') {
+                    return { status: 'success' }
+                }
+
+                // Gérer le format d'erreur { email: ["error", "message"] }
+                if (response.email && Array.isArray(response.email)) {
+                    const [errorType, errorMessage] = response.email
+                    if (errorType === 'error') {
+                        return { status: 'error', message: errorMessage }
+                    }
+                }
+
+                // Si format inconnu mais pas d'erreur explicite, considérer comme succès
+                return { status: 'success' }
+            }
+        } catch (error: any) {
+            console.error('🔍 [DEBUG] Erreur dans requestEmailChange:', error)
+            logger.error('Erreur lors de la demande de modification d\'email:', error)
+
+            const errorMessage = error.response?.data?.message || 'Impossible de demander la modification d\'email.'
+
+            throw new AuthError(
+                errorMessage,
+                'UNKNOWN_ERROR',
+                error.response?.status
+            )
+        }
+    }
+
+    /**
+     * Valide la modification d'email via le code reçu par email
+     * POST /accountKey/validation
+     *
+     * @param modificationCode - Hash reçu par email (depuis l'URL /changement/finalisation/:hash)
+     */
+    async validateEmailChange(modificationCode: string): Promise<ValidateEmailChangeResponse> {
+        try {
+            if (USE_MOCK) {
+                return await mockValidateEmailChangeAPI(modificationCode)
+            } else {
+                const response = await apiClient.post<ValidateEmailChangeResponse>(
+                    '/accountKey/validation',
+                    { modificationCode }
+                )
+                return response
+            }
+        } catch (error: any) {
+            logger.error('Erreur lors de la validation du changement d\'email:', error)
+
+            const errorMessage = error.response?.data?.message || 'Le lien de validation est invalide ou a expiré.'
 
             throw new AuthError(
                 errorMessage,

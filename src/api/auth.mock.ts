@@ -412,3 +412,102 @@ export async function mockCompletePasswordResetAPI(
         next: '/login'
     }
 }
+
+// Stockage des codes de modification d'email (code -> { oldEmail, newEmail })
+const MOCK_EMAIL_CHANGE_CODES: Map<string, { oldEmail: string; newEmail: string }> = new Map()
+
+/**
+ * Génère un code de modification d'email simulé
+ */
+function generateEmailChangeCode(): string {
+    return `email_change_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`
+}
+
+/**
+ * Mock Request Email Change API
+ * POST /accountKey/modification avec { email }
+ *
+ * Simule la demande de changement d'email
+ * L'utilisateur doit être connecté
+ */
+export async function mockRequestEmailChangeAPI(newEmail: string): Promise<{ status: 'success' | 'error'; message?: string }> {
+    console.log('📧 [MOCK API] mockRequestEmailChangeAPI appelé avec newEmail:', newEmail)
+    await delay(800)
+
+    // Vérifier que l'utilisateur est connecté
+    if (!MOCK_SESSION) {
+        console.log('❌ [MOCK API] Utilisateur non connecté')
+        return {
+            status: 'error',
+            message: 'Vous devez être connecté pour modifier votre email.'
+        }
+    }
+
+    // Récupérer l'utilisateur actuel
+    const user = MOCK_USERS.find(u => u.id === MOCK_SESSION!.userId)
+    if (!user) {
+        return {
+            status: 'error',
+            message: 'Utilisateur non trouvé.'
+        }
+    }
+
+    // Vérifier que le nouvel email n'est pas déjà utilisé
+    const existingUser = MOCK_USERS.find(u => u.email === newEmail)
+    if (existingUser) {
+        console.log('❌ [MOCK API] Email déjà utilisé:', newEmail)
+        return {
+            status: 'error',
+            message: 'Cet email est déjà utilisé par un autre compte.'
+        }
+    }
+
+    // Générer un code de modification et le stocker
+    const changeCode = generateEmailChangeCode()
+    MOCK_EMAIL_CHANGE_CODES.set(changeCode, {
+        oldEmail: user.email,
+        newEmail: newEmail
+    })
+
+    console.log('📧 [MOCK API] Email de validation envoyé à:', user.email)
+    console.log('🔗 [MOCK API] Lien de validation: /changement/finalisation/' + changeCode)
+
+    return {
+        status: 'success'
+    }
+}
+
+/**
+ * Mock Validate Email Change API
+ * POST /accountKey/validation avec { modificationCode }
+ *
+ * Valide la modification d'email via le code reçu
+ */
+export async function mockValidateEmailChangeAPI(modificationCode: string): Promise<{ status: 'success' | 'error'; message?: string }> {
+    console.log('✅ [MOCK API] mockValidateEmailChangeAPI appelé avec code:', modificationCode)
+    await delay(800)
+
+    // Vérifier si le code existe
+    const changeData = MOCK_EMAIL_CHANGE_CODES.get(modificationCode)
+
+    if (!changeData) {
+        console.log('❌ [MOCK API] Code de modification d\'email invalide ou expiré')
+        return {
+            status: 'error',
+            message: 'Le lien de validation est invalide ou a expiré.'
+        }
+    }
+
+    // Trouver l'utilisateur et mettre à jour son email
+    const user = MOCK_USERS.find(u => u.email === changeData.oldEmail)
+    if (user) {
+        user.email = changeData.newEmail
+        // Supprimer le code utilisé
+        MOCK_EMAIL_CHANGE_CODES.delete(modificationCode)
+        console.log('✅ [MOCK API] Email modifié de', changeData.oldEmail, 'vers', changeData.newEmail)
+    }
+
+    return {
+        status: 'success'
+    }
+}
