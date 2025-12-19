@@ -45,8 +45,14 @@ const handleViewDetails = (reference: ShopReference) => {
 
 const handleAddToCart = async (reference: ShopReference) => {
   try {
-    // Ajouter au panier avec le referenceId (ID de la référence dans le catalogue)
-    await cartStore.addItem(Number(reference.id))
+    // Utiliser l'ID du premier produit (reference_array[0].referenceId dans l'API)
+    // ShopReference.id = itemId (l'article), products[0].id = referenceId (la vraie référence)
+    const productId = reference.products[0]?.id
+    if (!productId) {
+      toast.error('Produit non disponible')
+      return
+    }
+    await cartStore.addItem(Number(productId))
 
     toast.success(`${reference.name} ajouté au panier`)
   } catch (error) {

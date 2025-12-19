@@ -94,11 +94,10 @@ function goToShop() {
 }
 
 /**
- * Va vers le checkout (à implémenter)
+ * Va vers le checkout
  */
 function goToCheckout() {
-  // TODO: Implémenter la page checkout
-  toast.info('Page de paiement à venir')
+  router.push('/commander')
 }
 </script>
 

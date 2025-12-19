@@ -69,6 +69,18 @@ class CartService {
                 request
             )
 
+            // DEBUG: Afficher la réponse complète
+            console.log('🔍 [DEBUG] addReference response:', JSON.stringify(response, null, 2))
+
+            // Vérifier si le backend retourne une erreur
+            if (response.status === 'error') {
+                logger.error('❌ [CART SERVICE] Erreur addReference:', response.message || 'Raison inconnue')
+                throw new CartError(
+                    response.message || 'Impossible d\'ajouter l\'article (erreur backend)',
+                    'API_ERROR'
+                )
+            }
+
             logger.info('✅ [CART SERVICE] Article ajouté avec succès')
             return response
         } catch (error: any) {

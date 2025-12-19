@@ -60,7 +60,6 @@ class ShopService {
       // Utilisation d'apiClient au lieu de fetch() manuel
       // Cela évite les problèmes de conversion de path sur Git Bash Windows
       // et utilise automatiquement le proxy Vite en dev
-      // Note: apiClient.get() retourne directement les données (pas besoin de .data)
       const rawData = await apiClient.get<APIRawStoreResponse>(
         API_CONFIG.ENDPOINTS.CATALOG,
         {

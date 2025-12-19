@@ -158,14 +158,14 @@ const handleBack = () => {
 }
 
 const handleAddToCart = async () => {
-  if (!reference.value) {
+  if (!reference.value || !selectedProduct.value) {
     toast.error('Produit non trouvé')
     return
   }
 
   try {
-    // Ajouter au panier avec le referenceId (ID de la référence dans le catalogue)
-    await cartStore.addItem(Number(reference.value.id))
+    // Utiliser selectedProduct.id (referenceId) et non reference.id (itemId)
+    await cartStore.addItem(Number(selectedProduct.value.id))
 
     toast.success(`${decodeHTMLEntities(reference.value.name)} ajouté au panier`)
   } catch (error) {
@@ -225,8 +225,9 @@ const handleShare = async () => {
  * Vérifie si le produit est déjà dans le panier
  */
 const isInCart = computed(() => {
-  if (!reference.value) return false
-  return cartStore.hasItem(Number(reference.value.id))
+  if (!selectedProduct.value?.prices[0]?.id) return false
+  // hasItem attend un priceId, pas un referenceId
+  return cartStore.hasItem(Number(selectedProduct.value.prices[0].id))
 })
 
 /**
