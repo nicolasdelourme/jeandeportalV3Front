@@ -5,8 +5,12 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-    /* Couleurs custom du projet */
-    --primary: #cc0000;
+    /* Nouvelle DA - Style Fintech/Bumble */
+    --primary: #1D1D1D;                      /* Noir signature - CTA & textes principaux */
+    --color-accent-yellow: #FFDD00;          /* Jaune signature */
+    --color-bg-yellow-soft: #FFF9D3;         /* Fond jaune descendu */
+
+    /* Couleurs consultations (thèmes) */
     --color-consultations-nd: #1a2d40;
     --color-consultations-nd-metauxprecieux: #dea600;
     --color-consultations-nd-immobilier: #489886;

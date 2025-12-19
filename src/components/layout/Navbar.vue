@@ -7,7 +7,6 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
-import { Button } from '@/components/ui/button'
 import CartPopover from '@/components/cart/CartPopover.vue'
 import {
     NavigationMenu,
@@ -43,8 +42,6 @@ import {
 } from '@/components/ui/accordion'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
-import Separator from '../ui/separator/Separator.vue'
-
 import { useUserDisplay } from '@/composables/useUserDisplay'
 
 /**
@@ -171,14 +168,14 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
 </script>
 
 <template>
-    <nav class="sticky top-0 z-50 border-b border-[#e9ecef] backdrop-blur-[10px] bg-white/90 shadow safe-top">
-        <div class="max-w-8xl mx-auto flex items-center justify-between px-2 py-2 md:px-4 md:py-3">
+    <nav class="sticky top-0 z-50 pt-2 pb-2">
+        <div class="max-w-7xl mx-auto flex items-center justify-between px-4 md:px-9">
             <!-- Mobile: Hamburger (visible < 768px) -->
             <Drawer v-model:open="drawerOpen" direction="left">
                 <DrawerTrigger as-child>
-                    <Button variant="ghost" size="icon" class="md:hidden shrink-0" aria-label="Menu">
-                        <FontAwesomeIcon v-if="icons.bars" :icon="icons.bars" class="h-5 w-5" />
-                    </Button>
+                    <button class="md:hidden shrink-0 p-2 rounded-xl hover:bg-primary/5 transition-colors" aria-label="Menu">
+                        <FontAwesomeIcon v-if="icons.bars" :icon="icons.bars" class="h-5 w-5 text-primary" />
+                    </button>
                 </DrawerTrigger>
                 <DrawerContent class="md:hidden w-[280px] flex flex-col justify-between h-full py-6 px-3">
                     <!-- Section Navigation (Haut) -->
@@ -189,13 +186,12 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                                 v-if="item.type === 'link'"
                                 @click="handleNavClick(item.href)"
                                 :class="[
-                                    'w-full px-3 py-2.5 text-left text-sm font-medium rounded-md transition-colors',
-                                    'text-neutral-700 hover:bg-primary/5 hover:text-primary',
+                                    'w-full px-3 py-2.5 text-left text-sm font-medium rounded-xl transition-colors',
+                                    'text-primary hover:bg-primary/5',
                                     isActiveRoute(item.href)
-                                        ? 'bg-primary/10 text-primary font-semibold border-l-3 border-primary'
+                                        ? 'bg-primary/10 font-semibold'
                                         : ''
                                 ]"
-                                style="font-family: Roboto, sans-serif;"
                             >
                                 {{ item.label }}
                             </button>
@@ -211,13 +207,12 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                                 <AccordionItem :value="item.label" class="border-none">
                                     <AccordionTrigger
                                         :class="[
-                                            'w-full px-3 py-2.5 text-left text-sm font-medium rounded-md hover:no-underline',
-                                            'hover:bg-primary/5 hover:text-primary transition-colors',
-                                            'data-[state=open]:bg-primary/5',
+                                            'w-full px-3 py-2.5 text-left text-sm font-medium rounded-xl hover:no-underline',
+                                            'hover:bg-[#1D1D1D]/5 transition-colors',
+                                            'data-[state=open]:bg-[#1D1D1D]/5',
                                             '[&>svg]:ml-auto [&>svg]:h-4 [&>svg]:w-4 [&>svg]:transition-transform',
-                                            isDropdownActive(item.items) ? 'text-primary' : 'text-neutral-700'
+                                            isDropdownActive(item.items) ? 'text-[#1D1D1D] font-semibold' : 'text-[#1D1D1D]'
                                         ]"
-                                        style="font-family: Roboto, sans-serif;"
                                     >
                                         {{ item.label }}
                                     </AccordionTrigger>
@@ -228,13 +223,12 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                                                 :key="subItem.label"
                                                 @click="handleNavClick(subItem.href)"
                                                 :class="[
-                                                    'w-full pl-7 pr-3 py-2 text-left text-xs font-normal rounded-md transition-colors',
-                                                    'text-neutral-600 hover:bg-primary/5 hover:text-primary',
+                                                    'w-full pl-7 pr-3 py-2 text-left text-xs font-normal rounded-xl transition-colors',
+                                                    'text-neutral-600 hover:bg-[#1D1D1D]/5 hover:text-[#1D1D1D]',
                                                     isActiveRoute(subItem.href)
-                                                        ? 'bg-primary/10 text-primary font-semibold border-l-3 border-primary'
+                                                        ? 'bg-[#1D1D1D]/10 text-[#1D1D1D] font-semibold'
                                                         : ''
                                                 ]"
-                                                style="font-family: Roboto, sans-serif;"
                                             >
                                                 {{ subItem.label }}
                                             </button>
@@ -251,14 +245,14 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                         <template v-if="isAuthenticated">
                             <!-- Avatar + Nom -->
                             <div class="flex items-center gap-3 px-3 py-2 mb-2">
-                                <Avatar class="h-9 w-9">
+                                <Avatar class="h-9 w-9 border border-[#1D1D1D]/10">
                                     <AvatarImage v-if="avatarUrl" :src="avatarUrl" :alt="displayName" />
-                                    <AvatarFallback class="bg-primary/10 text-primary font-semibold text-xs">
+                                    <AvatarFallback class="bg-[#1D1D1D] text-white font-semibold text-xs">
                                         {{ avatarInitials }}
                                     </AvatarFallback>
                                 </Avatar>
                                 <div class="flex flex-col overflow-hidden">
-                                    <p class="text-sm font-semibold text-neutral-800 truncate" style="font-family: Roboto, sans-serif;">
+                                    <p class="text-sm font-semibold text-[#1D1D1D] truncate">
                                         {{ displayName }}
                                     </p>
                                 </div>
@@ -267,8 +261,7 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                             <!-- Liens compte -->
                             <button
                                 @click="handleAccount"
-                                class="w-full px-3 py-2 text-left flex items-center text-sm font-normal rounded-md text-neutral-600 hover:bg-primary/5 hover:text-primary transition-colors"
-                                style="font-family: Roboto, sans-serif;"
+                                class="w-full px-3 py-2 text-left flex items-center text-sm font-normal rounded-xl text-neutral-600 hover:bg-[#1D1D1D]/5 hover:text-[#1D1D1D] transition-colors"
                             >
                                 <FontAwesomeIcon v-if="icons.userCircle" :icon="icons.userCircle" class="h-4 w-4 mr-3 shrink-0" />
                                 <span>Mon compte</span>
@@ -276,8 +269,7 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
 
                             <button
                                 @click="handleOrders"
-                                class="w-full px-3 py-2 text-left flex items-center text-sm font-normal rounded-md text-neutral-600 hover:bg-primary/5 hover:text-primary transition-colors"
-                                style="font-family: Roboto, sans-serif;"
+                                class="w-full px-3 py-2 text-left flex items-center text-sm font-normal rounded-xl text-neutral-600 hover:bg-[#1D1D1D]/5 hover:text-[#1D1D1D] transition-colors"
                             >
                                 <FontAwesomeIcon v-if="icons.box" :icon="icons.box" class="h-4 w-4 mr-3 shrink-0" />
                                 <span>Mes commandes</span>
@@ -287,8 +279,7 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
 
                             <button
                                 @click="handleLogout"
-                                class="w-full px-3 py-2 text-left flex items-center text-sm font-normal rounded-md text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors"
-                                style="font-family: Roboto, sans-serif;"
+                                class="w-full px-3 py-2 text-left flex items-center text-sm font-normal rounded-xl text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors"
                             >
                                 <FontAwesomeIcon v-if="icons.signOut" :icon="icons.signOut" class="h-4 w-4 mr-3 shrink-0" />
                                 <span>Déconnexion</span>
@@ -299,129 +290,118 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                         <template v-else>
                             <button
                                 @click="handleLogin"
-                                class="w-full px-3 py-2 text-left flex items-center text-sm font-normal rounded-md text-neutral-600 hover:bg-primary/5 hover:text-primary transition-colors"
-                                style="font-family: Roboto, sans-serif;"
+                                class="w-full px-3 py-3 flex items-center justify-center text-sm font-medium rounded-2xl bg-[#1D1D1D] text-white hover:bg-[#2D2D2D] transition-colors"
                             >
-                                <FontAwesomeIcon v-if="icons.login" :icon="icons.login" class="h-4 w-4 mr-3 shrink-0" />
-                                <span>Connexion</span>
+                                Se connecter
                             </button>
 
                             <button
                                 @click="handleRegister"
-                                class="w-full px-3 py-2 text-left flex items-center text-sm font-normal rounded-md text-neutral-600 hover:bg-primary/5 hover:text-primary transition-colors"
-                                style="font-family: Roboto, sans-serif;"
+                                class="w-full px-3 py-2.5 text-left flex items-center justify-center text-sm font-medium rounded-xl text-[#1D1D1D] hover:bg-[#1D1D1D]/5 transition-colors mt-2"
                             >
-                                <FontAwesomeIcon v-if="icons.user" :icon="icons.user" class="h-4 w-4 mr-3 shrink-0" />
-                                <span>Inscription</span>
+                                Créer un compte
                             </button>
                         </template>
                     </div>
                 </DrawerContent>
             </Drawer>
 
-            <!-- Section gauche/centre: Logo + Titre -->
-            <div class="flex items-center shrink-0 flex-1 md:flex-initial">
-                <RouterLink to="/" class="flex items-center gap-2 md:gap-4">
-                    <!-- Logo Jean de Portal -->
+            <!-- Logo -->
+            <div class="flex items-center shrink-0">
+                <RouterLink to="/" class="flex items-center gap-2">
                     <img src="/logoJDPLivre.png" alt="Logo Éditions Jean de Portal"
-                         class="w-8 h-8 md:w-10 md:h-10 object-contain" />
-
-                    <!-- Titre (responsive) -->
-                    <div class="relative">
-                        <p class="font-bold text-sm md:text-xl leading-5" style="font-family: Roboto, sans-serif;">
-                            <span class="hidden sm:inline">Éditions </span>Jean de Portal
-                        </p>
-                        <!-- Separator et sous-titre : visible uniquement sur desktop -->
-                        <template v-if="false">
-                            <Separator class="mt-1 bg-neutral-400 hidden md:block" />
-                            <p class="font-medium text-sm leading-5 text-neutral-500 hidden md:block"
-                                style="font-family: Roboto, sans-serif;">
-                                30 ans d'informations pratiques
-                            </p>
-                        </template>
-                    </div>
+                         class="w-8 h-8 md:w-9 md:h-9 object-contain" />
                 </RouterLink>
             </div>
 
-            <!-- Desktop: Navigation Menu (visible >= 768px) -->
-            <NavigationMenu class="hidden md:block">
-                <NavigationMenuList>
-                    <NavigationMenuItem v-for="item in navItems" :key="item.label">
+            <!-- Desktop: Navigation Pill Glassmorphism (visible >= 768px) -->
+            <div class="hidden md:flex flex-1 justify-center">
+                <nav class="nav-pill flex items-center gap-1 px-1 py-1 rounded-2xl backdrop-blur-[8px] bg-white/80 border border-[rgba(32,32,32,0.08)]">
+                    <template v-for="item in navItems" :key="item.label">
                         <!-- Lien simple -->
-                        <template v-if="item.type === 'link'">
-                            <NavigationMenuLink as-child>
-                                <RouterLink :to="item.href"
-                                    class="group inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 font-semibold text-[14px] leading-[20px] text-[#1a2d40] hover:text-primary transition-colors"
-                                    style="font-family: Roboto, sans-serif;">
-                                    {{ item.label }}
-                                </RouterLink>
-                            </NavigationMenuLink>
-                        </template>
+                        <RouterLink
+                            v-if="item.type === 'link'"
+                            :to="item.href"
+                            :class="[
+                                'px-5 py-3 text-[15px] font-medium text-[#1D1D1D] rounded-xl transition-all duration-200',
+                                'hover:bg-[#1D1D1D]/5',
+                                isActiveRoute(item.href) ? 'bg-[#1D1D1D]/10 font-semibold' : ''
+                            ]"
+                        >
+                            {{ item.label }}
+                        </RouterLink>
 
                         <!-- Menu dropdown -->
-                        <template v-else-if="item.type === 'dropdown'">
-                            <NavigationMenuTrigger
-                                class="group inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 font-semibold text-[14px] leading-[20px] text-[#1a2d40] hover:text-primary transition-colors"
-                                style="font-family: Roboto, sans-serif;">
-                                {{ item.label }}
-                            </NavigationMenuTrigger>
-                            <NavigationMenuContent>
-                                <ul class="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                                    <li v-for="subItem in item.items" :key="subItem.label">
-                                        <NavigationMenuLink as-child>
-                                            <RouterLink :to="subItem.href"
-                                                class="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                                                <div class="text-sm font-semibold leading-none text-[#1a2d40]"
-                                                     style="font-family: Roboto, sans-serif;">
-                                                    {{ subItem.label }}
-                                                </div>
-                                                <p class="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1"
-                                                   style="font-family: Roboto, sans-serif;">
-                                                    {{ subItem.description }}
-                                                </p>
-                                            </RouterLink>
-                                        </NavigationMenuLink>
-                                    </li>
-                                </ul>
-                            </NavigationMenuContent>
-                        </template>
-                    </NavigationMenuItem>
-                </NavigationMenuList>
-            </NavigationMenu>
+                        <NavigationMenu v-else-if="item.type === 'dropdown'" class="static">
+                            <NavigationMenuList>
+                                <NavigationMenuItem>
+                                    <NavigationMenuTrigger
+                                        :class="[
+                                            'px-5 py-3 text-[15px] font-medium text-[#1D1D1D] rounded-xl transition-all duration-200 bg-transparent',
+                                            'hover:bg-[#1D1D1D]/5 data-[state=open]:bg-[#1D1D1D]/5',
+                                            isDropdownActive(item.items) ? 'bg-[#1D1D1D]/10 font-semibold' : ''
+                                        ]"
+                                    >
+                                        {{ item.label }}
+                                    </NavigationMenuTrigger>
+                                    <NavigationMenuContent>
+                                        <ul class="grid w-[400px] gap-2 p-3">
+                                            <li v-for="subItem in item.items" :key="subItem.label">
+                                                <NavigationMenuLink as-child>
+                                                    <RouterLink
+                                                        :to="subItem.href"
+                                                        class="block select-none space-y-1 rounded-xl p-3 leading-none no-underline outline-none transition-colors hover:bg-[#1D1D1D]/5"
+                                                    >
+                                                        <div class="text-sm font-semibold leading-none text-[#1D1D1D]">
+                                                            {{ subItem.label }}
+                                                        </div>
+                                                        <p class="line-clamp-2 text-sm leading-snug text-neutral-500 mt-1.5">
+                                                            {{ subItem.description }}
+                                                        </p>
+                                                    </RouterLink>
+                                                </NavigationMenuLink>
+                                            </li>
+                                        </ul>
+                                    </NavigationMenuContent>
+                                </NavigationMenuItem>
+                            </NavigationMenuList>
+                        </NavigationMenu>
+                    </template>
+                </nav>
+            </div>
 
             <!-- Section droite: Auth / Avatar + Panier -->
-            <div class="flex items-center gap-1 md:gap-3 shrink-0">
+            <div class="flex items-center gap-2 md:gap-3 shrink-0">
                 <!-- Mode non connecté -->
                 <template v-if="!isAuthenticated">
-                    <!-- Desktop: Boutons complets (visible >= 768px) -->
+                    <!-- Desktop: Boutons style Bumble (visible >= 768px) -->
                     <template v-if="isOnAuthPage">
                         <!-- Si en mode login, afficher le bouton inscription -->
-                        <Button v-if="authPageMode === 'login'" @click="handleRegister" variant="default"
-                                color="primary" size="sm" class="hidden md:inline-flex"
-                                style="font-family: Roboto, sans-serif;">
+                        <button
+                            v-if="authPageMode === 'login'"
+                            @click="handleRegister"
+                            class="hidden md:flex items-center justify-center px-6 py-3 bg-[#1D1D1D] text-white text-[15px] font-medium rounded-2xl hover:bg-[#2D2D2D] transition-colors"
+                        >
                             Inscription
-                        </Button>
+                        </button>
                         <!-- Si en mode register, afficher le bouton connexion -->
-                        <Button v-else @click="handleLogin" variant="default" color="primary" size="sm"
-                                class="hidden md:inline-flex"
-                                style="font-family: Roboto, sans-serif;">
+                        <button
+                            v-else
+                            @click="handleLogin"
+                            class="hidden md:flex items-center justify-center px-6 py-3 bg-[#1D1D1D] text-white text-[15px] font-medium rounded-2xl hover:bg-[#2D2D2D] transition-colors"
+                        >
                             Connexion
-                        </Button>
+                        </button>
                     </template>
 
-                    <!-- Sur les autres pages : afficher les deux boutons (desktop) -->
+                    <!-- Sur les autres pages : CTA noir connexion (desktop) -->
                     <template v-else>
-                        <Button @click="handleRegister" variant="outline" color="neutral-800" size="sm"
-                                class="hidden md:inline-flex"
-                                style="font-family: Roboto, sans-serif;">
-                            Inscription
-                        </Button>
-
-                        <Button @click="handleAccount" variant="default" color="primary" size="sm"
-                                class="hidden md:inline-flex"
-                                style="font-family: Roboto, sans-serif;">
-                            Mon Compte
-                        </Button>
+                        <button
+                            @click="handleLogin"
+                            class="hidden md:flex items-center justify-center px-6 py-3 bg-[#1D1D1D] text-white text-[15px] font-medium rounded-2xl hover:bg-[#2D2D2D] transition-colors"
+                        >
+                            Se connecter
+                        </button>
                     </template>
                 </template>
 
@@ -430,29 +410,29 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                     <DropdownMenu>
                         <DropdownMenuTrigger as-child>
                             <button
-                                class="hidden md:inline-flex rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
-                                <Avatar class="h-10 w-10 cursor-pointer">
+                                class="hidden md:inline-flex rounded-full focus:outline-none focus:ring-2 focus:ring-[#1D1D1D]/20 focus:ring-offset-2">
+                                <Avatar class="h-10 w-10 cursor-pointer border-2 border-[#1D1D1D]/10">
                                     <AvatarImage v-if="avatarUrl" :src="avatarUrl" :alt="displayName" />
-                                    <AvatarFallback class="bg-primary/10 text-primary font-semibold">
+                                    <AvatarFallback class="bg-[#1D1D1D] text-white font-semibold text-sm">
                                         {{ avatarInitials }}
                                     </AvatarFallback>
                                 </Avatar>
                             </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" class="w-56">
-                            <DropdownMenuLabel>{{ displayName }}</DropdownMenuLabel>
+                        <DropdownMenuContent align="end" class="w-56 rounded-xl">
+                            <DropdownMenuLabel class="text-[#1D1D1D]">{{ displayName }}</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem @click="handleAccount" class="cursor-pointer">
+                            <DropdownMenuItem @click="handleAccount" class="cursor-pointer rounded-lg">
                                 <FontAwesomeIcon v-if="icons.userCircle" :icon="icons.userCircle"
-                                    class="h-4 w-4 mr-2" />
+                                    class="h-4 w-4 mr-2 text-[#1D1D1D]" />
                                 Mon compte
                             </DropdownMenuItem>
-                            <DropdownMenuItem @click="handleOrders" class="cursor-pointer">
-                                <FontAwesomeIcon v-if="icons.box" :icon="icons.box" class="h-4 w-4 mr-2" />
+                            <DropdownMenuItem @click="handleOrders" class="cursor-pointer rounded-lg">
+                                <FontAwesomeIcon v-if="icons.box" :icon="icons.box" class="h-4 w-4 mr-2 text-[#1D1D1D]" />
                                 Mes commandes
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem @click="handleLogout" class="cursor-pointer text-red-600">
+                            <DropdownMenuItem @click="handleLogout" class="cursor-pointer text-red-600 rounded-lg">
                                 <FontAwesomeIcon v-if="icons.signOut" :icon="icons.signOut" class="h-4 w-4 mr-2" />
                                 Déconnexion
                             </DropdownMenuItem>
