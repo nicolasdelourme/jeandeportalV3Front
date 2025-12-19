@@ -1,0 +1,18 @@
+<IfModule mod_rewrite.c>
+  # Active le moteur de réécriture d'URL
+  RewriteEngine On
+
+  # Point de départ : racine du site
+  RewriteBase /
+
+  # Si la requête correspond à un fichier existant, le servir tel quel
+  RewriteCond %{REQUEST_FILENAME} !-f
+
+  # Si la requête correspond à un dossier existant, le servir tel quel
+  RewriteCond %{REQUEST_FILENAME} !-d
+
+  # Sinon, rediriger vers index.html pour que Vue Router gère la route
+  # QSA = Query String Append (préserve les paramètres d'URL)
+  # L = Last (dernière règle, arrête le traitement)
+  RewriteRule ^.*$ index.html [QSA,L]
+</IfModule>
