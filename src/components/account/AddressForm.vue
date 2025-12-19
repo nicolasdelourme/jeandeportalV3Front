@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed } from 'vue'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
 import type { Address, CreateAddressDto } from '@/types/address.types'
+import { COUNTRIES_LIST } from '@/types/address.types'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -37,16 +40,24 @@ const addressSchema = z.object({
   postalCode: z.string().regex(/^\d{5}$/, 'Code postal invalide (5 chiffres)'),
   city: z.string().min(2, 'La ville doit contenir au moins 2 caractères'),
   country: z.string().min(2, 'Le pays est requis'),
-  phone: z
-    .string()
-    .regex(/^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/, 'Numéro de téléphone invalide'),
-  isDefault: z.boolean().default(false),
-  type: z.enum(['billing', 'shipping', 'both']).default('both')
+  isDefaultShipping: z.boolean().default(false),
+  isDefaultBilling: z.boolean().default(false)
 })
 
-const { handleSubmit } = useForm({
+const { handleSubmit, setFieldValue } = useForm({
   validationSchema: toTypedSchema(addressSchema),
-  initialValues: props.address || {
+  initialValues: props.address ? {
+    label: props.address.label || '',
+    firstName: props.address.firstName || '',
+    lastName: props.address.lastName || '',
+    street: props.address.street || '',
+    streetComplement: props.address.streetComplement || '',
+    postalCode: props.address.postalCode || '',
+    city: props.address.city || '',
+    country: props.address.country || 'FR',
+    isDefaultShipping: props.address.isDefaultShipping || false,
+    isDefaultBilling: props.address.isDefaultBilling || false
+  } : {
     label: '',
     firstName: '',
     lastName: '',
@@ -54,24 +65,14 @@ const { handleSubmit } = useForm({
     streetComplement: '',
     postalCode: '',
     city: '',
-    country: 'France',
-    phone: '',
-    isDefault: false,
-    type: 'both'
+    country: 'FR',
+    isDefaultShipping: false,
+    isDefaultBilling: false
   }
 })
 
-// Liste des pays (extensible)
-const countries = ref([
-  'France',
-  'Belgique',
-  'Suisse',
-  'Luxembourg',
-  'Canada',
-  'Autre'
-])
-
 const onSubmit = handleSubmit((values) => {
+  console.log('📍 [FORM] Valeurs du formulaire:', JSON.stringify(values, null, 2))
   emit('submit', values as CreateAddressDto)
 })
 
@@ -79,11 +80,16 @@ const onCancel = () => {
   emit('cancel')
 }
 
-// Libellés des types d'adresse
-const addressTypeLabels = {
-  billing: 'Facturation uniquement',
-  shipping: 'Livraison uniquement',
-  both: 'Facturation et livraison'
+/**
+ * Icônes
+ */
+const icons = computed(() => ({
+  check: byPrefixAndName.fas?.['check'],
+  xmark: byPrefixAndName.fas?.['xmark']
+}))
+
+const getIcon = (iconKey: keyof typeof icons.value): IconDefinition | undefined => {
+  return icons.value[iconKey] as IconDefinition | undefined
 }
 </script>
 
@@ -184,8 +190,8 @@ const addressTypeLabels = {
             class="flex h-10 w-full max-w-md rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <option value="" disabled>Sélectionnez un pays</option>
-            <option v-for="country in countries" :key="country" :value="country">
-              {{ country }}
+            <option v-for="country in COUNTRIES_LIST" :key="country.code" :value="country.code">
+              {{ country.name }}
             </option>
           </select>
         </FormControl>
@@ -193,60 +199,53 @@ const addressTypeLabels = {
       </FormItem>
     </FormField>
 
-    <!-- Téléphone -->
-    <FormField v-slot="{ componentField }" name="phone">
-      <FormItem>
-        <FormLabel>Téléphone *</FormLabel>
-        <FormControl>
-          <Input
-            v-bind="componentField"
-            type="tel"
-            placeholder="06 12 34 56 78"
-            class="max-w-md"
-          />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
-    </FormField>
+    <!-- Adresses par défaut -->
+    <div class="space-y-3">
+      <FormField v-slot="{ value }" name="isDefaultShipping">
+        <FormItem class="flex items-center space-x-3 space-y-0">
+          <FormControl>
+            <Checkbox
+              :checked="Boolean(value)"
+              @update:checked="(val: boolean | 'indeterminate') => {
+                const boolVal = val === true
+                console.log('shipping changed:', boolVal)
+                setFieldValue('isDefaultShipping', boolVal)
+              }"
+            />
+          </FormControl>
+          <FormLabel class="font-normal cursor-pointer">
+            Adresse de livraison par défaut
+          </FormLabel>
+        </FormItem>
+      </FormField>
 
-    <!-- Type d'adresse -->
-    <FormField v-slot="{ componentField }" name="type">
-      <FormItem>
-        <FormLabel>Type d'adresse</FormLabel>
-        <FormControl>
-          <select
-            v-bind="componentField"
-            class="flex h-10 w-full max-w-md rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <option value="both">{{ addressTypeLabels.both }}</option>
-            <option value="billing">{{ addressTypeLabels.billing }}</option>
-            <option value="shipping">{{ addressTypeLabels.shipping }}</option>
-          </select>
-        </FormControl>
-        <FormMessage />
-      </FormItem>
-    </FormField>
-
-    <!-- Adresse par défaut -->
-    <FormField v-slot="{ value, handleChange }" name="isDefault">
-      <FormItem class="flex items-center space-x-3 space-y-0">
-        <FormControl>
-          <Checkbox :checked="value" @update:checked="handleChange" />
-        </FormControl>
-        <FormLabel class="font-normal cursor-pointer">
-          Définir comme adresse par défaut
-        </FormLabel>
-      </FormItem>
-    </FormField>
+      <FormField v-slot="{ value }" name="isDefaultBilling">
+        <FormItem class="flex items-center space-x-3 space-y-0">
+          <FormControl>
+            <Checkbox
+              :checked="Boolean(value)"
+              @update:checked="(val: boolean | 'indeterminate') => {
+                const boolVal = val === true
+                console.log('billing changed:', boolVal)
+                setFieldValue('isDefaultBilling', boolVal)
+              }"
+            />
+          </FormControl>
+          <FormLabel class="font-normal cursor-pointer">
+            Adresse de facturation par défaut
+          </FormLabel>
+        </FormItem>
+      </FormField>
+    </div>
 
     <!-- Actions -->
     <div class="flex gap-3 pt-4">
       <Button type="submit" class="flex items-center gap-2">
-        <FontAwesomeIcon :icon="['fas', 'check']" />
+        <FontAwesomeIcon v-if="getIcon('check')" :icon="getIcon('check')!" />
         {{ mode === 'create' ? 'Ajouter l\'adresse' : 'Enregistrer les modifications' }}
       </Button>
       <Button type="button" variant="outline" @click="onCancel">
-        <FontAwesomeIcon :icon="['fas', 'times']" class="mr-2" />
+        <FontAwesomeIcon v-if="getIcon('xmark')" :icon="getIcon('xmark')!" class="mr-2" />
         Annuler
       </Button>
     </div>

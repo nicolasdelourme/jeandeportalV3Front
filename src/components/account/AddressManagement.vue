@@ -4,9 +4,11 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
 import type { Address, CreateAddressDto } from '@/types/address.types'
+import { COUNTRY_CODES, type CountryCode } from '@/types/address.types'
 import type { UserAddress } from '@/types/auth.types'
 import { toast } from 'vue-sonner'
 import { useAuth } from '@/composables/useAuth'
+import { addressService } from '@/services/address.service'
 
 import AddressForm from './AddressForm.vue'
 import { Button } from '@/components/ui/button'
@@ -23,7 +25,13 @@ import {
 /**
  * Auth store
  */
-const { user } = useAuth()
+const { user, refreshUser } = useAuth()
+
+/**
+ * États de chargement
+ */
+const isLoading = ref(false)
+const isDeleting = ref(false)
 
 /**
  * Icônes
@@ -34,7 +42,8 @@ const icons = computed(() => ({
   trash: byPrefixAndName.fas?.['trash'],
   star: byPrefixAndName.fas?.['star'],
   phone: byPrefixAndName.fas?.['phone'],
-  locationDot: byPrefixAndName.fas?.['location-dot']
+  locationDot: byPrefixAndName.fas?.['location-dot'],
+  spinner: byPrefixAndName.fas?.['spinner']
 }))
 
 const getIcon = (iconKey: keyof typeof icons.value): IconDefinition => {
@@ -110,23 +119,26 @@ const closeForm = () => {
 
 // Soumettre le formulaire
 const handleSubmit = async (data: CreateAddressDto) => {
+  isLoading.value = true
+
   try {
     if (formMode.value === 'create') {
-      // TODO: Appel API pour créer l'adresse
-      // await addressService.create(data)
-      // await authStore.refreshUser()
-      toast.info('Fonctionnalité à venir : ajout d\'adresse')
-    } else {
-      // TODO: Appel API pour modifier l'adresse
-      // await addressService.update(currentAddress.value?.id, data)
-      // await authStore.refreshUser()
-      toast.info('Fonctionnalité à venir : modification d\'adresse')
+      await addressService.createAddress(data)
+      toast.success('Adresse ajoutée avec succès')
+    } else if (currentAddress.value) {
+      const addressId = parseInt(currentAddress.value.id)
+      await addressService.updateAddress(addressId, data)
+      toast.success('Adresse mise à jour avec succès')
     }
 
+    // Rafraîchir les données utilisateur
+    await refreshUser()
     closeForm()
-  } catch (error) {
-    toast.error('Une erreur est survenue')
-    console.error(error)
+  } catch (error: any) {
+    console.error('Erreur lors de la sauvegarde de l\'adresse:', error)
+    toast.error(error.message || 'Une erreur est survenue')
+  } finally {
+    isLoading.value = false
   }
 }
 
@@ -140,41 +152,68 @@ const confirmDelete = (addressId: string) => {
 const deleteAddress = async () => {
   if (!addressToDelete.value) return
 
+  isDeleting.value = true
+
   try {
-    // TODO: Appel API pour supprimer l'adresse
-    // await addressService.delete(addressToDelete.value)
-    // await authStore.refreshUser()
-    toast.info('Fonctionnalité à venir : suppression d\'adresse')
-  } catch (error) {
-    toast.error('Impossible de supprimer cette adresse')
-    console.error(error)
+    const addressId = parseInt(addressToDelete.value)
+    await addressService.deleteAddress(addressId)
+
+    // Rafraîchir les données utilisateur
+    await refreshUser()
+    toast.success('Adresse supprimée avec succès')
+  } catch (error: any) {
+    console.error('Erreur lors de la suppression de l\'adresse:', error)
+    toast.error(error.message || 'Impossible de supprimer cette adresse')
   } finally {
+    isDeleting.value = false
     isDeleteDialogOpen.value = false
     addressToDelete.value = null
   }
 }
 
-// Définir une adresse par défaut
-const setAsDefault = async (addressId: string) => {
+// Définir une adresse comme livraison par défaut
+const setAsDefaultShipping = async (addressId: string) => {
+  isLoading.value = true
+
   try {
-    // TODO: Appel API pour définir l'adresse par défaut
-    // await addressService.setDefault(addressId)
-    // await authStore.refreshUser()
-    toast.info('Fonctionnalité à venir : définir par défaut')
-  } catch (error) {
-    toast.error('Une erreur est survenue')
-    console.error(error)
+    const id = parseInt(addressId)
+    await addressService.setDefaultShipping(id)
+
+    // Rafraîchir les données utilisateur
+    await refreshUser()
+    toast.success('Adresse de livraison par défaut mise à jour')
+  } catch (error: any) {
+    console.error('Erreur lors de la mise à jour:', error)
+    toast.error(error.message || 'Une erreur est survenue')
+  } finally {
+    isLoading.value = false
   }
 }
 
-// Formatage du type d'adresse
-const getAddressTypeLabel = (type: Address['type']) => {
-  const labels = {
-    billing: 'Facturation',
-    shipping: 'Livraison',
-    both: 'Facturation et Livraison'
+// Définir une adresse comme facturation par défaut
+const setAsDefaultBilling = async (addressId: string) => {
+  isLoading.value = true
+
+  try {
+    const id = parseInt(addressId)
+    await addressService.setDefaultBilling(id)
+
+    // Rafraîchir les données utilisateur
+    await refreshUser()
+    toast.success('Adresse de facturation par défaut mise à jour')
+  } catch (error: any) {
+    console.error('Erreur lors de la mise à jour:', error)
+    toast.error(error.message || 'Une erreur est survenue')
+  } finally {
+    isLoading.value = false
   }
-  return labels[type]
+}
+
+/**
+ * Récupère le nom du pays à partir du code ISO
+ */
+const getCountryName = (code: string): string => {
+  return COUNTRY_CODES[code as CountryCode] || code
 }
 
 // Formatage de l'adresse complète
@@ -183,7 +222,7 @@ const formatFullAddress = (address: Address) => {
     address.street,
     address.streetComplement,
     `${address.postalCode} ${address.city}`,
-    address.country
+    getCountryName(address.country)
   ].filter(Boolean)
   return parts.join(', ')
 }
@@ -199,7 +238,12 @@ const formatFullAddress = (address: Address) => {
             Gérez vos adresses de facturation et de livraison
           </CardDescription>
         </div>
-        <Button variant="outline" @click="openCreateForm" class="flex items-center gap-2">
+        <Button
+          variant="outline"
+          @click="openCreateForm"
+          class="flex items-center gap-2"
+          :disabled="isLoading"
+        >
           <FontAwesomeIcon v-if="getIcon('plus')" :icon="getIcon('plus')" />
           <span class="hidden sm:inline">Ajouter</span>
         </Button>
@@ -207,8 +251,18 @@ const formatFullAddress = (address: Address) => {
     </CardHeader>
 
     <CardContent>
+      <!-- Indicateur de chargement global -->
+      <div v-if="isLoading" class="flex items-center justify-center py-4">
+        <FontAwesomeIcon
+          v-if="getIcon('spinner')"
+          :icon="getIcon('spinner')"
+          class="w-5 h-5 animate-spin text-primary"
+        />
+        <span class="ml-2 text-sm text-muted-foreground">Chargement...</span>
+      </div>
+
       <!-- Liste des adresses -->
-      <div v-if="addresses.length > 0" class="space-y-4">
+      <div v-else-if="addresses.length > 0" class="space-y-4">
         <div
           v-for="address in addresses"
           :key="address.id"
@@ -224,6 +278,7 @@ const formatFullAddress = (address: Address) => {
               size="sm"
               @click="openEditForm(address)"
               class="h-8 w-8 p-0"
+              :disabled="isLoading"
             >
               <FontAwesomeIcon v-if="getIcon('pen')" :icon="getIcon('pen')" class="w-3.5 h-3.5" />
             </Button>
@@ -232,6 +287,7 @@ const formatFullAddress = (address: Address) => {
               size="sm"
               @click="confirmDelete(address.id)"
               class="h-8 w-8 p-0 text-destructive hover:text-destructive"
+              :disabled="isLoading"
             >
               <FontAwesomeIcon v-if="getIcon('trash')" :icon="getIcon('trash')" class="w-3.5 h-3.5" />
             </Button>
@@ -276,8 +332,9 @@ const formatFullAddress = (address: Address) => {
                 v-if="!address.isDefaultShipping"
                 variant="ghost"
                 size="sm"
-                @click="setAsDefault(address.id)"
+                @click="setAsDefaultShipping(address.id)"
                 class="text-xs h-7"
+                :disabled="isLoading"
               >
                 <FontAwesomeIcon v-if="getIcon('star')" :icon="getIcon('star')" class="mr-1.5 w-3" />
                 Livraison par défaut
@@ -286,8 +343,9 @@ const formatFullAddress = (address: Address) => {
                 v-if="!address.isDefaultBilling"
                 variant="ghost"
                 size="sm"
-                @click="setAsDefault(address.id)"
+                @click="setAsDefaultBilling(address.id)"
                 class="text-xs h-7"
+                :disabled="isLoading"
               >
                 <FontAwesomeIcon v-if="getIcon('star')" :icon="getIcon('star')" class="mr-1.5 w-3" />
                 Facturation par défaut
@@ -351,14 +409,25 @@ const formatFullAddress = (address: Address) => {
           </DialogDescription>
         </DialogHeader>
         <div class="flex gap-3 pt-4">
-          <Button variant="outline" @click="isDeleteDialogOpen = false" class="flex-1">
+          <Button
+            variant="outline"
+            @click="isDeleteDialogOpen = false"
+            class="flex-1"
+            :disabled="isDeleting"
+          >
             Annuler
           </Button>
           <Button
             @click="deleteAddress"
             class="flex-1 bg-destructive hover:bg-destructive/90 text-white"
+            :disabled="isDeleting"
           >
-            Supprimer
+            <FontAwesomeIcon
+              v-if="isDeleting && getIcon('spinner')"
+              :icon="getIcon('spinner')"
+              class="mr-2 animate-spin"
+            />
+            {{ isDeleting ? 'Suppression...' : 'Supprimer' }}
           </Button>
         </div>
       </DialogContent>

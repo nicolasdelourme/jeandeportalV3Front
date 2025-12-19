@@ -2,6 +2,102 @@
  * Types pour la gestion des adresses postales
  */
 
+// ============================================
+// Types API (Backend)
+// ============================================
+
+/**
+ * Structure d'une adresse retournée par l'API
+ */
+export interface AddressAPIItem {
+  adressId: number
+  firstname: string
+  lastname: string
+  recipient: string | null  // Libellé de l'adresse (ex: "Maison")
+  line1: string
+  line2: string | null
+  zipcode: string
+  city: string
+  country: string           // Code ISO (FR, BE, CH, LU, CA)
+  mainAdress: boolean       // Adresse de livraison par défaut
+  mainBillAdress: boolean   // Adresse de facturation par défaut
+}
+
+/**
+ * Réponse standard de l'API pour les adresses
+ */
+export interface AddressAPIResponse {
+  status: 'success' | 'error'
+  adress_array: AddressAPIItem[]
+  message?: string
+}
+
+/**
+ * Payload pour créer une nouvelle adresse
+ * POST /createAdress
+ */
+export interface CreateAddressAPIRequest {
+  country: string           // Code ISO (FR, BE, etc.)
+  city: string
+  zipcode: string
+  line1: string
+  line2?: string | null
+  firstname?: string | null // Si null, utilise le prénom du user
+  lastname?: string | null  // Si null, utilise le nom du user
+  recipient?: string | null // Libellé de l'adresse
+  mainAdress: boolean
+  mainBillAdress: boolean
+}
+
+/**
+ * Payload pour mettre à jour une adresse existante
+ * POST /createAdress (avec adressId)
+ */
+export interface UpdateAddressAPIRequest {
+  adressId: number
+  adress_array: Partial<Omit<CreateAddressAPIRequest, 'mainAdress' | 'mainBillAdress'>> & {
+    mainAdress?: boolean
+    mainBillAdress?: boolean
+  }
+}
+
+/**
+ * Payload pour supprimer une adresse
+ * POST /deleteAdress
+ */
+export interface DeleteAddressAPIRequest {
+  adressId: number
+}
+
+// ============================================
+// Mapping codes pays
+// ============================================
+
+/**
+ * Codes pays ISO supportés
+ */
+export const COUNTRY_CODES = {
+  FR: 'France',
+  BE: 'Belgique',
+  CH: 'Suisse',
+  LU: 'Luxembourg',
+  CA: 'Canada'
+} as const
+
+export type CountryCode = keyof typeof COUNTRY_CODES
+
+/**
+ * Liste des pays pour les selects
+ */
+export const COUNTRIES_LIST = Object.entries(COUNTRY_CODES).map(([code, name]) => ({
+  code: code as CountryCode,
+  name
+}))
+
+// ============================================
+// Types Frontend
+// ============================================
+
 export type AddressType = 'billing' | 'shipping' | 'both'
 
 export interface Address {
