@@ -24,7 +24,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
-import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
 
 // ============================================
 // Stores et Router
@@ -65,10 +64,6 @@ const icons = computed(() => ({
   lock: byPrefixAndName.fas?.['lock'],
   spinner: byPrefixAndName.fas?.['spinner'],
 }))
-
-const getIcon = (iconKey: keyof typeof icons.value): IconDefinition | undefined => {
-  return icons.value[iconKey] as IconDefinition | undefined
-}
 
 const addresses = computed(() => user.value?.addresses || [])
 const hasAddresses = computed(() => addresses.value.length > 0)
@@ -314,8 +309,8 @@ function goToCart() {
         <div class="max-w-4xl mx-auto px-4">
           <div class="flex items-center gap-3 mb-3">
             <FontAwesomeIcon
-              v-if="getIcon('creditCard')"
-              :icon="getIcon('creditCard')"
+              v-if="icons.creditCard"
+              :icon="icons.creditCard"
               class="h-10 w-10 text-primary"
             />
             <h1 class="text-4xl md:text-5xl font-bold text-neutral-800" style="font-family: Roboto, sans-serif;">
@@ -336,7 +331,7 @@ function goToCart() {
 
             <!-- Alerte erreur -->
             <Alert v-if="error && currentStep !== 'error'" variant="destructive">
-              <FontAwesomeIcon v-if="getIcon('exclamationTriangle')" :icon="getIcon('exclamationTriangle')" class="h-4 w-4" />
+              <FontAwesomeIcon v-if="icons.exclamationTriangle" :icon="icons.exclamationTriangle" class="h-4 w-4" />
               <AlertTitle>Erreur</AlertTitle>
               <AlertDescription>{{ error }}</AlertDescription>
             </Alert>
@@ -359,7 +354,7 @@ function goToCart() {
               <Card v-else>
                 <CardHeader>
                   <CardTitle class="flex items-center gap-2">
-                    <FontAwesomeIcon v-if="getIcon('shippingFast')" :icon="getIcon('shippingFast')" class="h-5 w-5" />
+                    <FontAwesomeIcon v-if="icons.shippingFast" :icon="icons.shippingFast" class="h-5 w-5" />
                     Adresse de livraison
                   </CardTitle>
                   <CardDescription>
@@ -412,7 +407,7 @@ function goToCart() {
               <Card v-if="hasAddresses && !useSameAddress">
                 <CardHeader>
                   <CardTitle class="flex items-center gap-2">
-                    <FontAwesomeIcon v-if="getIcon('fileInvoice')" :icon="getIcon('fileInvoice')" class="h-5 w-5" />
+                    <FontAwesomeIcon v-if="icons.fileInvoice" :icon="icons.fileInvoice" class="h-5 w-5" />
                     Adresse de facturation
                   </CardTitle>
                   <CardDescription>
@@ -448,7 +443,7 @@ function goToCart() {
               <!-- Bouton continuer -->
               <div class="flex gap-4">
                 <Button variant="outline" @click="goToCart">
-                  <FontAwesomeIcon v-if="getIcon('arrowLeft')" :icon="getIcon('arrowLeft')" class="h-4 w-4 mr-2" />
+                  <FontAwesomeIcon v-if="icons.arrowLeft" :icon="icons.arrowLeft" class="h-4 w-4 mr-2" />
                   Retour au panier
                 </Button>
                 <Button
@@ -457,8 +452,8 @@ function goToCart() {
                   class="flex-1"
                 >
                   <FontAwesomeIcon
-                    v-if="isLoading && getIcon('spinner')"
-                    :icon="getIcon('spinner')"
+                    v-if="isLoading && icons.spinner"
+                    :icon="icons.spinner"
                     class="h-4 w-4 mr-2 animate-spin"
                   />
                   <span v-if="isLoading">Chargement...</span>
@@ -494,7 +489,7 @@ function goToCart() {
               <Card>
                 <CardHeader>
                   <CardTitle class="flex items-center gap-2">
-                    <FontAwesomeIcon v-if="getIcon('lock')" :icon="getIcon('lock')" class="h-5 w-5" />
+                    <FontAwesomeIcon v-if="icons.lock" :icon="icons.lock" class="h-5 w-5" />
                     Paiement sécurisé
                   </CardTitle>
                   <CardDescription>
@@ -512,7 +507,7 @@ function goToCart() {
               <!-- Boutons -->
               <div class="flex gap-4">
                 <Button variant="outline" @click="backToAddresses">
-                  <FontAwesomeIcon v-if="getIcon('arrowLeft')" :icon="getIcon('arrowLeft')" class="h-4 w-4 mr-2" />
+                  <FontAwesomeIcon v-if="icons.arrowLeft" :icon="icons.arrowLeft" class="h-4 w-4 mr-2" />
                   Retour
                 </Button>
                 <Button
@@ -521,8 +516,8 @@ function goToCart() {
                   class="flex-1"
                 >
                   <FontAwesomeIcon
-                    v-if="isLoading && getIcon('spinner')"
-                    :icon="getIcon('spinner')"
+                    v-if="isLoading && icons.spinner"
+                    :icon="icons.spinner"
                     class="h-4 w-4 mr-2 animate-spin"
                   />
                   <span v-if="isLoading">Traitement en cours...</span>
@@ -536,8 +531,8 @@ function goToCart() {
               <Card>
                 <CardContent class="py-16 text-center">
                   <FontAwesomeIcon
-                    v-if="getIcon('spinner')"
-                    :icon="getIcon('spinner')"
+                    v-if="icons.spinner"
+                    :icon="icons.spinner"
                     class="h-12 w-12 text-primary mx-auto mb-4 animate-spin"
                   />
                   <p class="text-lg font-medium">Traitement de votre paiement...</p>
@@ -551,8 +546,8 @@ function goToCart() {
               <Card>
                 <CardContent class="py-16 text-center">
                   <FontAwesomeIcon
-                    v-if="getIcon('checkCircle')"
-                    :icon="getIcon('checkCircle')"
+                    v-if="icons.checkCircle"
+                    :icon="icons.checkCircle"
                     class="h-16 w-16 text-green-500 mx-auto mb-4"
                   />
                   <h2 class="text-2xl font-bold mb-2">Paiement réussi !</h2>
@@ -571,8 +566,8 @@ function goToCart() {
               <Card>
                 <CardContent class="py-16 text-center">
                   <FontAwesomeIcon
-                    v-if="getIcon('exclamationTriangle')"
-                    :icon="getIcon('exclamationTriangle')"
+                    v-if="icons.exclamationTriangle"
+                    :icon="icons.exclamationTriangle"
                     class="h-16 w-16 text-red-500 mx-auto mb-4"
                   />
                   <h2 class="text-2xl font-bold mb-2">Erreur de paiement</h2>
