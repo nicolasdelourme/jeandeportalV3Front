@@ -5,24 +5,61 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-    /* Nouvelle DA - Style Fintech/Bumble */
+    /* ═══════════════════════════════════════════════════════════════════════
+       INFOCASH ACADÉMIE - Design System
+       ═══════════════════════════════════════════════════════════════════════ */
+
+    /* ─── Brand Colors ─── */
     --primary: #1D1D1D;                      /* Noir signature - CTA & textes principaux */
     --color-accent-yellow: #FFDD00;          /* Jaune signature */
     --color-bg-yellow-soft: #FFF9D3;         /* Fond jaune descendu */
 
-    /* Couleurs consultations (thèmes) */
+    /* ─── Thématiques Infocash Académie ─── */
+    /* Métaux précieux - Or */
+    --color-theme-metaux: #F2CC00;
+    --color-theme-metaux-light: #FFF9D3;
+    --color-theme-metaux-dark: #D4B200;
+    --color-theme-metaux-gradient-start: rgba(242, 204, 0, 1);
+    --color-theme-metaux-gradient-end: rgba(242, 204, 0, 0.67);
+
+    /* Portefeuille permanent - Bleu clair */
+    --color-theme-portefeuille: #A8C7EA;
+    --color-theme-portefeuille-light: #EBF3FA;
+    --color-theme-portefeuille-dark: #7BA8D9;
+    --color-theme-portefeuille-gradient-start: rgba(168, 199, 234, 1);
+    --color-theme-portefeuille-gradient-end: rgba(168, 199, 234, 0.67);
+
+    /* Liberté financière - Pêche */
+    --color-theme-liberte: #F4BFA6;
+    --color-theme-liberte-light: #FDF5F0;
+    --color-theme-liberte-dark: #E9A080;
+    --color-theme-liberte-gradient-start: rgba(244, 191, 166, 1);
+    --color-theme-liberte-gradient-end: rgba(244, 191, 166, 0.67);
+
+    /* Bonus mystère - Noir */
+    --color-theme-bonus: #1D1D1D;
+    --color-theme-bonus-light: #F5F5F5;
+    --color-theme-bonus-dark: #000000;
+    --color-theme-bonus-gradient-start: rgba(29, 29, 29, 1);
+    --color-theme-bonus-gradient-end: rgba(29, 29, 29, 0.67);
+
+    /* ─── Legacy: Consultations Nicolas Delourme (rétro-compatibilité) ─── */
     --color-consultations-nd: #1a2d40;
     --color-consultations-nd-metauxprecieux: #dea600;
     --color-consultations-nd-immobilier: #489886;
     --color-consultations-nd-argent: #c8462f;
     --color-consultations-nd-patrimoine: #33b9c9;
 
-    /* Couleurs Tailwind standards pour les boutons dynamiques */
+    /* ─── Couleurs Tailwind standards ─── */
     --color-yellow-500: #eab308;
     --color-yellow-600: #ca8a04;
     --color-red-800: #991b1b;
     --color-neutral-900: #171717;
     --color-green-600: #16a34a;
+
+    /* ─── Typography ─── */
+    --font-heading: 'bernina-sans-condensed', 'Inter', sans-serif;
+    --font-body: 'Inter', system-ui, sans-serif;
 }
 
 :root {
@@ -171,7 +208,54 @@
     }
     body {
         @apply bg-background text-foreground;
+        font-family: var(--font-body);
     }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   TYPOGRAPHY UTILITIES
+   ═══════════════════════════════════════════════════════════════════════ */
+.font-heading {
+    font-family: var(--font-heading);
+}
+
+.font-body {
+    font-family: var(--font-body);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   THEME UTILITIES - Pour appliquer les couleurs thématiques
+   ═══════════════════════════════════════════════════════════════════════ */
+.theme-metaux {
+    --theme-color: var(--color-theme-metaux);
+    --theme-color-light: var(--color-theme-metaux-light);
+    --theme-color-dark: var(--color-theme-metaux-dark);
+    --theme-gradient-start: var(--color-theme-metaux-gradient-start);
+    --theme-gradient-end: var(--color-theme-metaux-gradient-end);
+}
+
+.theme-portefeuille {
+    --theme-color: var(--color-theme-portefeuille);
+    --theme-color-light: var(--color-theme-portefeuille-light);
+    --theme-color-dark: var(--color-theme-portefeuille-dark);
+    --theme-gradient-start: var(--color-theme-portefeuille-gradient-start);
+    --theme-gradient-end: var(--color-theme-portefeuille-gradient-end);
+}
+
+.theme-liberte {
+    --theme-color: var(--color-theme-liberte);
+    --theme-color-light: var(--color-theme-liberte-light);
+    --theme-color-dark: var(--color-theme-liberte-dark);
+    --theme-gradient-start: var(--color-theme-liberte-gradient-start);
+    --theme-gradient-end: var(--color-theme-liberte-gradient-end);
+}
+
+.theme-bonus {
+    --theme-color: var(--color-theme-bonus);
+    --theme-color-light: var(--color-theme-bonus-light);
+    --theme-color-dark: var(--color-theme-bonus-dark);
+    --theme-gradient-start: var(--color-theme-bonus-gradient-start);
+    --theme-gradient-end: var(--color-theme-bonus-gradient-end);
 }
 
 /* Styles pour le contenu HTML des descriptions produits */

@@ -5,6 +5,9 @@
 		<link rel="icon" type="image/png" href="/favicon.png"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 
+		<!-- Adobe Fonts: Bernina Sans -->
+		<link rel="stylesheet" href="https://use.typekit.net/hnt0ocn.css">
+
 		<!-- Security: Force HTTPS -->
 		<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 
@@ -12,10 +15,10 @@
 		<meta http-equiv="Content-Security-Policy" content="
 			default-src 'self';
 			script-src 'self' 'unsafe-inline' https://kit.fontawesome.com https://js.stripe.com;
-			style-src 'self' 'unsafe-inline';
+			style-src 'self' 'unsafe-inline' https://use.typekit.net;
 			img-src 'self' data: https:;
-			font-src 'self' data: https://ka-f.fontawesome.com;
-			connect-src 'self' https://jeandeportal.fr https://api.jeandeportal.fr https://api.stripe.com;
+			font-src 'self' data: https://ka-f.fontawesome.com https://use.typekit.net;
+			connect-src 'self' https://jeandeportal.fr https://api.jeandeportal.fr https://api.stripe.com https://p.typekit.net;
 			frame-src https://js.stripe.com https://hooks.stripe.com;
 			frame-ancestors 'none';
 			base-uri 'self';

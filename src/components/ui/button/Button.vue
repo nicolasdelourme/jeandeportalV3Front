@@ -34,6 +34,25 @@ const computedColorStyles = computed(() => {
     if (colorName === 'primary') {
       return 'var(--primary)'
     }
+
+    // ═══ Thématiques Infocash Académie ═══
+    // Support direct des noms de thèmes
+    const themeColors: Record<string, string> = {
+      'theme-metaux': 'var(--color-theme-metaux)',
+      'theme-portefeuille': 'var(--color-theme-portefeuille)',
+      'theme-liberte': 'var(--color-theme-liberte)',
+      'theme-bonus': 'var(--color-theme-bonus)',
+      // Raccourcis pour les thèmes (usage: color="metaux")
+      'metaux': 'var(--color-theme-metaux)',
+      'portefeuille': 'var(--color-theme-portefeuille)',
+      'liberte': 'var(--color-theme-liberte)',
+      'bonus': 'var(--color-theme-bonus)',
+    }
+
+    if (themeColors[colorName]) {
+      return themeColors[colorName]
+    }
+
     // Pour toutes les autres couleurs (custom ou Tailwind)
     // Utiliser --color-{nom} qui est défini dans @theme
     return `var(--color-${colorName})`
