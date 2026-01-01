@@ -18,11 +18,11 @@ export const buttonVariants = cva(
             },
             size: {
                 // Tailles basées sur les specs JDP
-                xs: "h-7 px-3 text-xs leading-7",
-                sm: "h-8 px-4 text-xs leading-8",
-                default: "h-10 px-5 text-sm leading-10", // 40px hauteur original
-                lg: "h-12 px-6 text-base leading-[3rem]",
-                xl: "h-14 px-8 text-lg leading-[3.5rem]",
+                xs: "h-7 px-3 text-xs",
+                sm: "h-8 px-4 text-xs ",
+                default: "h-10 px-5 text-sm ", // 40px hauteur original
+                lg: "h-12 px-6 text-base ",
+                xl: "h-14 px-8 text-lg ",
                 icon: "size-10",
                 "icon-sm": "size-8",
                 "icon-lg": "size-12",
