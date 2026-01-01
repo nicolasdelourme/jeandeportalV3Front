@@ -40,6 +40,7 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from '@/components/ui/accordion'
+import { Button } from '@/components/ui/button'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
 import { useUserDisplay } from '@/composables/useUserDisplay'
@@ -86,6 +87,14 @@ const icons = computed(() => ({
  */
 const navItems = [
     { label: 'Notre Maison', href: '/', type: 'link' },
+    {
+        label: 'Académie',
+        type: 'dropdown',
+        items: [
+            { label: 'Découvrir', href: '/academie', description: 'Notre programme de formation premium' },
+            { label: 'Catalogue', href: '/academie/catalogue', description: 'Tous les contenus disponibles' },
+        ]
+    },
     {
         label: 'Consultations Privées',
         type: 'dropdown',
@@ -151,24 +160,27 @@ const handleNavClick = (href: string) => {
 }
 
 /**
- * Vérifie si une route est active
+ * Vérifie si une route est active (exact match ou sous-route)
  */
 const isActiveRoute = (href: string): boolean => {
-    return route.value.path === href
+    if (href === '/') {
+        return route.value.path === '/'
+    }
+    return route.value.path.startsWith(href)
 }
 
 /**
  * Vérifie si un item dropdown contient la route active
  */
 const isDropdownActive = (items: readonly { href: string }[]): boolean => {
-    return items.some(item => route.value.path === item.href)
+    return items.some(item => isActiveRoute(item.href))
 }
 
 // handleCart supprimé - géré par CartPopover maintenant
 </script>
 
 <template>
-    <nav class="sticky top-0 z-50 pt-2 pb-2">
+    <nav class="sticky top-0 z-50 pt-2 pb-2 bg-white/50 backdrop-blur-sm ">
         <div class="max-w-7xl mx-auto flex items-center justify-between px-4 md:px-9">
             <!-- Mobile: Hamburger (visible < 768px) -->
             <Drawer v-model:open="drawerOpen" direction="left">
@@ -309,23 +321,23 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
             <!-- Logo -->
             <div class="flex items-center shrink-0">
                 <RouterLink to="/" class="flex items-center gap-2">
-                    <img src="/logoJDPLivre.png" alt="Logo Éditions Jean de Portal"
-                         class="w-8 h-8 md:w-9 md:h-9 object-contain" />
+                    <img src="/logoInfocash.png" alt="Logo Infocash"
+                         class="w-8 h-8 md:w-36 md:h-8 object-contain" />
                 </RouterLink>
             </div>
 
             <!-- Desktop: Navigation Pill Glassmorphism (visible >= 768px) -->
             <div class="hidden md:flex flex-1 justify-center">
-                <nav class="nav-pill flex items-center gap-1 px-1 py-1 rounded-2xl backdrop-blur-[8px] bg-white/80 border border-[rgba(32,32,32,0.08)]">
+                <nav class="nav-pill flex items-center gap-1 px-1 py-1 rounded-sm backdrop-blur-sm bg-white/80 border border-[rgba(32,32,32,0.08)]">
                     <template v-for="item in navItems" :key="item.label">
                         <!-- Lien simple -->
                         <RouterLink
                             v-if="item.type === 'link'"
                             :to="item.href"
                             :class="[
-                                'px-5 py-3 text-[15px] font-medium text-[#1D1D1D] rounded-xl transition-all duration-200',
-                                'hover:bg-[#1D1D1D]/5',
-                                isActiveRoute(item.href) ? 'bg-[#1D1D1D]/10 font-semibold' : ''
+                                'px-3 py-2 font-medium text-[#1D1D1D] rounded-sm transition-all duration-500',
+                                'hover:bg-accent-yellow/25',
+                                isActiveRoute(item.href) ? 'bg-accent-yellow font-semibold' : ''
                             ]"
                         >
                             {{ item.label }}
@@ -337,20 +349,20 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                                 <NavigationMenuItem>
                                     <NavigationMenuTrigger
                                         :class="[
-                                            'px-5 py-3 text-[15px] font-medium text-[#1D1D1D] rounded-xl transition-all duration-200 bg-transparent',
-                                            'hover:bg-[#1D1D1D]/5 data-[state=open]:bg-[#1D1D1D]/5',
-                                            isDropdownActive(item.items) ? 'bg-[#1D1D1D]/10 font-semibold' : ''
+                                            'px-3 py-2 font-medium text-primary rounded-sm transition-all duration-500 bg-transparent',
+                                            'hover:bg-accent-yellow/25 data-[state=open]:bg-accent-yellow/25',
+                                            isDropdownActive(item.items) ? 'bg-accent-yellow font-semibold' : ''
                                         ]"
                                     >
                                         {{ item.label }}
                                     </NavigationMenuTrigger>
                                     <NavigationMenuContent>
-                                        <ul class="grid w-[400px] gap-2 p-3">
+                                        <ul class="grid w-[400px] gap-2 p-2.5">
                                             <li v-for="subItem in item.items" :key="subItem.label">
                                                 <NavigationMenuLink as-child>
                                                     <RouterLink
                                                         :to="subItem.href"
-                                                        class="block select-none space-y-1 rounded-xl p-3 leading-none no-underline outline-none transition-colors hover:bg-[#1D1D1D]/5"
+                                                        class="block select-none space-y-1 rounded-sm p-3 leading-none no-underline outline-none transition-colors hover:bg-accent-yellow/25"
                                                     >
                                                         <div class="text-sm font-semibold leading-none text-[#1D1D1D]">
                                                             {{ subItem.label }}
@@ -377,31 +389,40 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                     <!-- Desktop: Boutons style Bumble (visible >= 768px) -->
                     <template v-if="isOnAuthPage">
                         <!-- Si en mode login, afficher le bouton inscription -->
-                        <button
-                            v-if="authPageMode === 'login'"
-                            @click="handleRegister"
-                            class="hidden md:flex items-center justify-center px-6 py-3 bg-[#1D1D1D] text-white text-[15px] font-medium rounded-2xl hover:bg-[#2D2D2D] transition-colors"
-                        >
-                            Inscription
-                        </button>
-                        <!-- Si en mode register, afficher le bouton connexion -->
-                        <button
-                            v-else
-                            @click="handleLogin"
-                            class="hidden md:flex items-center justify-center px-6 py-3 bg-[#1D1D1D] text-white text-[15px] font-medium rounded-2xl hover:bg-[#2D2D2D] transition-colors"
-                        >
-                            Connexion
-                        </button>
+                        <div class="hidden md:inline-block">
+                            <Button
+                                v-if="authPageMode === 'login'"
+                                color="primary"
+                                size="sm"
+                                rounded="sm"
+                                @click="handleRegister"
+                            >
+                                Inscription
+                            </Button>
+                            <!-- Si en mode register, afficher le bouton connexion -->
+                            <Button
+                                v-else
+                                color="primary"
+                                size="sm"
+                                rounded="sm"
+                                @click="handleLogin"
+                            >
+                                Connexion
+                            </Button>
+                        </div>
                     </template>
 
                     <!-- Sur les autres pages : CTA noir connexion (desktop) -->
                     <template v-else>
-                        <button
+                        <Button
+                            variant="default"
+                            color="primary"
+                            size="sm"
+                            class="hidden md:block"
                             @click="handleLogin"
-                            class="hidden md:flex items-center justify-center px-6 py-3 bg-[#1D1D1D] text-white text-[15px] font-medium rounded-2xl hover:bg-[#2D2D2D] transition-colors"
                         >
                             Se connecter
-                        </button>
+                        </Button>
                     </template>
                 </template>
 
@@ -419,7 +440,7 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                                 </Avatar>
                             </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" class="w-56 rounded-xl">
+                        <DropdownMenuContent align="end" class="w-56 rounded-sm">
                             <DropdownMenuLabel class="text-[#1D1D1D]">{{ displayName }}</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem @click="handleAccount" class="cursor-pointer rounded-lg">

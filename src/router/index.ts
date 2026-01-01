@@ -28,6 +28,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import("@/views/UIPage.vue"),
     },
     {
+        path: "/academie",
+        name: "academie",
+        component: () => import("@/views/academie/AcademiePage.vue"),
+    },
+    {
         path: "/consultations-nicolas-delourme",
         name: "consultations-catalogue",
         component: () =>
