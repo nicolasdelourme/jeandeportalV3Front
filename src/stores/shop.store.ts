@@ -12,8 +12,9 @@ import type {
   ShopSortOption,
   ShopCollectionFilter,
   ShopTagFilter,
+  ParsedTag,
 } from '@/types/shop-api.types'
-import { getAllTags, getAllCollections } from '@/types/shop-api.types'
+import { getAllTags, getAllCollections, getFilterTags } from '@/types/shop-api.types'
 import { ShopAPIError } from '@/types/shop-api.types'
 
 /**
@@ -109,10 +110,10 @@ export const useShopStore = defineStore('shop', () => {
       filtered = filtered.filter((ref) => activeCollectionFilters.value.has(ref.collectionId))
     }
 
-    // Filtre par tags (ET logique: doit avoir TOUS les tags sélectionnés)
+    // Filtre par tags (OU logique: doit avoir AU MOINS UN des tags sélectionnés)
     if (activeTagFilters.value.size > 0) {
       filtered = filtered.filter((ref) => {
-        return Array.from(activeTagFilters.value).every((tag) => ref.tags.includes(tag))
+        return Array.from(activeTagFilters.value).some((tag) => ref.tags.includes(tag))
       })
     }
 
@@ -132,9 +133,10 @@ export const useShopStore = defineStore('shop', () => {
   })
 
   /**
-   * Tags disponibles en fonction des collections sélectionnées
+   * Tags de filtre disponibles (préfixe "filter_") en fonction des collections sélectionnées
+   * Retourne des ParsedTag avec displayName pour l'affichage
    */
-  const availableTagsFiltered = computed(() => {
+  const availableTagsFiltered = computed((): ParsedTag[] => {
     let refs = references.value
 
     // Si des collections sont sélectionnées, filtrer uniquement sur ces collections
@@ -142,7 +144,7 @@ export const useShopStore = defineStore('shop', () => {
       refs = refs.filter((ref) => activeCollectionFilters.value.has(ref.collectionId))
     }
 
-    return getAllTags(refs)
+    return getFilterTags(refs)
   })
 
   /**

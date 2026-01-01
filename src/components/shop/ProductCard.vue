@@ -1,23 +1,24 @@
 <script setup lang="ts">
-/**
- * Composant ProductCard
- * Carte produit pour la grille de la boutique
- */
+
 import { computed } from 'vue'
 import type { ShopReference } from '@/types/shop-api.types'
-import { getShopImageUrl, formatPrice, stripHTML, decodeHTMLEntities } from '@/types/shop-api.types'
-import { Card, CardContent } from '@/components/ui/card'
+import { getShopImageUrl, formatPrice, stripHTML, decodeHTMLEntities, getFirstTagByPrefix } from '@/types/shop-api.types'
 import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
-import { AspectRatio } from '@/components/ui/aspect-ratio'
 import { Button } from '@/components/ui/button'
+import { AspectRatio } from '@/components/ui/aspect-ratio'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
 import { useCartStore } from '@/stores/cart.store'
+import { cn } from '@/lib/utils'
 
-const props = defineProps<{
+export type CardSize = 'featured' | 'medium' | 'small' | 'wide'
+
+const props = withDefaults(defineProps<{
   reference: ShopReference
-}>()
+  size?: CardSize
+}>(), {
+  size: 'medium'
+})
 
 const emit = defineEmits<{
   viewDetails: [reference: ShopReference]
@@ -30,107 +31,77 @@ const cartStore = useCartStore()
  * Icônes FontAwesome
  */
 const icons = computed(() => ({
-  tag: byPrefixAndName.fas?.['tag'],
   eye: byPrefixAndName.fas?.['eye'],
   shoppingCart: byPrefixAndName.fas?.['cart-shopping'],
+  check: byPrefixAndName.fas?.['check'],
+  tag: byPrefixAndName.fas?.['tag'],
 }))
 
 /**
- * Image principale (première image de la référence)
+ * Image principale
  */
 const mainImage = computed(() => {
   if (props.reference.images.length === 0) {
-    return 'https://placehold.co/400x400/e5e7eb/6b7280?text=Pas+d%27image'
+    return 'https://placehold.co/400x600/f5f5f5/a3a3a3?text=Image'
   }
   const firstImage = props.reference.images[0]
   if (!firstImage) {
-    return 'https://placehold.co/400x400/e5e7eb/6b7280?text=Pas+d%27image'
+    return 'https://placehold.co/400x600/f5f5f5/a3a3a3?text=Image'
   }
   return getShopImageUrl(firstImage)
 })
 
 /**
- * Prix minimum de tous les produits de cette référence
+ * Prix minimum
  */
 const minPrice = computed(() => {
   const allPrices = props.reference.products.flatMap((product) =>
     product.prices.map((price) => price.amount)
   )
-
   if (allPrices.length === 0) return null
-
   return Math.min(...allPrices)
 })
 
 /**
- * Prix maximum de tous les produits de cette référence
- */
-const maxPrice = computed(() => {
-  const allPrices = props.reference.products.flatMap((product) =>
-    product.prices.map((price) => price.amount)
-  )
-
-  if (allPrices.length === 0) return null
-
-  return Math.max(...allPrices)
-})
-
-/**
- * Affichage du prix (fourchette ou prix unique)
+ * Affichage du prix
  */
 const priceDisplay = computed(() => {
-  if (minPrice.value === null || maxPrice.value === null) {
-    return 'Prix non disponible'
-  }
-
-  if (minPrice.value === maxPrice.value) {
-    return formatPrice(minPrice.value)
-  }
-
-  return `${formatPrice(minPrice.value)} - ${formatPrice(maxPrice.value)}`
+  if (minPrice.value === null) return 'Prix N/A'
+  return formatPrice(minPrice.value)
 })
 
 /**
- * Couleur du badge de collection
+ * Premier tag filter_ pour badge catégorie
  */
-const collectionBadgeColor = computed(() => {
-  const collectionColors: Record<string, string> = {
-    or: 'yellow-500',
-    argent: 'gray-400',
-    patrimoine: 'blue-600',
-    immobilier: 'green-600',
-  }
-
-  return collectionColors[props.reference.collectionId] || 'neutral-600'
+const filterTag = computed(() => {
+  return getFirstTagByPrefix(props.reference.tags, 'filter')
 })
 
 /**
- * Ratio d'aspect pour les images
- * Format A4 (1/1.414) pour tous les produits
+ * Premier tag reco_ pour badge recommandation
  */
-const aspectRatio = computed(() => {
-  return 1 / 1.414 // Format A4 (portrait)
+const recoTag = computed(() => {
+  return getFirstTagByPrefix(props.reference.tags, 'reco')
 })
 
 /**
- * Titre décodé (enlever les entités HTML comme &nbsp;)
+ * Titre décodé
  */
 const decodedName = computed(() => {
   return decodeHTMLEntities(props.reference.name || '')
 })
 
 /**
- * Sous-titre/description courte en texte brut (strip HTML pour la card)
+ * Description courte
  */
-const subnameText = computed(() => {
+const shortDescription = computed(() => {
   const subname = props.reference.subname || ''
-  if (!subname) return 'Description non disponible'
+  if (!subname) return ''
   return stripHTML(subname)
 })
 
 /**
- * Vérifier si le produit est déjà dans le panier
- * (Vérifie si l'un des prix de cette référence est dans le panier)
+ * Dans le panier ?
  */
 const isInCart = computed(() => {
   const allPriceIds = props.reference.products.flatMap((product) =>
@@ -140,17 +111,9 @@ const isInCart = computed(() => {
 })
 
 /**
- * Variant du bouton panier (outline si déjà dans le panier)
+ * Handlers
  */
-const cartButtonVariant = computed(() => {
-  return isInCart.value ? 'outline' : 'default'
-})
-
-/**
- * Gérer les actions
- */
-const handleViewDetails = (e: Event) => {
-  e.stopPropagation()
+const handleViewDetails = () => {
   emit('viewDetails', props.reference)
 }
 
@@ -161,82 +124,128 @@ const handleAddToCart = (e: Event) => {
 </script>
 
 <template>
-  <Card class="group shadow-none hover:shadow-md py-0 rounded-md transition-all duration-300 h-full flex flex-col gap-0">
-    <!-- Image avec AspectRatio -->
-    <div @click="handleViewDetails" class="relative  bg-gray-100 shrink-0 cursor-pointer">
-      <AspectRatio :ratio="aspectRatio">
-        <img :src="mainImage" :alt="reference.name"
-          class="w-full h-full object-cover group-hover:scale-[102%] transition-transform duration-300" />
-      </AspectRatio>
-      
-      <!-- Badge collection (overlay) -->
-      <div class="absolute top-3 left-3">
-        <Badge :color="collectionBadgeColor" variant="default" class="text-xs font-semibold uppercase">
-          {{ reference.collectionId }}
-        </Badge>
+  <div
+    class="product-card group relative bg-white rounded-sm overflow-hidden cursor-pointer border-2 border-primary shadow-md transition-all duration-500"
+    @click="handleViewDetails"
+  >
+    <!-- Inner content avec padding 10px comme Figma -->
+    <div class="p-2.5 flex flex-col gap-2.5 h-full">
+      <!-- Image -->
+      <div class="relative overflow-hidden rounded-sm bg-neutral-100">
+          <img
+            :src="mainImage"
+            :alt="decodedName"
+            class="w-full h-full object-contain"
+          />
+
       </div>
-    </div>
-    
-    <Separator />
-    <!-- Contenu -->
-    <CardContent class="p-4 flex flex-col flex-1">
-      
-      <!-- Contenu flexible qui pousse le bottom -->
-      <div class="space-y-2 mb-3 flex-1">
-        <!-- Titre (décodé HTML) -->
-        <h3 class="font-bold text-base text-neutral-800 line-clamp-2">
+
+      <!-- Contenu - flex-1 pour pousser prix+CTA en bas -->
+      <div class="flex flex-col gap-2 flex-1">
+        <!-- Badges -->
+        <div class="flex flex-wrap gap-2">
+          <!-- Badge catégorie (premier tag filter_) -->
+          <Badge
+            v-if="filterTag"
+            variant="outline"
+            rounded="sm"
+            class="text-xs font-semibold border-primary bg-secondary text-foreground px-2 py-0.5"
+          >
+            {{ filterTag.displayName }}
+          </Badge>
+
+          <!-- Badge recommandation (premier tag reco_) -->
+          <Badge
+            v-if="recoTag"
+            variant="outline"
+            rounded="sm"
+            class="text-xs font-semibold border-primary bg-secondary text-foreground px-2 py-0.5 gap-1.5"
+          >
+            <FontAwesomeIcon v-if="icons.tag" :icon="icons.tag" class="size-3" />
+            {{ recoTag.displayName }}
+          </Badge>
+        </div>
+
+        <!-- Titre -->
+        <h3 class="font-heading font-bold text-lg leading-tight text-foreground line-clamp-2 group-hover:text-primary-foreground transition-colors duration-500">
           {{ decodedName }}
         </h3>
 
-        <!-- Sous-titre / Description courte (subname) pour vendre -->
-        <p class="text-sm text-neutral-600 line-clamp-4 leading-relaxed">
-          {{ subnameText }}
+        <!-- Description -->
+        <p
+          v-if="shortDescription"
+          class="text-muted-foreground text-sm leading-relaxed line-clamp-2 group-hover:text-primary-foreground/80 transition-colors duration-500"
+        >
+          {{ shortDescription }}
+        </p>
+      </div>
+
+      <!-- Prix + Actions - toujours en bas -->
+      <div class="mt-auto space-y-2.5">
+        <!-- Prix -->
+        <p class="font-bold text-xl text-primary group-hover:text-primary-foreground transition-colors duration-500">
+          {{ priceDisplay }}
         </p>
 
-        <!-- Tags (masqués pour gagner de la place, décommenter si besoin) -->
-        <!-- <div v-if="reference.tags.length > 0" class="flex flex-wrap gap-1.5">
-          <div v-for="tag in reference.tags.slice(0, 2)" :key="tag"
-            class="flex items-center gap-1 text-xs text-neutral-500">
-            <FontAwesomeIcon v-if="icons.tag" :icon="icons.tag" class="w-3 h-3" />
-            <span>{{ tag }}</span>
-          </div>
-          <span v-if="reference.tags.length > 2" class="text-xs text-neutral-400">
-            +{{ reference.tags.length - 2 }}
-          </span>
-        </div> -->
-      </div>
+        <!-- Actions - gap-3 comme Figma -->
+        <div class="flex items-center gap-3">
+          <!-- CTA Secondaire : En savoir plus (outline → secondary au hover card) -->
+          <Button
+            variant="outline"
+            size="default"
+            rounded="sm"
+            class="flex-1 group-hover:bg-white group-hover:border-border group-hover:text-secondary-foreground transition-all duration-500"
+            @click.stop="handleViewDetails"
+          >
+            En savoir +
+          </Button>
 
-      <!-- Bloc poussé en bas (toujours aligné grâce à mt-auto) -->
-      <div class="space-y-2.5 mt-auto">
-        <Separator />
-
-        <!-- Prix + CTA -->
-        <div class="space-y-2">
-          <div class="bg-gradient-to-r from-red-50 to-transparent rounded-md p-3 -mx-1 text-center">
-            <p class="text-xs text-neutral-500 uppercase tracking-wide">Prix</p>
-            <p class="font-bold text-lg text-primary">{{ priceDisplay }}</p>
-          </div>
-
-          <!-- Boutons d'action -->
-          <div class="flex gap-2">
-            <Button @click="handleViewDetails" variant="outline" size="sm" class="flex-1">
-              <FontAwesomeIcon v-if="icons.eye" :icon="icons.eye" class="w-4 h-4" />
-            </Button>
-            <Button
-              @click="handleAddToCart"
-              :variant="cartButtonVariant"
-              color="primary"
-              size="sm"
-              class="flex-1"
-            >
-              <FontAwesomeIcon v-if="icons.shoppingCart" :icon="icons.shoppingCart" class="w-4 h-4" />
-            </Button>
-          </div>
-
-          <!-- Référence technique (petite indication) -->
-          <p class="text-xs text-neutral-400 italic text-center">Réf: {{ reference.technicalReference }}</p>
+          <!-- CTA Principal : Panier (vert success, juste icône) -->
+          <Button
+            size="default"
+            rounded="sm"
+            class="shrink-0 bg-success hover:bg-success/90 text-success-foreground"
+            @click="handleAddToCart"
+          >
+            <FontAwesomeIcon
+              v-if="isInCart && icons.check"
+              :icon="icons.check"
+              class="size-4"
+            />
+            <FontAwesomeIcon
+              v-else-if="icons.shoppingCart"
+              :icon="icons.shoppingCart"
+              class="size-4"
+            />
+          </Button>
         </div>
       </div>
-    </CardContent>
-  </Card>
+    </div>
+  </div>
 </template>
+
+<style scoped>
+.product-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    145deg,
+    var(--primary) 31%,
+    color-mix(in srgb, var(--primary) 75%, transparent) 95%
+  );
+  opacity: 0;
+  transition: opacity 500ms ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.product-card:hover::before {
+  opacity: 1;
+}
+
+.product-card > * {
+  position: relative;
+  z-index: 1;
+}
+</style>

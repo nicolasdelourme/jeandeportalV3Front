@@ -1,23 +1,28 @@
 <script setup lang="ts">
 /**
  * Page ProductDetailPage
- * Page détail d'un produit avec toutes ses variantes et prix
- * Layout optimisé pour la conversion e-commerce
+ * Layout 3 colonnes style Amazon/Figma:
+ * - Gauche: Image produit (sticky sur desktop)
+ * - Centre: Contenu (titre, description, tags)
+ * - Droite: Sidebar sticky (prix, format, CTA)
+ * - Mobile: Layout vertical avec sticky CTA en bas
  */
-import { onMounted, computed, ref } from 'vue'
+import { onMounted, computed, ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import DefaultLayout from '@/components/layout/DefaultLayout.vue'
 import { useShopStore } from '@/stores/shop.store'
 import { useCartStore } from '@/stores/cart.store'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { AspectRatio } from '@/components/ui/aspect-ratio'
+import FormatSelector from '@/components/shop/FormatSelector.vue'
+import StickyCart from '@/components/shop/StickyCart.vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
-import { getShopImageUrl, formatPrice, decodeHTMLEntities, sanitizeHTML } from '@/types/shop-api.types'
-import type { ShopProduct, ShopPrice } from '@/types/shop-api.types'
+import { formatPrice, decodeHTMLEntities, sanitizeHTML, getShopImageUrl, getDisplayTags, getFirstTagByPrefix } from '@/types/shop-api.types'
+import type { ShopProduct, ShopPrice, ParsedTag } from '@/types/shop-api.types'
 import { toast } from 'vue-sonner'
 import { CartError } from '@/types/cart.types'
 
@@ -30,17 +35,20 @@ const cartStore = useCartStore()
  * Icônes FontAwesome
  */
 const icons = computed(() => ({
-  arrowLeft: byPrefixAndName.fas?.['arrow-left'],
   shoppingCart: byPrefixAndName.fas?.['cart-shopping'],
   tag: byPrefixAndName.fas?.['tag'],
-  box: byPrefixAndName.fas?.['box'],
   truck: byPrefixAndName.fas?.['truck'],
   shield: byPrefixAndName.fas?.['shield-check'],
   share: byPrefixAndName.fas?.['share-nodes'],
   heart: byPrefixAndName.far?.['heart'],
   heartSolid: byPrefixAndName.fas?.['heart'],
   check: byPrefixAndName.fas?.['check'],
-  info: byPrefixAndName.fas?.['circle-info'],
+  arrowLeft: byPrefixAndName.fas?.['arrow-left'],
+  star: byPrefixAndName.fas?.['star'],
+  creditCard: byPrefixAndName.fas?.['credit-card'],
+  coins: byPrefixAndName.fas?.['coins'],
+  lock: byPrefixAndName.fas?.['lock'],
+  undo: byPrefixAndName.fas?.['undo'],
 }))
 
 /**
@@ -60,43 +68,10 @@ const selectedProduct = ref<ShopProduct | null>(null)
 const selectedPrice = ref<ShopPrice | null>(null)
 
 /**
- * Image active (pour la galerie)
+ * Prix sélectionné (montant)
  */
-const activeImageIndex = ref(0)
-
-/**
- * Images de la galerie
- */
-const galleryImages = computed(() => {
-  if (!reference.value) return []
-  return reference.value.images
-})
-
-/**
- * Image active
- */
-const activeImage = computed(() => {
-  const images = galleryImages.value
-  if (images.length === 0) return 'https://placehold.co/600x600/e5e7eb/6b7280?text=Pas+d%27image'
-  const currentImage = images[activeImageIndex.value]
-  if (!currentImage) return 'https://placehold.co/600x600/e5e7eb/6b7280?text=Pas+d%27image'
-  return getShopImageUrl(currentImage)
-})
-
-/**
- * Couleur du badge de collection
- */
-const collectionBadgeColor = computed(() => {
-  if (!reference.value) return 'neutral-600'
-  const collectionColors: Record<string, string> = {
-    or: 'yellow-500',
-    argent: 'gray-400',
-    patrimoine: 'blue-600',
-    immobilier: 'green-600',
-    securite: 'red-600',
-    formation: 'purple-600',
-  }
-  return collectionColors[reference.value.collectionId] || 'neutral-600'
+const selectedPriceAmount = computed(() => {
+  return selectedPrice.value?.amount ?? null
 })
 
 /**
@@ -108,36 +83,24 @@ const selectedPriceDisplay = computed(() => {
 })
 
 /**
- * Quantité
- */
-const quantity = ref(1)
-
-/**
  * Charger la référence au montage
  */
 onMounted(async () => {
   document.title = 'Éditions Jean de Portal : Produit'
 
-  // Charger le catalogue si pas déjà fait
   await shopStore.fetchCatalog()
 
-  // Si la référence existe, sélectionner le premier produit et prix par défaut
   if (reference.value && reference.value.products.length > 0) {
     const firstProduct = reference.value.products[0]
     if (firstProduct) {
       selectedProduct.value = firstProduct
       if (firstProduct.prices.length > 0) {
-        const firstPrice = firstProduct.prices[0]
-        if (firstPrice) {
-          selectedPrice.value = firstPrice
-        }
+        selectedPrice.value = firstProduct.prices[0] ?? null
       }
     }
 
-    // Mettre à jour le titre avec le nom du produit
-    document.title = `Éditions Jean de Portal : ${reference.value.name}`
+    document.title = `Éditions Jean de Portal : ${decodeHTMLEntities(reference.value.name)}`
   }
-
 })
 
 /**
@@ -164,9 +127,7 @@ const handleAddToCart = async () => {
   }
 
   try {
-    // Utiliser selectedProduct.id (referenceId) et non reference.id (itemId)
     await cartStore.addItem(Number(selectedProduct.value.id))
-
     toast.success(`${decodeHTMLEntities(reference.value.name)} ajouté au panier`)
   } catch (error) {
     if (error instanceof CartError) {
@@ -179,25 +140,14 @@ const handleAddToCart = async () => {
 
 const selectProduct = (product: ShopProduct) => {
   selectedProduct.value = product
-  if (product.prices.length > 0) {
-    const firstPrice = product.prices[0]
-    if (firstPrice) {
-      selectedPrice.value = firstPrice
-    }
-  }
 }
 
 const selectPrice = (price: ShopPrice) => {
   selectedPrice.value = price
 }
 
-const changeImage = (index: number) => {
-  activeImageIndex.value = index
-}
-
 const toggleFavorite = () => {
   isFavorite.value = !isFavorite.value
-  // TODO: Sauvegarder dans localStorage ou backend
 }
 
 const handleShare = async () => {
@@ -212,7 +162,6 @@ const handleShare = async () => {
       console.log('Partage annulé')
     }
   } else {
-    // Fallback: copier le lien
     navigator.clipboard.writeText(window.location.href)
     showShareMenu.value = true
     setTimeout(() => {
@@ -226,7 +175,6 @@ const handleShare = async () => {
  */
 const isInCart = computed(() => {
   if (!selectedProduct.value?.prices[0]?.id) return false
-  // hasItem attend un priceId, pas un referenceId
   return cartStore.hasItem(Number(selectedProduct.value.prices[0].id))
 })
 
@@ -239,19 +187,28 @@ const decodedName = computed(() => {
 })
 
 /**
+ * Image principale du produit
+ */
+const mainImage = computed(() => {
+  if (!reference.value || reference.value.images.length === 0) {
+    return 'https://placehold.co/400x600/e5e7eb/6b7280?text=Pas+d%27image'
+  }
+  const firstImage = reference.value.images[0]
+  if (!firstImage) {
+    return 'https://placehold.co/400x600/e5e7eb/6b7280?text=Pas+d%27image'
+  }
+  return getShopImageUrl(firstImage)
+})
+
+/**
  * Sous-titre/subname HTML nettoyé pour affichage
  */
 const sanitizedSubname = computed(() => {
   if (!reference.value) return ''
   let html = sanitizeHTML(reference.value.subname)
 
-  // Enlever le paragraphe "Caractéristiques" complet (avec son <strong>)
   html = html.replace(/<p>\s*<strong>Caractéristiques<\/strong>\s*<\/p>/gi, '')
-
-  // Enlever le paragraphe "Niveau d'expertise..." complet
   html = html.replace(/<p>Niveau[^<]*★[^<]*<\/p>/gi, '')
-
-  // Mettre en gras "Auteurs", "Auteur", "Parution", "Nombre de pages" (uniquement le mot, pas après)
   html = html.replace(/\bAuteurs?\b(?=\s*(&nbsp;)*\s*:)/gi, '<strong>$&</strong>')
   html = html.replace(/\bParution\b(?=\s*(&nbsp;)*\s*:)/gi, '<strong>Parution</strong>')
   html = html.replace(/\bNombre de pages\b(?=\s*(&nbsp;)*\s*:)/gi, '<strong>Nombre de pages</strong>')
@@ -267,199 +224,334 @@ const sanitizedDescription = computed(() => {
   return sanitizeHTML(reference.value.description)
 })
 
+/**
+ * Premier tag filter_ pour le badge catégorie
+ */
+const filterTag = computed(() => {
+  if (!reference.value) return null
+  return getFirstTagByPrefix(reference.value.tags, 'filter')
+})
+
+/**
+ * Tags d'affichage (tab_, et autres sauf filter_ et reco_)
+ */
+const displayTags = computed((): ParsedTag[] => {
+  if (!reference.value) return []
+  return getDisplayTags(reference.value.tags)
+})
 </script>
 
 <template>
   <DefaultLayout>
-    <div class="min-h-screen bg-gray-50">
-      <!-- Breadcrumb / Retour -->
-      <section class="bg-white border-b border-gray-200 py-4">
-        <div class="max-w-6xl mx-auto px-4">
-          <Button @click="handleBack" variant="ghost" size="sm" class="gap-2">
-            <FontAwesomeIcon v-if="icons.arrowLeft" :icon="icons.arrowLeft" class="w-4 h-4" />
-            Retour à la boutique
-          </Button>
-        </div>
-      </section>
-
+    <div class="min-h-screen bg-background">
       <!-- État de chargement -->
-      <div v-if="shopStore.isLoading" class="max-w-6xl mx-auto px-4 py-16 text-center">
-        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        <p class="mt-4 text-neutral-700">Chargement du produit...</p>
+      <div v-if="shopStore.isLoading" class="flex items-center justify-center min-h-[60vh]">
+        <div class="text-center">
+          <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary/20 border-t-primary" />
+          <p class="mt-4 text-muted-foreground">Chargement du produit...</p>
+        </div>
       </div>
 
       <!-- Produit non trouvé -->
-      <div v-else-if="!reference" class="max-w-6xl mx-auto px-4 py-16 text-center">
-        <div class="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
-          <p class="text-red-800 font-semibold mb-2">Produit introuvable</p>
-          <p class="text-red-600 text-sm mb-4">Ce produit n'existe pas ou a été supprimé.</p>
-          <Button @click="handleBack" variant="outline" size="sm">
-            Retour à la boutique
-          </Button>
+      <div v-else-if="!reference" class="flex items-center justify-center min-h-[60vh]">
+        <div class="text-center max-w-md mx-auto px-4">
+          <div class="bg-destructive/10 border border-destructive/20 rounded-lg p-6">
+            <p class="text-destructive font-semibold mb-2">Produit introuvable</p>
+            <p class="text-muted-foreground text-sm mb-4">Ce produit n'existe pas ou a été supprimé.</p>
+            <Button @click="handleBack" variant="outline" size="sm">
+              Retour à la boutique
+            </Button>
+          </div>
         </div>
       </div>
 
       <!-- Contenu produit -->
-      <section v-else class="max-w-6xl mx-auto px-4 py-8">
-        <div class="grid lg:grid-cols-12 gap-8">
-          <!-- ========================================
-               COLONNE GAUCHE : Informations produit (col-8)
-               ======================================== -->
-          <div class="lg:col-span-8 space-y-6">
-            <!-- Header avec badge et actions -->
-            <div class="flex items-start justify-between gap-4">
-              <Badge :color="collectionBadgeColor" variant="default" class="text-xs font-semibold uppercase">
-                {{ reference.collectionId }}
-              </Badge>
+      <template v-else>
+        <!-- Header avec breadcrumb/retour -->
+        <div class="border-b">
+          <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              class="gap-2 text-muted-foreground hover:text-foreground -ml-2"
+              @click="handleBack"
+            >
+              <FontAwesomeIcon v-if="icons.arrowLeft" :icon="icons.arrowLeft" class="w-3.5 h-3.5" />
+              Retour à la boutique
+            </Button>
+          </div>
+        </div>
 
-              <!-- Actions : Favoris + Partage -->
-              <div class="flex gap-2">
-                <Button @click="toggleFavorite" variant="outline" size="sm" class="relative">
+        <!-- Layout 3 colonnes -->
+        <section class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-10">
+          <div class="grid grid-cols-1 lg:grid-cols-[280px_1fr_340px] gap-6 lg:gap-10">
+
+            <!-- Colonne gauche: Image produit (sticky sur desktop) -->
+            <div class="lg:sticky lg:top-24 lg:self-start">
+              <!-- Image principale -->
+              <div class="bg-neutral-50 rounded-sm overflow-hidden border">
+                <AspectRatio :ratio="2/3">
+                  <img
+                    :src="mainImage"
+                    :alt="decodedName"
+                    class="w-full h-full object-contain"
+                  />
+                </AspectRatio>
+              </div>
+
+              <!-- Miniatures si plusieurs images (desktop) -->
+              <div v-if="reference.images.length > 1" class="hidden lg:flex gap-2 mt-3">
+                <button
+                  v-for="(image, index) in reference.images.slice(0, 4)"
+                  :key="index"
+                  class="w-14 h-14 rounded-sm overflow-hidden border-2 transition-all"
+                  :class="index === 0 ? 'border-primary' : 'border-transparent hover:border-neutral-300'"
+                >
+                  <img
+                    :src="getShopImageUrl(image)"
+                    :alt="`${decodedName} - ${index + 1}`"
+                    class="w-full h-full object-contain bg-neutral-50"
+                  />
+                </button>
+              </div>
+            </div>
+
+            <!-- Colonne centrale: Contenu -->
+            <div class="space-y-6">
+              <!-- Header avec badge catégorie -->
+              <div>
+                <Badge
+                  v-if="filterTag"
+                  variant="default"
+                  color="primary"
+                  class="text-xs font-semibold uppercase tracking-wider mb-3"
+                >
+                  {{ filterTag.displayName }}
+                </Badge>
+
+                <!-- Titre -->
+                <h1 class="font-heading font-bold text-2xl md:text-3xl text-foreground leading-tight mb-2">
+                  {{ decodedName }}
+                </h1>
+
+                <!-- Référence -->
+                <p class="text-sm text-muted-foreground">
+                  Réf: {{ reference.technicalReference }}
+                </p>
+              </div>
+
+              <!-- Accroche / Pitch -->
+              <div
+                v-if="reference.subname"
+                class="prose prose-sm max-w-none bg-muted/50 border-l-4 border-primary p-4 rounded-r-sm"
+                v-html="sanitizedSubname"
+              />
+
+              <!-- Description détaillée -->
+              <div class="space-y-3">
+                <h2 class="font-semibold text-lg text-foreground">
+                  Description
+                </h2>
+                <div
+                  class="prose prose-sm max-w-none text-muted-foreground leading-relaxed"
+                  v-html="sanitizedDescription"
+                />
+              </div>
+
+              <!-- Tags thématiques (tab_, etc.) -->
+              <div v-if="displayTags.length > 0">
+                <Separator class="mb-4" />
+                <div class="space-y-3">
+                  <h3 class="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                    Thématiques
+                  </h3>
+                  <div class="flex flex-wrap gap-2">
+                    <Badge
+                      v-for="tag in displayTags"
+                      :key="tag.raw"
+                      variant="outline"
+                      class="text-sm rounded-sm"
+                    >
+                      <FontAwesomeIcon v-if="icons.tag" :icon="icons.tag" class="w-3 h-3 mr-1.5" />
+                      {{ tag.displayName }}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Actions secondaires (Favoris + Partage) -->
+              <div class="flex gap-3 pt-4">
+                <Button @click="toggleFavorite" variant="outline" size="sm" class="gap-2 rounded-sm">
                   <FontAwesomeIcon
-                    v-if="isFavorite ? icons.heartSolid : icons.heart"
-                    :icon="isFavorite ? icons.heartSolid! : icons.heart!"
-                    :class="isFavorite ? 'text-red-500' : ''"
+                    v-if="isFavorite && icons.heartSolid"
+                    :icon="icons.heartSolid"
+                    class="w-4 h-4 text-red-500"
+                  />
+                  <FontAwesomeIcon
+                    v-else-if="icons.heart"
+                    :icon="icons.heart"
                     class="w-4 h-4"
                   />
+                  {{ isFavorite ? 'Favori' : 'Ajouter aux favoris' }}
                 </Button>
-                <Button @click="handleShare" variant="outline" size="sm" class="relative">
+                <Button @click="handleShare" variant="outline" size="sm" class="gap-2 rounded-sm relative">
                   <FontAwesomeIcon v-if="icons.share" :icon="icons.share" class="w-4 h-4" />
-                  <span v-if="showShareMenu"
-                    class="absolute -bottom-8 right-0 bg-green-600 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                  Partager
+                  <span
+                    v-if="showShareMenu"
+                    class="absolute -bottom-8 left-0 bg-green-600 text-white text-xs px-2 py-1 rounded-sm whitespace-nowrap z-10"
+                  >
                     Lien copié !
                   </span>
                 </Button>
               </div>
             </div>
 
-            <!-- Titre -->
-            <div>
-              <h1 class="text-3xl md:text-4xl font-bold text-neutral-800 mb-2" style="font-family: Roboto, sans-serif;">
-                {{ decodedName }}
-              </h1>
-              <p class="text-sm text-neutral-500">Réf: {{ reference.technicalReference }}</p>
-            </div>
-
-            <!-- Grid col-6 col-6 : Info + Prix -->
-            <div class="grid md:grid-cols-2 gap-6">
-              <!-- COLONNE GAUCHE : Infos produit -->
-              <div class="space-y-4">
-                <!-- Sous-titre / Pitch commercial -->
-                <div v-if="reference.subname"
-                  class="text-base text-neutral-700 bg-amber-50 border-l-4 border-amber-400 p-4 rounded leading-relaxed"
-                  v-html="sanitizedSubname" />
-              </div>
-
-              <!-- COLONNE DROITE : Bloc Prix & CTA -->
-              <div>
-                <Card
-                  class="border-2 border-primary p-0 shadow-lg bg-linear-to-br from-primary/10 to-primary/20 h-full">
-                  <CardContent class="p-6 space-y-4 flex flex-col h-full">
-                    <!-- Prix mis en avant -->
-                    <div class="text-center">
-                      <p class="text-sm text-primary font-semibold uppercase tracking-wide mb-1">Prix</p>
-                      <div class="flex items-center justify-center gap-2">
-                        <p class="text-4xl font-bold text-neutal-800">
-                          {{ selectedPriceDisplay || 'Non disponible' }}
-                        </p>
-                        <Badge class="bg-neutral-400 text-xs">TTC</Badge>
-                      </div>
-                    </div>
-
-                    <Separator />
-
-                    <!-- Bouton CTA Principal -->
-                    <Button @click="handleAddToCart" :disabled="!selectedPrice" variant="default" color="primary"
-                      size="lg" class="w-full justify-center relative">
-                      <FontAwesomeIcon v-if="icons.shoppingCart" :icon="icons.shoppingCart" class="w-5 h-5 mr-2" />
-                      {{ isInCart ? 'Déjà dans le panier' : 'Ajouter au panier' }}
-                      <!-- Indicateur visuel si déjà dans le panier -->
-                      <span
-                        v-if="isInCart"
-                        class="absolute -top-1 -right-1 h-3 w-3 bg-green-500 rounded-full border-2 border-white"
-                        title="Déjà dans le panier"
-                      />
-                    </Button>
-
-                    <!-- Garanties intégrées -->
-                    <div class="grid grid-cols-2 gap-2 mt-4">
-                      <div class="flex items-center gap-2">
-                        <FontAwesomeIcon v-if="icons.truck" :icon="icons.truck" class="w-4 h-4 text-primary shrink-0" />
-                        <div>
-                          <p class="text-xs font-semibold text-neutral-700">Livraison rapide</p>
-                          <p class="text-xs text-neutral-500">2-5 jours</p>
-                        </div>
-                      </div>
-                      <div class="flex items-center gap-2">
-                        <FontAwesomeIcon v-if="icons.shield" :icon="icons.shield"
-                          class="w-4 h-4 text-primary shrink-0" />
-                        <div>
-                          <p class="text-xs font-semibold text-neutral-700">Paiement sécurisé</p>
-                          <p class="text-xs text-neutral-500">100% protégé</p>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-
-            <!-- Description détaillée -->
-            <Card class="border-2">
-              <CardHeader>
-                <CardTitle class="flex items-center gap-2">
-                  <FontAwesomeIcon v-if="icons.info" :icon="icons.info" class="w-4 h-4" />
-                  Description détaillée
-                </CardTitle>
-              </CardHeader>
-              <CardContent class="space-y-4">
-                <!-- Description complète HTML -->
-                <div class="prose prose-sm max-w-none text-neutral-600 leading-relaxed" v-html="sanitizedDescription" />
-
-                <!-- Tags -->
-                <div v-if="reference.tags.length > 0">
-                  <Separator class="mb-3" />
-                  <p class="text-xs font-semibold text-neutral-500 uppercase mb-2">Thématiques</p>
-                  <div class="flex flex-wrap gap-2">
-                    <Badge v-for="tag in reference.tags" :key="tag" variant="outline" color="neutral-700"
-                      class="text-xs">
-                      <FontAwesomeIcon v-if="icons.tag" :icon="icons.tag" class="w-3 h-3 mr-1" />
-                      {{ tag }}
-                    </Badge>
+            <!-- Colonne droite: Sidebar sticky -->
+            <div class="lg:sticky lg:top-24 lg:self-start space-y-4">
+              <Card class="border shadow-sm rounded-sm">
+                <CardContent class="p-5 space-y-5">
+                  <!-- Prix principal -->
+                  <div>
+                    <p class="text-4xl font-bold text-foreground">
+                      {{ selectedPriceDisplay || 'Non disponible' }}
+                    </p>
+                    <p class="text-sm text-muted-foreground mt-1">TTC</p>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
 
-          <!-- ========================================
-               COLONNE DROITE : Image sticky (col-4)
-               ======================================== -->
-          <div class="lg:col-span-4">
-            <!-- Galerie d'images sticky avec compensation navbar -->
-            <div class="sticky top-20 space-y-4">
-              <!-- Image principale -->
-              <Card class="overflow-hidden shadow-lg p-0 rounded-md">
-                <AspectRatio :ratio="1 / 1.414" class="">
-                  <img :src="activeImage" :alt="reference.name" class="w-full h-full object-cover" />
-                </AspectRatio>
+                  <!-- Sélection format (si plusieurs produits) -->
+                  <div v-if="reference.products.length > 1">
+                    <Separator class="my-4" />
+                    <FormatSelector
+                      :products="reference.products"
+                      :selected-product-id="selectedProduct?.id"
+                      :selected-price-id="selectedPrice?.id"
+                      @select-product="selectProduct"
+                      @select-price="selectPrice"
+                    />
+                  </div>
+
+                  <Separator />
+
+                  <!-- Options de paiement -->
+                  <div class="space-y-2">
+                    <button class="w-full flex items-center gap-3 p-3 border rounded-sm hover:bg-muted/50 transition-colors text-left">
+                      <FontAwesomeIcon v-if="icons.creditCard" :icon="icons.creditCard" class="w-5 h-5 text-muted-foreground" />
+                      <div class="flex-1">
+                        <p class="text-sm font-medium">Paiement classique</p>
+                        <p class="text-xs text-muted-foreground">CB, PayPal, virement</p>
+                      </div>
+                      <div class="w-4 h-4 rounded-full border-2 border-primary flex items-center justify-center">
+                        <div class="w-2 h-2 rounded-full bg-primary"></div>
+                      </div>
+                    </button>
+                    <button class="w-full flex items-center gap-3 p-3 border rounded-sm hover:bg-muted/50 transition-colors text-left opacity-60">
+                      <FontAwesomeIcon v-if="icons.coins" :icon="icons.coins" class="w-5 h-5 text-muted-foreground" />
+                      <div class="flex-1">
+                        <p class="text-sm font-medium">Payer en Points</p>
+                        <p class="text-xs text-muted-foreground">Solde: 0 pts</p>
+                      </div>
+                      <div class="w-4 h-4 rounded-full border-2 border-neutral-300"></div>
+                    </button>
+                  </div>
+
+                  <!-- Boutons CTA (masqués sur mobile) -->
+                  <div class="hidden md:flex flex-col gap-2">
+                    <Button
+                      @click="handleAddToCart"
+                      :disabled="!selectedPrice"
+                      :variant="isInCart ? 'outline' : 'default'"
+                      size="lg"
+                      class="w-full justify-center rounded-sm bg-success hover:bg-success/90 text-success-foreground"
+                    >
+                      <FontAwesomeIcon
+                        v-if="isInCart && icons.check"
+                        :icon="icons.check"
+                        class="w-5 h-5 mr-2"
+                      />
+                      <FontAwesomeIcon
+                        v-else-if="icons.shoppingCart"
+                        :icon="icons.shoppingCart"
+                        class="w-5 h-5 mr-2"
+                      />
+                      {{ isInCart ? 'Dans le panier' : 'Ajouter au panier' }}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      class="w-full justify-center rounded-sm"
+                    >
+                      S'abonner
+                    </Button>
+                  </div>
+
+                  <Separator />
+
+                  <!-- Garanties -->
+                  <div class="grid grid-cols-2 gap-3">
+                    <div class="flex items-center gap-2">
+                      <FontAwesomeIcon
+                        v-if="icons.truck"
+                        :icon="icons.truck"
+                        class="w-4 h-4 text-green-600 shrink-0"
+                      />
+                      <div>
+                        <p class="text-xs font-medium text-foreground">Livraison</p>
+                        <p class="text-xs text-muted-foreground">2-5 jours</p>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <FontAwesomeIcon
+                        v-if="icons.lock"
+                        :icon="icons.lock"
+                        class="w-4 h-4 text-green-600 shrink-0"
+                      />
+                      <div>
+                        <p class="text-xs font-medium text-foreground">Sécurisé</p>
+                        <p class="text-xs text-muted-foreground">100%</p>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <FontAwesomeIcon
+                        v-if="icons.undo"
+                        :icon="icons.undo"
+                        class="w-4 h-4 text-green-600 shrink-0"
+                      />
+                      <div>
+                        <p class="text-xs font-medium text-foreground">Retours</p>
+                        <p class="text-xs text-muted-foreground">14 jours</p>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <FontAwesomeIcon
+                        v-if="icons.shield"
+                        :icon="icons.shield"
+                        class="w-4 h-4 text-green-600 shrink-0"
+                      />
+                      <div>
+                        <p class="text-xs font-medium text-foreground">Qualité</p>
+                        <p class="text-xs text-muted-foreground">Garanti</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
               </Card>
-
-              <!-- Miniatures -->
-              <div v-if="galleryImages.length > 1" class="grid grid-cols-4 gap-2">
-                <div v-for="(image, index) in galleryImages" :key="index" @click="changeImage(index)"
-                  class="cursor-pointer border-2 rounded-md overflow-hidden transition-all hover:shadow-md"
-                  :class="activeImageIndex === index ? 'border-primary ring-2 ring-primary ring-offset-2' : 'border-gray-200 hover:border-gray-400'">
-                  <AspectRatio :ratio="1 / 1.414">
-                    <img :src="getShopImageUrl(image)" :alt="`${reference.name} - ${index + 1}`"
-                      class="w-full h-full object-cover" />
-                  </AspectRatio>
-                </div>
-              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        <!-- Mobile: CTA Sticky -->
+        <StickyCart
+          :price="selectedPriceAmount"
+          :product-name="decodedName"
+          :is-in-cart="isInCart"
+          :disabled="!selectedPrice"
+          @add-to-cart="handleAddToCart"
+        />
+
+        <!-- Spacer pour le sticky cart mobile -->
+        <div class="h-20 md:hidden" />
+      </template>
     </div>
   </DefaultLayout>
 </template>

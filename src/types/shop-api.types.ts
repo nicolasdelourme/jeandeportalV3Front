@@ -131,7 +131,96 @@ export function formatPrice(amount: number, currency = 'EUR'): string {
 }
 
 /**
- * Helper: Obtenir tous les tags uniques du catalogue
+ * Structure d'un tag parsé
+ */
+export interface ParsedTag {
+  raw: string        // Tag original (ex: "filter_evolutionor")
+  prefix: string     // Préfixe (ex: "filter")
+  value: string      // Valeur sans préfixe (ex: "evolutionor")
+  displayName: string // Nom d'affichage formaté (ex: "Evolutionor")
+}
+
+/**
+ * Helper: Parser un tag au format "prefix_value"
+ * Retourne le préfixe, la valeur et le nom d'affichage formaté
+ */
+export function parseTag(tag: string): ParsedTag {
+  const underscoreIndex = tag.indexOf('_')
+
+  if (underscoreIndex === -1) {
+    // Pas de préfixe, c'est un tag simple (ex: "Métaux précieux")
+    return {
+      raw: tag,
+      prefix: '',
+      value: tag,
+      displayName: tag,
+    }
+  }
+
+  const prefix = tag.substring(0, underscoreIndex)
+  const value = tag.substring(underscoreIndex + 1)
+
+  // Capitaliser la première lettre pour l'affichage
+  const displayName = value.charAt(0).toUpperCase() + value.slice(1)
+
+  return {
+    raw: tag,
+    prefix,
+    value,
+    displayName,
+  }
+}
+
+/**
+ * Helper: Obtenir les tags de filtre boutique (préfixe "filter_")
+ * Retourne les tags parsés pour l'affichage
+ */
+export function getFilterTags(references: ShopReference[]): ParsedTag[] {
+  const tagsSet = new Set<string>()
+
+  references.forEach((ref) => {
+    ref.tags.forEach((tag) => {
+      if (tag.startsWith('filter_')) {
+        tagsSet.add(tag)
+      }
+    })
+  })
+
+  return Array.from(tagsSet)
+    .map(parseTag)
+    .sort((a, b) => a.displayName.localeCompare(b.displayName, 'fr'))
+}
+
+/**
+ * Helper: Extraire les tags d'un produit par préfixe
+ * Retourne les tags parsés pour l'affichage
+ */
+export function getTagsByPrefix(tags: string[], prefix: string): ParsedTag[] {
+  return tags
+    .filter((tag) => tag.startsWith(`${prefix}_`))
+    .map(parseTag)
+}
+
+/**
+ * Helper: Obtenir le premier tag d'un préfixe donné (pour affichage)
+ */
+export function getFirstTagByPrefix(tags: string[], prefix: string): ParsedTag | null {
+  const tag = tags.find((t) => t.startsWith(`${prefix}_`))
+  return tag ? parseTag(tag) : null
+}
+
+/**
+ * Helper: Obtenir les tags d'affichage (tous sauf filter_ et reco_)
+ * Pour la page produit
+ */
+export function getDisplayTags(tags: string[]): ParsedTag[] {
+  return tags
+    .filter((tag) => !tag.startsWith('filter_') && !tag.startsWith('reco_'))
+    .map(parseTag)
+}
+
+/**
+ * Helper: Obtenir tous les tags uniques du catalogue (tous types confondus)
  */
 export function getAllTags(references: ShopReference[]): string[] {
   const tagsSet = new Set<string>()
