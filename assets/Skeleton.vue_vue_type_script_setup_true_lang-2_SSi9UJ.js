@@ -1,0 +1,1 @@
+import{o as a}from"./DefaultLayout.vue_vue_type_script_setup_true_lang-CrzcWZWr.js";import{d as n,a as o,o as r,j as t,h as c}from"./index-Bgq9Av1o.js";const i=n({__name:"Skeleton",props:{class:{}},setup(e){const s=e;return(l,m)=>(r(),o("div",{class:t(c(a)("animate-pulse rounded-md bg-neutral-200",s.class))},null,2))}});export{i as _};
