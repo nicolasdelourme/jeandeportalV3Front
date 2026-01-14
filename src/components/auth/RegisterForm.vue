@@ -11,6 +11,7 @@ import { getLocalTimeZone, today } from '@internationalized/date'
 import type { DateValue } from 'reka-ui'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { PhoneInput } from '@/components/ui/phone-input'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -37,6 +38,7 @@ const emit = defineEmits<{
         email: string
         password: string
         confirmPassword: string
+        phone?: string
         birthDate?: string
     }]
 }>()
@@ -57,6 +59,9 @@ const formSchema = toTypedSchema(z.object({
         .regex(/[a-z]/, { message: 'Le mot de passe doit contenir au moins une minuscule' })
         .regex(/[0-9]/, { message: 'Le mot de passe doit contenir au moins un chiffre' }),
     confirmPassword: z.string({ required_error: 'Veuillez confirmer votre mot de passe' }),
+    phone: z.string()
+        .optional()
+        .or(z.literal('')),
     birthDate: z.string()
         .regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'Format invalide (YYYY-MM-DD)' })
         .optional()
@@ -128,10 +133,11 @@ const icons = computed(() => ({
     user: byPrefixAndName.fas?.['user'],
     envelope: byPrefixAndName.fas?.['envelope'],
     lock: byPrefixAndName.fas?.['lock'],
+    phone: byPrefixAndName.fas?.['phone'],
     calendar: byPrefixAndName.fas?.['calendar'],
 }))
 
-const getIcon = (iconKey: 'eye' | 'eyeSlash' | 'user' | 'envelope' | 'lock' | 'calendar'): IconDefinition => {
+const getIcon = (iconKey: 'eye' | 'eyeSlash' | 'user' | 'envelope' | 'lock' | 'phone' | 'calendar'): IconDefinition => {
     return icons.value[iconKey] as IconDefinition
 }
 
@@ -202,7 +208,7 @@ const onSubmit = handleSubmit((values) => {
             <FormField v-slot="{ componentField }" name="firstName">
                 <FormItem class="gap-1">
                     <FormLabel class="text-sm font-medium text-neutral-700">
-                        Prénom
+                        Prénom <span class="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
                         <div class="relative">
@@ -220,7 +226,7 @@ const onSubmit = handleSubmit((values) => {
             <FormField v-slot="{ componentField }" name="lastName">
                 <FormItem class="gap-1">
                     <FormLabel class="text-sm font-medium text-neutral-700">
-                        Nom
+                        Nom <span class="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
                         <div class="relative">
@@ -239,7 +245,7 @@ const onSubmit = handleSubmit((values) => {
         <FormField v-slot="{ componentField }" name="email">
             <FormItem class="gap-1">
                 <FormLabel class="text-sm font-medium text-neutral-700">
-                    Adresse email
+                    Adresse email <span class="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
                     <div class="relative">
@@ -254,11 +260,30 @@ const onSubmit = handleSubmit((values) => {
             </FormItem>
         </FormField>
 
+        <!-- Téléphone (optionnel) -->
+        <FormField v-slot="{ componentField }" name="phone">
+            <FormItem class="gap-1">
+                <FormLabel class="text-sm font-medium text-neutral-700">
+                    Téléphone
+                    <span class="text-neutral-400 font-normal">(optionnel)</span>
+                </FormLabel>
+                <FormControl>
+                    <PhoneInput
+                        v-bind="componentField"
+                        placeholder="6 12 34 56 78"
+                        initial-country="fr"
+                        :preferred-countries="['fr', 'be', 'ch', 'ca']"
+                    />
+                </FormControl>
+                <FormMessage />
+            </FormItem>
+        </FormField>
+
         <!-- Mot de passe -->
         <FormField v-slot="{ componentField }" name="password">
             <FormItem class="gap-1">
                 <FormLabel class="text-sm font-medium text-neutral-700">
-                    Mot de passe
+                    Mot de passe <span class="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
                     <div class="relative">
@@ -308,7 +333,7 @@ const onSubmit = handleSubmit((values) => {
         <FormField v-slot="{ componentField }" name="confirmPassword">
             <FormItem class="gap-1">
                 <FormLabel class="text-sm font-medium text-neutral-700">
-                    Confirmer le mot de passe
+                    Confirmer le mot de passe <span class="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
                     <div class="relative">

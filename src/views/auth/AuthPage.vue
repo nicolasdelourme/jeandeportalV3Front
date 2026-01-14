@@ -93,6 +93,7 @@ const handleRegisterSubmit = async (values: {
     email: string
     password: string
     confirmPassword: string
+    phone?: string
     birthDate?: string
 }) => {
     isSubmitting.value = true
@@ -106,6 +107,7 @@ const handleRegisterSubmit = async (values: {
             email: values.email,
             password: values.password,
             passwordConfirm: values.confirmPassword,
+            phone: values.phone || null,
             birthDate: values.birthDate || null
         })
 
