@@ -20,7 +20,7 @@ import { decodeHtmlEntities } from '@/utils/html.utils'
 /**
  * URL de base pour les images du backend
  */
-const IMAGE_BASE_URL = 'https://api.jeandeportal.fr'
+const IMAGE_BASE_URL = 'https://jeandeportal.fr'
 
 /**
  * Convertit un prix en centimes vers un prix en euros

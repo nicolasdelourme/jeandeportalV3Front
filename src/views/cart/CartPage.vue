@@ -20,8 +20,8 @@ const cartStore = useCartStore()
 const icons = computed(() => ({
   shoppingCart: byPrefixAndName.fas?.['shopping-cart'],
   trash: byPrefixAndName.fas?.['trash'],
-  plus: byPrefixAndName.fas?.['plus'],
-  minus: byPrefixAndName.fas?.['minus'],
+  creditCard: byPrefixAndName.fas?.['credit-card'],
+  arrowLeft: byPrefixAndName.fas?.['arrow-left'],
 }))
 
 /**
@@ -61,28 +61,6 @@ async function clearCart() {
     } catch (error) {
       // Toast d'erreur géré par le store
     }
-  }
-}
-
-/**
- * Augmente la quantité d'un article
- */
-async function increaseQuantity(priceId: number) {
-  try {
-    await cartStore.increaseQuantity(priceId)
-  } catch (error) {
-    // Toast d'erreur géré par le store
-  }
-}
-
-/**
- * Diminue la quantité d'un article
- */
-async function decreaseQuantity(priceId: number) {
-  try {
-    await cartStore.decreaseQuantity(priceId)
-  } catch (error) {
-    // Toast d'erreur géré par le store
   }
 }
 
@@ -177,12 +155,12 @@ function goToCheckout() {
             >
               <div class="flex gap-4">
                 <!-- Image -->
-                <div class="w-24 h-24 flex-shrink-0 bg-neutral-100 rounded-md overflow-hidden">
+                <div class="w-24 h-24 flex-shrink-0 bg-neutral-100 rounded-lg overflow-hidden">
                   <img
                     v-if="item.images && item.images[0]"
                     :src="item.images[0]"
                     :alt="item.name"
-                    class="w-full h-full object-cover"
+                    class="w-full h-full object-contain"
                   />
                 </div>
 
@@ -200,32 +178,8 @@ function goToCheckout() {
                     </div>
                   </div>
 
-                  <!-- Contrôles quantité et suppression -->
-                  <div class="flex items-center justify-between mt-3">
-                    <!-- Contrôles quantité -->
-                    <div class="flex items-center gap-2 border border-neutral-300 rounded-md">
-                      <Button
-                        @click="decreaseQuantity(item.priceId)"
-                        variant="ghost"
-                        size="sm"
-                        class="h-8 w-8 p-0"
-                        :disabled="cartStore.isLoading"
-                      >
-                        <FontAwesomeIcon v-if="icons.minus" :icon="icons.minus" class="h-3 w-3" />
-                      </Button>
-                      <span class="px-3 font-medium">{{ item.quantity }}</span>
-                      <Button
-                        @click="increaseQuantity(item.priceId)"
-                        variant="ghost"
-                        size="sm"
-                        class="h-8 w-8 p-0"
-                        :disabled="cartStore.isLoading"
-                      >
-                        <FontAwesomeIcon v-if="icons.plus" :icon="icons.plus" class="h-3 w-3" />
-                      </Button>
-                    </div>
-
-                    <!-- Bouton suppression -->
+                  <!-- Bouton suppression -->
+                  <div class="flex items-center justify-end mt-3">
                     <Button
                       @click="removeItem(item.itemId, item.name)"
                       variant="ghost"
@@ -280,26 +234,33 @@ function goToCheckout() {
               </p>
             </div>
 
-            <!-- CTA Commander -->
+            <!-- CTA Principal : Commander -->
             <Button
               @click="goToCheckout"
-              variant="default"
-              color="primary"
-              class="w-full"
               size="lg"
+              rounded="lg"
+              class="w-full bg-success hover:bg-success/90 text-success-foreground"
             >
-              <span class="font-bold" style="font-family: Roboto, sans-serif;">
-                Procéder au paiement
-              </span>
+              <FontAwesomeIcon
+                v-if="icons.creditCard"
+                :icon="icons.creditCard"
+                class="w-5 h-5 mr-2"
+              />
+              Commander
             </Button>
 
-            <!-- Continuer les achats -->
+            <!-- CTA Secondaire : Continuer les achats -->
             <Button
               @click="goToShop"
               variant="outline"
-              color="neutral-800"
+              rounded="lg"
               class="w-full mt-3"
             >
+              <FontAwesomeIcon
+                v-if="icons.arrowLeft"
+                :icon="icons.arrowLeft"
+                class="w-4 h-4 mr-2"
+              />
               Continuer mes achats
             </Button>
           </div>

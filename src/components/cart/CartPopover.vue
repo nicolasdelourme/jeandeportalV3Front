@@ -13,7 +13,6 @@ import { Separator } from '@/components/ui/separator'
 import { Empty } from '@/components/ui/empty'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
-import { toast } from 'vue-sonner'
 
 const router = useRouter()
 const cartStore = useCartStore()
@@ -22,6 +21,8 @@ const icons = computed(() => ({
   shoppingCart: byPrefixAndName.fas?.['shopping-cart'],
   trash: byPrefixAndName.fas?.['trash'],
   xmark: byPrefixAndName.fas?.['xmark'],
+  creditCard: byPrefixAndName.fas?.['credit-card'],
+  eye: byPrefixAndName.fas?.['eye'],
 }))
 
 /**
@@ -42,6 +43,13 @@ async function handleRemoveItem(itemId: number) {
  */
 function goToCart() {
   router.push('/panier')
+}
+
+/**
+ * Navigue vers le checkout (commande directe)
+ */
+function goToCheckout() {
+  router.push('/commander')
 }
 
 /**
@@ -118,7 +126,7 @@ function formatPrice(price: number): string {
                 v-if="item.images && item.images[0]"
                 :src="item.images[0]"
                 :alt="item.name"
-                class="w-full h-full object-cover"
+                class="w-full h-full object-contain"
               />
               <!-- Badge quantité si > 1 -->
               <Badge
@@ -168,18 +176,38 @@ function formatPrice(price: number): string {
           <span class="text-primary">{{ formatPrice(cartStore.subtotal) }}</span>
         </div>
 
-        <!-- CTA -->
-        <Button
-          @click="goToCart"
-          variant="default"
-          color="primary"
-          class="w-full"
-          size="lg"
-        >
-          <span class="font-bold" style="font-family: Roboto, sans-serif;">
+        <!-- CTAs -->
+        <div class="flex flex-col gap-2">
+          <!-- CTA Principal : Commander -->
+          <Button
+            @click="goToCheckout"
+            size="lg"
+            rounded="lg"
+            class="w-full bg-success hover:bg-success/90 text-success-foreground"
+          >
+            <FontAwesomeIcon
+              v-if="icons.creditCard"
+              :icon="icons.creditCard"
+              class="w-4 h-4 mr-2"
+            />
+            Commander
+          </Button>
+          <!-- CTA Secondaire : Voir le panier -->
+          <Button
+            @click="goToCart"
+            variant="outline"
+            size="lg"
+            rounded="lg"
+            class="w-full"
+          >
+            <FontAwesomeIcon
+              v-if="icons.eye"
+              :icon="icons.eye"
+              class="w-4 h-4 mr-2"
+            />
             Voir le panier
-          </span>
-        </Button>
+          </Button>
+        </div>
       </div>
     </PopoverContent>
   </Popover>
