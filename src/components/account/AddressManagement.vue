@@ -13,7 +13,6 @@ import { addressService } from '@/services/address.service'
 import AddressForm from './AddressForm.vue'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import {
   Dialog,
   DialogContent,
@@ -233,19 +232,20 @@ const formatFullAddress = (address: Address) => {
     <CardHeader>
       <div class="flex items-center justify-between">
         <div>
-          <CardTitle style="font-family: Roboto, sans-serif">Adresses postales</CardTitle>
-          <CardDescription style="font-family: Roboto, sans-serif">
+          <CardTitle>Adresses postales</CardTitle>
+          <CardDescription>
             Gérez vos adresses de facturation et de livraison
           </CardDescription>
         </div>
         <Button
           variant="outline"
+          size="sm"
           @click="openCreateForm"
-          class="flex items-center gap-2"
+          class="flex items-center gap-1.5"
           :disabled="isLoading"
         >
-          <FontAwesomeIcon v-if="getIcon('plus')" :icon="getIcon('plus')" />
-          <span class="hidden sm:inline">Ajouter</span>
+          <FontAwesomeIcon v-if="getIcon('plus')" :icon="getIcon('plus')" class="w-3 h-3" />
+          <span class="font-semibold tracking-wide">AJOUTER</span>
         </Button>
       </div>
     </CardHeader>
@@ -262,14 +262,11 @@ const formatFullAddress = (address: Address) => {
       </div>
 
       <!-- Liste des adresses -->
-      <div v-else-if="addresses.length > 0" class="space-y-4">
+      <div v-else-if="addresses.length > 0" class="space-y-2">
         <div
           v-for="address in addresses"
           :key="address.id"
-          :class="[
-            'relative p-4 rounded-lg border transition-all',
-            (address.isDefaultShipping || address.isDefaultBilling) ? 'border-primary bg-primary/5' : 'border-border'
-          ]"
+          class="relative p-4 rounded-md border border-neutral-200"
         >
           <!-- Actions en top-right -->
           <div class="absolute top-3 right-3 flex gap-1">
@@ -295,61 +292,31 @@ const formatFullAddress = (address: Address) => {
 
           <!-- Contenu -->
           <div class="space-y-3 pr-20">
-            <!-- En-tête -->
-            <div class="flex items-start gap-2">
-              <div class="space-y-1 flex-1">
-                <div class="flex items-center gap-2 flex-wrap">
-                  <h4 class="font-medium text-sm" style="font-family: Roboto, sans-serif">
-                    {{ address.label || 'Adresse' }}
-                  </h4>
-                  <Badge v-if="address.isDefaultShipping" variant="default" class="text-xs h-5">
-                    Livraison par défaut
-                  </Badge>
-                  <Badge v-if="address.isDefaultBilling" variant="secondary" class="text-xs h-5">
-                    Facturation par défaut
-                  </Badge>
-                </div>
-              </div>
-            </div>
+            <!-- Titre de l'adresse -->
+            <h4 class="font-semibold text-sm text-neutral-900">
+              {{ address.label || 'Adresse' }}
+            </h4>
 
             <!-- Informations -->
             <div class="space-y-1 text-sm">
               <p class="font-medium text-neutral-700">
                 {{ address.title }} {{ address.firstName }} {{ address.lastName }}
               </p>
-              <p class="text-muted-foreground leading-relaxed">
+              <p class="text-muted-foreground">
                 {{ formatFullAddress(address) }}
-              </p>
-              <p v-if="address.phone" class="text-muted-foreground flex items-center gap-2">
-                <FontAwesomeIcon v-if="getIcon('phone')" :icon="getIcon('phone')" class="w-3.5" />
-                {{ address.phone }}
               </p>
             </div>
 
-            <!-- Actions par défaut -->
-            <div v-if="!address.isDefaultShipping || !address.isDefaultBilling" class="pt-2 flex gap-2 flex-wrap">
-              <Button
-                v-if="!address.isDefaultShipping"
-                variant="ghost"
-                size="sm"
-                @click="setAsDefaultShipping(address.id)"
-                class="text-xs h-7"
-                :disabled="isLoading"
-              >
-                <FontAwesomeIcon v-if="getIcon('star')" :icon="getIcon('star')" class="mr-1.5 w-3" />
+            <!-- Badges par défaut (affichés uniquement si l'adresse est par défaut) -->
+            <div v-if="address.isDefaultShipping || address.isDefaultBilling" class="pt-2 flex gap-4 flex-wrap">
+              <div v-if="address.isDefaultShipping" class="flex items-center gap-1.5 text-xs font-bold text-neutral-900 tracking-wide uppercase">
+                <FontAwesomeIcon v-if="getIcon('star')" :icon="getIcon('star')" class="w-3 h-3" />
                 Livraison par défaut
-              </Button>
-              <Button
-                v-if="!address.isDefaultBilling"
-                variant="ghost"
-                size="sm"
-                @click="setAsDefaultBilling(address.id)"
-                class="text-xs h-7"
-                :disabled="isLoading"
-              >
-                <FontAwesomeIcon v-if="getIcon('star')" :icon="getIcon('star')" class="mr-1.5 w-3" />
+              </div>
+              <div v-if="address.isDefaultBilling" class="flex items-center gap-1.5 text-xs font-bold text-neutral-900 tracking-wide uppercase">
+                <FontAwesomeIcon v-if="getIcon('star')" :icon="getIcon('star')" class="w-3 h-3" />
                 Facturation par défaut
-              </Button>
+              </div>
             </div>
           </div>
         </div>
