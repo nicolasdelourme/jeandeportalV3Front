@@ -102,10 +102,11 @@ export function sanitizeUser(user: unknown): User {
         lastName: sanitizeNullableString(data.lastName ?? data.lastname),
         phone: sanitizeNullableString(data.phone),
         phoneStatus: sanitizeNullableString(data.phoneStatus ?? data.phone_status),
+        pseudo: sanitizeNullableString(data.pseudo),
+        birthDate: sanitizeNullableString(data.birthDate ?? data.birthdate ?? data.birth_date),
 
         // À venir - null/[] par défaut pour l'instant
         avatarUrl: sanitizeNullableString(data.avatarUrl ?? data.avatar_url),
-        birthDate: sanitizeNullableString(data.birthDate ?? data.birth_date),
 
         // Adresses - backend utilise "adress_array" (avec typo)
         addresses: sanitizeAddresses(data.addresses ?? data.adress_array),

@@ -4,7 +4,7 @@
  */
 
 import { apiClient } from '@/api/client'
-import type { LoginCredentials, RegisterCredentials, AuthResponse, AuthSuccessResponse, User, VerifyEmailResponse, ResetPasswordResponse, ChangeEmailResponse, ValidateEmailChangeResponse } from '@/types/auth.types'
+import type { LoginCredentials, RegisterCredentials, AuthResponse, AuthSuccessResponse, User, VerifyEmailResponse, ResetPasswordResponse, ChangeEmailResponse, ValidateEmailChangeResponse, UpdateProfileDto } from '@/types/auth.types'
 import { AuthError } from '@/types/auth.types'
 import { logger } from '@/utils/logger'
 
@@ -29,7 +29,8 @@ import {
     mockVerifyResetCodeAPI,
     mockCompletePasswordResetAPI,
     mockRequestEmailChangeAPI,
-    mockValidateEmailChangeAPI
+    mockValidateEmailChangeAPI,
+    mockUpdateProfileAPI
 } from '@/api/auth.mock'
 
 /**
@@ -106,6 +107,7 @@ export class AuthService {
                     email: credentials.email,
                     password: credentials.password,
                     passwordConfirm: credentials.passwordConfirm,
+                    phone: credentials.phone || null,
                     birthdate: credentials.birthDate || null
                 })
             }
@@ -208,6 +210,29 @@ export class AuthService {
             throw new AuthError(
                 'Impossible de récupérer le profil utilisateur.',
                 'TOKEN_EXPIRED',
+                error.response?.status
+            )
+        }
+    }
+
+    /**
+     * Met à jour le profil de l'utilisateur connecté
+     * POST /updateMe
+     */
+    async updateProfile(data: UpdateProfileDto): Promise<User> {
+        try {
+            if (USE_MOCK) {
+                return await mockUpdateProfileAPI(data)
+            } else {
+                // Appel API réel
+                const response = await apiClient.post<User>('/updateMe', data)
+                return response
+            }
+        } catch (error: any) {
+            logger.error('Erreur lors de la mise à jour du profil:', error)
+            throw new AuthError(
+                error.response?.data?.message || 'Impossible de mettre à jour le profil.',
+                'UNKNOWN_ERROR',
                 error.response?.status
             )
         }

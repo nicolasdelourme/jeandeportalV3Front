@@ -6,7 +6,7 @@
  * La "session" est stockée en mémoire pour simuler le cookie côté serveur
  */
 
-import type { LoginCredentials, RegisterCredentials, AuthResponse, AuthSuccessResponse, AuthErrorResponse, User } from '@/types/auth.types'
+import type { LoginCredentials, RegisterCredentials, AuthResponse, AuthSuccessResponse, AuthErrorResponse, User, UpdateProfileDto } from '@/types/auth.types'
 
 // Base de données simulée (en mémoire)
 const MOCK_USERS: Array<User & { password: string }> = [
@@ -20,8 +20,9 @@ const MOCK_USERS: Array<User & { password: string }> = [
         lastName: 'Dupont',
         phone: '0612345678',
         phoneStatus: 'verified',
+        pseudo: 'JeanD',
+        birthDate: '1990-05-15',
         avatarUrl: null,
-        birthDate: null,
         addresses: [
             {
                 id: 1,
@@ -173,10 +174,11 @@ export async function mockRegisterAPI(credentials: RegisterCredentials): Promise
         title: null,
         firstName: credentials.firstName,
         lastName: credentials.lastName,
-        phone: null,
+        phone: credentials.phone || null,
         phoneStatus: null,
-        avatarUrl: null,
+        pseudo: null, // Sera généré par le backend si null
         birthDate: credentials.birthDate || null,
+        avatarUrl: null,
         addresses: [],
         optinStatus: null,
         tag: 'new_user',
@@ -510,4 +512,46 @@ export async function mockValidateEmailChangeAPI(modificationCode: string): Prom
     return {
         status: 'success'
     }
+}
+
+/**
+ * Mock Update Profile API
+ * POST /updateMe
+ *
+ * Met à jour les informations du profil de l'utilisateur connecté
+ */
+export async function mockUpdateProfileAPI(data: UpdateProfileDto): Promise<User> {
+    console.log('👤 [MOCK API] mockUpdateProfileAPI appelé avec:', data)
+    await delay(800)
+
+    // Vérifier que l'utilisateur est connecté
+    if (!MOCK_SESSION) {
+        console.log('❌ [MOCK API] Utilisateur non connecté')
+        throw new Error('Vous devez être connecté pour modifier votre profil.')
+    }
+
+    // Récupérer l'utilisateur actuel
+    const user = MOCK_USERS.find(u => u.id === MOCK_SESSION!.userId)
+    if (!user) {
+        throw new Error('Utilisateur non trouvé.')
+    }
+
+    // Mettre à jour les champs fournis (mapping API → User)
+    if (data.firstname !== undefined) user.firstName = data.firstname
+    if (data.lastname !== undefined) user.lastName = data.lastname
+    if (data.phone !== undefined) user.phone = data.phone
+    if (data.pseudo !== undefined) user.pseudo = data.pseudo
+    if (data.birthdate !== undefined) user.birthDate = data.birthdate
+
+    console.log('✅ [MOCK API] Profil mis à jour:', {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phone: user.phone,
+        pseudo: user.pseudo,
+        birthDate: user.birthDate
+    })
+
+    // Retourner l'utilisateur sans le mot de passe
+    const { password, ...userWithoutPassword } = user
+    return userWithoutPassword
 }

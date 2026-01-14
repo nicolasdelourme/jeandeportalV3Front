@@ -21,6 +21,7 @@ export interface RegisterCredentials {
     email: string
     password: string
     passwordConfirm: string       // Confirmation du mot de passe (envoyé à l'API)
+    phone?: string | null         // Téléphone (optionnel)
     birthDate?: string | null     // Date de naissance format YYYY-MM-DD (optionnel)
 }
 
@@ -100,6 +101,18 @@ export interface ValidateEmailChangeResponse {
 }
 
 /**
+ * Données pour la mise à jour du profil
+ * POST /updateMe
+ */
+export interface UpdateProfileDto {
+    firstname?: string
+    lastname?: string
+    birthdate?: string  // Format YYYY-MM-DD
+    phone?: string
+    pseudo?: string
+}
+
+/**
  * Union type pour toutes les réponses possibles
  */
 export type AuthResponse = AuthSuccessResponse | AuthErrorResponse
@@ -122,10 +135,11 @@ export interface User {
     lastName: string | null          // API: "lastname" (lowercase)
     phone: string | null             // API: "phone"
     phoneStatus: string | null       // API: "phoneStatus" - "pending" | "verified" etc.
+    pseudo: string | null            // API: "pseudo" - pseudonyme utilisateur
+    birthDate: string | null         // API: "birthdate" - date de naissance (YYYY-MM-DD)
 
     // Profil (à venir)
     avatarUrl: string | null         // À venir
-    birthDate: string | null         // À venir
 
     // Adresses - backend renvoie "adress_array" (avec typo)
     addresses: UserAddress[]

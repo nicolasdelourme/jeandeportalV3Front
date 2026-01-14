@@ -6,7 +6,7 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
-import type { LoginCredentials, RegisterCredentials } from '@/types/auth.types'
+import type { LoginCredentials, RegisterCredentials, UpdateProfileDto } from '@/types/auth.types'
 
 /**
  * Composable useAuth
@@ -79,6 +79,14 @@ export function useAuth() {
     }
 
     /**
+     * Met à jour le profil utilisateur
+     * @param data - Les champs à mettre à jour (format API: firstname, lastname, etc.)
+     */
+    async function updateUserProfile(data: UpdateProfileDto): Promise<void> {
+        await authStore.updateUserProfile(data)
+    }
+
+    /**
      * Réinitialise l'erreur
      */
     function clearError(): void {
@@ -124,6 +132,7 @@ export function useAuth() {
         register,
         logout,
         refreshUser,
+        updateUserProfile,
         clearError,
         hasRole,
         requireAuth

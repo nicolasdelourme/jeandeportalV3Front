@@ -8,7 +8,7 @@
 
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { User, LoginCredentials, RegisterCredentials, VerifyEmailResponse } from '@/types/auth.types'
+import type { User, LoginCredentials, RegisterCredentials, VerifyEmailResponse, UpdateProfileDto } from '@/types/auth.types'
 import { AuthError } from '@/types/auth.types'
 import { authService } from '@/services/auth.service'
 import {
@@ -300,6 +300,40 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     /**
+     * Met à jour le profil utilisateur
+     * POST /updateMe
+     *
+     * @param data - Les champs à mettre à jour (format API: firstname, lastname, etc.)
+     */
+    async function updateUserProfile(data: UpdateProfileDto): Promise<void> {
+        if (!user.value) {
+            throw new AuthError('Vous devez être connecté pour modifier votre profil.', 'TOKEN_EXPIRED')
+        }
+
+        isLoading.value = true
+        error.value = null
+
+        try {
+            console.log('👤 [AUTH STORE] Mise à jour du profil...')
+            const updatedUser = await authService.updateProfile(data)
+            console.log('✅ [AUTH STORE] Profil mis à jour:', updatedUser)
+
+            // Mettre à jour le state avec le user sanitisé
+            user.value = sanitizeUser(updatedUser)
+            setAuthUser(updatedUser)
+        } catch (err: any) {
+            console.error('❌ [AUTH STORE] Erreur lors de la mise à jour:', err)
+            error.value = err instanceof AuthError ? err : new AuthError(
+                'Une erreur est survenue lors de la mise à jour du profil',
+                'UNKNOWN_ERROR'
+            )
+            throw error.value
+        } finally {
+            isLoading.value = false
+        }
+    }
+
+    /**
      * Réinitialise l'erreur
      */
     function clearError(): void {
@@ -326,6 +360,7 @@ export const useAuthStore = defineStore('auth', () => {
         verifyEmail,
         logout,
         refreshUser,
+        updateUserProfile,
         clearError
     }
 })
