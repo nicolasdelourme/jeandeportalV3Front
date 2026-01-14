@@ -8,6 +8,13 @@ import { useShopStore } from '@/stores/shop.store'
 import type { ShopSortOption } from '@/types/shop-api.types'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 const shopStore = useShopStore()
 
@@ -37,6 +44,23 @@ const activeSortOption = computed({
   get: () => shopStore.activeSortOption,
   set: (value: ShopSortOption) => shopStore.setSortOption(value),
 })
+
+/**
+ * Label de l'option active
+ */
+const activeLabel = computed(() => {
+  const option = sortOptions.find((o) => o.value === activeSortOption.value)
+  return option?.label ?? 'Trier'
+})
+
+/**
+ * Gestion du changement de valeur
+ */
+const handleValueChange = (value: string | number | bigint | boolean | Record<string, string> | null) => {
+  if (typeof value === 'string') {
+    activeSortOption.value = value as ShopSortOption
+  }
+}
 </script>
 
 <template>
@@ -44,19 +68,20 @@ const activeSortOption = computed({
     <!-- Icône -->
     <FontAwesomeIcon v-if="icons.sort" :icon="icons.sort" class="w-5 h-5 text-primary" />
 
-    <!-- Select custom -->
-    <select
-      v-model="activeSortOption"
-      class="bg-white border border-gray-300 rounded-md px-4 py-2 pr-10 text-sm text-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent cursor-pointer appearance-none bg-no-repeat"
-      style="
-        background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27currentColor%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%27%3e%3c/polyline%3e%3c/svg%3e');
-        background-position: right 0.5rem center;
-        background-size: 1.5em 1.5em;
-      "
-    >
-      <option v-for="option in sortOptions" :key="option.value" :value="option.value">
-        {{ option.label }}
-      </option>
-    </select>
+    <!-- Select shadcn-vue -->
+    <Select :model-value="activeSortOption" @update:model-value="handleValueChange">
+      <SelectTrigger class="w-[180px]">
+        <SelectValue :placeholder="activeLabel" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem
+          v-for="option in sortOptions"
+          :key="option.value"
+          :value="option.value"
+        >
+          {{ option.label }}
+        </SelectItem>
+      </SelectContent>
+    </Select>
   </div>
 </template>

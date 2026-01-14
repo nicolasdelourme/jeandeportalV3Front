@@ -79,8 +79,8 @@ onMounted(() => {
     if (!inputRef.value) return
 
     iti.value = intlTelInput(inputRef.value, {
-        initialCountry: props.initialCountry,
-        countryOrder: props.preferredCountries,
+        initialCountry: props.initialCountry as 'fr' | 'be' | 'ch' | 'ca',
+        countryOrder: props.preferredCountries as ('fr' | 'be' | 'ch' | 'ca')[],
         separateDialCode: false,
         formatAsYouType: true,
         nationalMode: false,
