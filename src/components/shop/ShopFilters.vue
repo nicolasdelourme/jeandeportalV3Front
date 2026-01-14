@@ -81,7 +81,7 @@ const activeFiltersCount = computed(() => {
         <Button
           variant="outline"
           size="sm"
-          rounded="sm"
+          rounded="default"
           :color="!shopStore.hasActiveFilters ? 'primary' : 'neutral-400'"
           :class="!shopStore.hasActiveFilters ? 'bg-primary/10' : ''"
           @click="resetFilters"
@@ -95,7 +95,7 @@ const activeFiltersCount = computed(() => {
           :variant="isTagActive(tag.raw) ? 'default' : 'outline'"
           color="primary"
           size="sm"
-          rounded="sm"
+          rounded="default"
           class="whitespace-nowrap"
           @click="toggleTag(tag.raw)"
         >

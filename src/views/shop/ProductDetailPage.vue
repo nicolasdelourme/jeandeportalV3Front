@@ -138,6 +138,28 @@ const handleAddToCart = async () => {
   }
 }
 
+const handleDirectPurchase = async () => {
+  if (!reference.value || !selectedProduct.value) {
+    toast.error('Produit non trouvé')
+    return
+  }
+
+  try {
+    // Ajouter au panier si pas déjà présent
+    if (!isInCart.value) {
+      await cartStore.addItem(Number(selectedProduct.value.id))
+    }
+    // Rediriger vers le checkout
+    router.push('/commander')
+  } catch (error) {
+    if (error instanceof CartError) {
+      toast.error(error.message)
+    } else {
+      toast.error('Impossible de commander')
+    }
+  }
+}
+
 const selectProduct = (product: ShopProduct) => {
   selectedProduct.value = product
 }
@@ -289,7 +311,7 @@ const displayTags = computed((): ParsedTag[] => {
             <!-- Colonne gauche: Image produit (sticky sur desktop) -->
             <div class="lg:sticky lg:top-24 lg:self-start">
               <!-- Image principale -->
-              <div class="bg-neutral-50 rounded-sm overflow-hidden border">
+              <div class="bg-neutral-50 rounded-lg overflow-hidden border">
                 <AspectRatio :ratio="2/3">
                   <img
                     :src="mainImage"
@@ -304,7 +326,7 @@ const displayTags = computed((): ParsedTag[] => {
                 <button
                   v-for="(image, index) in reference.images.slice(0, 4)"
                   :key="index"
-                  class="w-14 h-14 rounded-sm overflow-hidden border-2 transition-all"
+                  class="w-14 h-14 rounded-lg overflow-hidden border-2 transition-all"
                   :class="index === 0 ? 'border-primary' : 'border-transparent hover:border-neutral-300'"
                 >
                   <img
@@ -370,7 +392,7 @@ const displayTags = computed((): ParsedTag[] => {
                       v-for="tag in displayTags"
                       :key="tag.raw"
                       variant="outline"
-                      class="text-sm rounded-sm"
+                      class="text-sm rounded-lg"
                     >
                       <FontAwesomeIcon v-if="icons.tag" :icon="icons.tag" class="w-3 h-3 mr-1.5" />
                       {{ tag.displayName }}
@@ -381,7 +403,7 @@ const displayTags = computed((): ParsedTag[] => {
 
               <!-- Actions secondaires (Favoris + Partage) -->
               <div class="flex gap-3 pt-4">
-                <Button @click="toggleFavorite" variant="outline" size="sm" class="gap-2 rounded-sm">
+                <Button @click="toggleFavorite" variant="outline" size="sm" class="gap-2 rounded-lg">
                   <FontAwesomeIcon
                     v-if="isFavorite && icons.heartSolid"
                     :icon="icons.heartSolid"
@@ -394,12 +416,12 @@ const displayTags = computed((): ParsedTag[] => {
                   />
                   {{ isFavorite ? 'Favori' : 'Ajouter aux favoris' }}
                 </Button>
-                <Button @click="handleShare" variant="outline" size="sm" class="gap-2 rounded-sm relative">
+                <Button @click="handleShare" variant="outline" size="sm" class="gap-2 rounded-lg relative">
                   <FontAwesomeIcon v-if="icons.share" :icon="icons.share" class="w-4 h-4" />
                   Partager
                   <span
                     v-if="showShareMenu"
-                    class="absolute -bottom-8 left-0 bg-green-600 text-white text-xs px-2 py-1 rounded-sm whitespace-nowrap z-10"
+                    class="absolute -bottom-8 left-0 bg-green-600 text-white text-xs px-2 py-1 rounded-lg whitespace-nowrap z-10"
                   >
                     Lien copié !
                   </span>
@@ -409,7 +431,7 @@ const displayTags = computed((): ParsedTag[] => {
 
             <!-- Colonne droite: Sidebar sticky -->
             <div class="lg:sticky lg:top-24 lg:self-start space-y-4">
-              <Card class="border shadow-sm rounded-sm">
+              <Card class="border shadow-sm rounded-lg">
                 <CardContent class="p-5 space-y-5">
                   <!-- Prix principal -->
                   <div>
@@ -435,7 +457,7 @@ const displayTags = computed((): ParsedTag[] => {
 
                   <!-- Options de paiement -->
                   <div class="space-y-2">
-                    <button class="w-full flex items-center gap-3 p-3 border rounded-sm hover:bg-muted/50 transition-colors text-left">
+                    <button class="w-full flex items-center gap-3 p-3 border rounded-lg hover:bg-muted/50 transition-colors text-left">
                       <FontAwesomeIcon v-if="icons.creditCard" :icon="icons.creditCard" class="w-5 h-5 text-muted-foreground" />
                       <div class="flex-1">
                         <p class="text-sm font-medium">Paiement classique</p>
@@ -445,7 +467,7 @@ const displayTags = computed((): ParsedTag[] => {
                         <div class="w-2 h-2 rounded-full bg-primary"></div>
                       </div>
                     </button>
-                    <button class="w-full flex items-center gap-3 p-3 border rounded-sm hover:bg-muted/50 transition-colors text-left opacity-60">
+                    <button class="w-full flex items-center gap-3 p-3 border rounded-lg hover:bg-muted/50 transition-colors text-left opacity-60">
                       <FontAwesomeIcon v-if="icons.coins" :icon="icons.coins" class="w-5 h-5 text-muted-foreground" />
                       <div class="flex-1">
                         <p class="text-sm font-medium">Payer en Points</p>
@@ -457,12 +479,29 @@ const displayTags = computed((): ParsedTag[] => {
 
                   <!-- Boutons CTA (masqués sur mobile) -->
                   <div class="hidden md:flex flex-col gap-2">
+                    <!-- CTA Principal : Commander (achat direct) -->
+                    <Button
+                      @click="handleDirectPurchase"
+                      :disabled="!selectedPrice"
+                      size="lg"
+                      rounded="lg"
+                      class="w-full justify-center bg-success hover:bg-success/90 text-success-foreground"
+                    >
+                      <FontAwesomeIcon
+                        v-if="icons.creditCard"
+                        :icon="icons.creditCard"
+                        class="w-5 h-5 mr-2"
+                      />
+                      Commander
+                    </Button>
+                    <!-- CTA Secondaire : Ajouter au panier -->
                     <Button
                       @click="handleAddToCart"
                       :disabled="!selectedPrice"
-                      :variant="isInCart ? 'outline' : 'default'"
+                      variant="outline"
                       size="lg"
-                      class="w-full justify-center rounded-sm bg-success hover:bg-success/90 text-success-foreground"
+                      rounded="lg"
+                      class="w-full justify-center"
                     >
                       <FontAwesomeIcon
                         v-if="isInCart && icons.check"
@@ -475,13 +514,6 @@ const displayTags = computed((): ParsedTag[] => {
                         class="w-5 h-5 mr-2"
                       />
                       {{ isInCart ? 'Dans le panier' : 'Ajouter au panier' }}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      class="w-full justify-center rounded-sm"
-                    >
-                      S'abonner
                     </Button>
                   </div>
 

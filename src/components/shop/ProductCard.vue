@@ -1,15 +1,17 @@
 <script setup lang="ts">
-
+/**
+ * Composant ProductCard
+ * Card produit basée sur shadcn-vue Card
+ */
 import { computed } from 'vue'
 import type { ShopReference } from '@/types/shop-api.types'
 import { getShopImageUrl, formatPrice, stripHTML, decodeHTMLEntities, getFirstTagByPrefix } from '@/types/shop-api.types'
+import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { AspectRatio } from '@/components/ui/aspect-ratio'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
 import { useCartStore } from '@/stores/cart.store'
-import { cn } from '@/lib/utils'
 
 export type CardSize = 'featured' | 'medium' | 'small' | 'wide'
 
@@ -124,20 +126,18 @@ const handleAddToCart = (e: Event) => {
 </script>
 
 <template>
-  <div
-    class="product-card group relative bg-white rounded-sm overflow-hidden cursor-pointer border-2 border-primary shadow-md transition-all duration-500"
+  <Card
+    class="product-card group relative cursor-pointer border-2 border-primary shadow-md rounded-lg py-0 gap-0 transition-all duration-500 overflow-hidden"
     @click="handleViewDetails"
   >
-    <!-- Inner content avec padding 10px comme Figma -->
-    <div class="p-2.5 flex flex-col gap-2.5 h-full">
+    <CardContent class="p-2.5 flex flex-col gap-2.5 flex-1">
       <!-- Image -->
-      <div class="relative overflow-hidden rounded-sm bg-neutral-100">
-          <img
-            :src="mainImage"
-            :alt="decodedName"
-            class="w-full h-full object-contain"
-          />
-
+      <div class="relative overflow-hidden rounded-lg bg-neutral-100">
+        <img
+          :src="mainImage"
+          :alt="decodedName"
+          class="w-full h-full object-contain"
+        />
       </div>
 
       <!-- Contenu - flex-1 pour pousser prix+CTA en bas -->
@@ -148,8 +148,7 @@ const handleAddToCart = (e: Event) => {
           <Badge
             v-if="filterTag"
             variant="outline"
-            rounded="sm"
-            class="text-xs font-semibold border-primary bg-secondary text-foreground px-2 py-0.5"
+            class="border-primary bg-white rounded-lg"
           >
             {{ filterTag.displayName }}
           </Badge>
@@ -158,8 +157,7 @@ const handleAddToCart = (e: Event) => {
           <Badge
             v-if="recoTag"
             variant="outline"
-            rounded="sm"
-            class="text-xs font-semibold border-primary bg-secondary text-foreground px-2 py-0.5 gap-1.5"
+            class="border-primary bg-white rounded-lg"
           >
             <FontAwesomeIcon v-if="icons.tag" :icon="icons.tag" class="size-3" />
             {{ recoTag.displayName }}
@@ -179,49 +177,41 @@ const handleAddToCart = (e: Event) => {
           {{ shortDescription }}
         </p>
       </div>
+    </CardContent>
 
-      <!-- Prix + Actions - toujours en bas -->
-      <div class="mt-auto space-y-2.5">
-        <!-- Prix -->
-        <p class="font-bold text-xl text-primary group-hover:text-primary-foreground transition-colors duration-500">
-          {{ priceDisplay }}
-        </p>
+    <CardFooter class="flex-col items-stretch gap-2.5 px-2.5 pb-2.5 mt-auto">
+      <!-- Prix -->
+      <p class="font-bold text-xl text-primary group-hover:text-primary-foreground transition-colors duration-500">
+        {{ priceDisplay }}
+      </p>
 
-        <!-- Actions - gap-3 comme Figma -->
-        <div class="flex items-center gap-3">
-          <!-- CTA Secondaire : En savoir plus (outline → secondary au hover card) -->
-          <Button
-            variant="outline"
-            size="default"
-            rounded="sm"
-            class="flex-1 group-hover:bg-white group-hover:border-border group-hover:text-secondary-foreground transition-all duration-500"
-            @click.stop="handleViewDetails"
-          >
-            En savoir +
-          </Button>
+      <!-- Actions - gap-3 comme Figma -->
+      <div class="flex items-center gap-3">
 
-          <!-- CTA Principal : Panier (vert success, juste icône) -->
-          <Button
-            size="default"
-            rounded="sm"
-            class="shrink-0 bg-success hover:bg-success/90 text-success-foreground"
-            @click="handleAddToCart"
-          >
+        <!-- CTA Principal : Panier (vert success, juste icône) -->
+        <Button
+          size="default"
+          rounded="lg"
+          color="success"
+          class="w-full bg-success hover:bg-success/90 text-success-foreground"
+          @click="handleAddToCart"
+        >
+          <FontAwesomeIcon
+            v-if="isInCart && icons.check"
+            :icon="icons.check"
+            class="size-4"
+          />
+          <span v-else-if="icons.shoppingCart" class="flex items-center justify-center gap-2 w-full">
             <FontAwesomeIcon
-              v-if="isInCart && icons.check"
-              :icon="icons.check"
-              class="size-4"
-            />
-            <FontAwesomeIcon
-              v-else-if="icons.shoppingCart"
               :icon="icons.shoppingCart"
               class="size-4"
             />
-          </Button>
-        </div>
+            <p>Ajouter au panier</p>
+          </span>
+        </Button>
       </div>
-    </div>
-  </div>
+    </CardFooter>
+  </Card>
 </template>
 
 <style scoped>
@@ -244,7 +234,7 @@ const handleAddToCart = (e: Event) => {
   opacity: 1;
 }
 
-.product-card > * {
+.product-card > :deep(*) {
   position: relative;
   z-index: 1;
 }
