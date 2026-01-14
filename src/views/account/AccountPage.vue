@@ -9,7 +9,6 @@ import DefaultLayout from '@/components/layout/DefaultLayout.vue'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import ProfileSection from '@/components/account/ProfileSection.vue'
 import SubscriptionSection from '@/components/account/SubscriptionSection.vue'
-import SettingsSection from '@/components/account/SettingsSection.vue'
 import PurchasesSection from '@/components/account/PurchasesSection.vue'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -60,18 +59,15 @@ const activeTab = ref('profile')
 
                 <!-- Tabs Navigation -->
                 <Tabs v-model="activeTab" class="w-full">
-                    <TabsList class="grid w-full grid-cols-4">
+                    <TabsList class="grid w-full grid-cols-3">
                         <TabsTrigger value="profile">
                             <span style="font-family: Roboto, sans-serif;">Profil</span>
                         </TabsTrigger>
                         <TabsTrigger value="subscription">
-                            <span style="font-family: Roboto, sans-serif;">Abonnement</span>
+                            <span style="font-family: Roboto, sans-serif;">Abonnements</span>
                         </TabsTrigger>
                         <TabsTrigger value="purchases">
                             <span style="font-family: Roboto, sans-serif;">Mes achats</span>
-                        </TabsTrigger>
-                        <TabsTrigger value="settings">
-                            <span style="font-family: Roboto, sans-serif;">Paramètres</span>
                         </TabsTrigger>
                     </TabsList>
 
@@ -88,11 +84,6 @@ const activeTab = ref('profile')
                     <!-- Purchases Tab -->
                     <TabsContent value="purchases">
                         <PurchasesSection />
-                    </TabsContent>
-
-                    <!-- Settings Tab -->
-                    <TabsContent value="settings">
-                        <SettingsSection />
                     </TabsContent>
                 </Tabs>
             </div>
