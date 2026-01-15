@@ -1,0 +1,1 @@
+import{a7 as r}from"./DefaultLayout.vue_vue_type_script_setup_true_lang-DMKUdJDp.js";import{b as t,W as e}from"./index-Cv1Oz3Ns.js";function a(o){return t(()=>e(o)?!!r(o)?.closest("form"):!0)}export{a as u};
