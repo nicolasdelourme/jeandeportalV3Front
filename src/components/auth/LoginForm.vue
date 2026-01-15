@@ -128,14 +128,14 @@ const onSubmit = handleSubmit((values) => {
                     Rester connecté
                 </span>
             </label>
-            <button type="button" @click="emit('forgot-password')" class="text-sm text-primary hover:underline"
+            <button type="button" @click="emit('forgot-password')" class="text-sm text-secondary hover:underline"
                 style="font-family: Roboto, sans-serif;">
                 Mot de passe oublié ?
             </button>
         </div>
 
         <!-- Bouton de soumission -->
-        <Button type="submit" color="primary" class="w-full" size="lg" :disabled="isSubmitting">
+        <Button type="submit" variant="secondary" rounded="lg" class="w-full" size="lg" :disabled="isSubmitting">
             <span class="font-bold" style="font-family: Roboto, sans-serif;">
                 {{ isSubmitting ? 'Chargement...' : 'Se connecter' }}
             </span>

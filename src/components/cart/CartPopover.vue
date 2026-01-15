@@ -99,6 +99,7 @@ function formatPrice(price: number): string {
       <div v-if="cartStore.isEmpty" class="py-8">
         <Empty
           title="Panier vide"
+          
           description="Votre panier est vide. Ajoutez des produits pour commencer."
           class="py-4"
         >

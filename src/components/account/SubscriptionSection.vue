@@ -230,7 +230,7 @@ const formatPrice = (price: number, period: 'mensuel' | 'annuel'): string => {
                     v-for="subscription in activeSubscriptions"
                     :key="subscription.id"
                     :class="[
-                        'border rounded-md p-4',
+                        'border rounded-lg p-4',
                         getThemeBorderClass(subscription.theme)
                     ]"
                 >
@@ -333,7 +333,7 @@ const formatPrice = (price: number, period: 'mensuel' | 'annuel'): string => {
                             v-for="subscription in cancelledSubscriptions"
                             :key="subscription.id"
                             :class="[
-                                'border rounded-md p-4',
+                                'border rounded-lg p-4',
                                 getThemeBorderClass(subscription.theme)
                             ]"
                         >

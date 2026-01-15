@@ -39,11 +39,6 @@ const contentTypes = [
 <template>
   <section class="py-16 md:py-24 bg-white">
     <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
-      <!-- Version indicator -->
-      <div class="text-center mb-4">
-        <Badge variant="outline" class="text-xs">VERSION 6 - Timeline mensuelle</Badge>
-      </div>
-
       <!-- Header -->
       <div class="text-center mb-12">
         <h2 class="font-heading font-bold text-2xl md:text-3xl text-foreground mb-4">

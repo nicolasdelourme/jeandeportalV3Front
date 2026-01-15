@@ -240,6 +240,7 @@ const formatFullAddress = (address: Address) => {
         <Button
           variant="outline"
           size="sm"
+          rounded="lg"
           @click="openCreateForm"
           class="flex items-center gap-1.5"
           :disabled="isLoading"
@@ -266,7 +267,7 @@ const formatFullAddress = (address: Address) => {
         <div
           v-for="address in addresses"
           :key="address.id"
-          class="relative p-4 rounded-md border border-neutral-200"
+          class="relative p-4 rounded-lg border border-neutral-200"
         >
           <!-- Actions en top-right -->
           <div class="absolute top-3 right-3 flex gap-1">

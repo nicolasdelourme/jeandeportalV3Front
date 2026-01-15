@@ -58,11 +58,6 @@ const themes: Theme[] = [
 <template>
   <section class="py-16 md:py-24 bg-neutral-50">
     <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
-      <!-- Version indicator -->
-      <div class="text-center mb-4">
-        <Badge variant="outline" class="text-xs">VERSION 2 - Gradients audacieux</Badge>
-      </div>
-
       <!-- Header -->
       <div class="text-center mb-12">
         <h2 class="font-heading font-bold text-2xl md:text-3xl text-foreground mb-4">
@@ -90,7 +85,7 @@ const themes: Theme[] = [
             v-if="theme.premium"
             variant="default"
             rounded="sm"
-            class="absolute top-4 right-4 bg-accent-yellow text-primary gap-1"
+            class="absolute top-4 right-4 bg-accent-yellow text-secondary gap-1"
           >
             <FontAwesomeIcon v-if="icons.crown" :icon="icons.crown" class="size-3" />
             Premium

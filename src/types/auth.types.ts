@@ -105,9 +105,9 @@ export interface ValidateEmailChangeResponse {
  * POST /updateMe
  */
 export interface UpdateProfileDto {
-    firstname?: string
-    lastname?: string
-    birthdate?: string  // Format YYYY-MM-DD
+    firstName?: string
+    lastName?: string
+    birthDate?: string  // Format YYYY-MM-DD
     phone?: string
     pseudo?: string
 }

@@ -536,12 +536,12 @@ export async function mockUpdateProfileAPI(data: UpdateProfileDto): Promise<User
         throw new Error('Utilisateur non trouvé.')
     }
 
-    // Mettre à jour les champs fournis (mapping API → User)
-    if (data.firstname !== undefined) user.firstName = data.firstname
-    if (data.lastname !== undefined) user.lastName = data.lastname
+    // Mettre à jour les champs fournis (camelCase direct)
+    if (data.firstName !== undefined) user.firstName = data.firstName
+    if (data.lastName !== undefined) user.lastName = data.lastName
     if (data.phone !== undefined) user.phone = data.phone
     if (data.pseudo !== undefined) user.pseudo = data.pseudo
-    if (data.birthdate !== undefined) user.birthDate = data.birthdate
+    if (data.birthDate !== undefined) user.birthDate = data.birthDate
 
     console.log('✅ [MOCK API] Profil mis à jour:', {
         firstName: user.firstName,

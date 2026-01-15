@@ -82,8 +82,8 @@ const activeFiltersCount = computed(() => {
           variant="outline"
           size="sm"
           rounded="default"
-          :color="!shopStore.hasActiveFilters ? 'primary' : 'neutral-400'"
-          :class="!shopStore.hasActiveFilters ? 'bg-primary/10' : ''"
+          :color="!shopStore.hasActiveFilters ? 'secondary' : 'neutral-400'"
+          :class="!shopStore.hasActiveFilters ? 'bg-secondary/10' : ''"
           @click="resetFilters"
         >
           Tous
@@ -93,7 +93,7 @@ const activeFiltersCount = computed(() => {
           v-for="tag in filterTags"
           :key="tag.raw"
           :variant="isTagActive(tag.raw) ? 'default' : 'outline'"
-          color="primary"
+          color="secondary"
           size="sm"
           rounded="default"
           class="whitespace-nowrap"
@@ -126,7 +126,7 @@ const activeFiltersCount = computed(() => {
             <Badge
               v-if="activeFiltersCount > 0"
               variant="default"
-              color="primary"
+              color="secondary"
               class="ml-1 px-1.5 py-0 text-xs"
             >
               {{ activeFiltersCount }}
@@ -162,7 +162,7 @@ const activeFiltersCount = computed(() => {
                   v-for="tag in filterTags"
                   :key="tag.raw"
                   :variant="isTagActive(tag.raw) ? 'default' : 'outline'"
-                  color="primary"
+                  color="secondary"
                   size="sm"
                   rounded="sm"
                   @click="toggleTag(tag.raw)"
@@ -187,7 +187,7 @@ const activeFiltersCount = computed(() => {
           <div class="absolute bottom-0 left-0 right-0 p-4 bg-background border-t border-border">
             <Button
               variant="default"
-              color="primary"
+              color="secondary"
               class="w-full"
               @click="isSheetOpen = false"
             >

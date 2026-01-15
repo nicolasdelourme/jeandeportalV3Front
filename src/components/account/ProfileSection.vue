@@ -175,19 +175,17 @@ watch(() => user.value, (newUser) => {
 
 /**
  * Soumission du formulaire
- * Mapping camelCase (frontend) → lowercase (API)
  */
 const onSubmit = handleSubmit(async (values) => {
     isSubmitting.value = true
 
     try {
-        // Mapper les valeurs du formulaire vers le format API
         await updateUserProfile({
-            firstname: values.firstName || undefined,
-            lastname: values.lastName || undefined,
+            firstName: values.firstName || undefined,
+            lastName: values.lastName || undefined,
             pseudo: values.pseudo || undefined,
             phone: values.phone || undefined,
-            birthdate: values.birthDate || undefined,
+            birthDate: values.birthDate || undefined,
         })
 
         toast.success('Profil mis à jour avec succès !')
@@ -246,7 +244,7 @@ const onSubmit = handleSubmit(async (values) => {
                             <FormItem class="gap-1">
                                 <FormLabel class="text-sm font-medium text-neutral-700">Prénom</FormLabel>
                                 <FormControl>
-                                    <Input type="text" v-bind="componentField" />
+                                    <Input type="text" v-bind="componentField" class="rounded-lg" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -256,7 +254,7 @@ const onSubmit = handleSubmit(async (values) => {
                             <FormItem class="gap-1">
                                 <FormLabel class="text-sm font-medium text-neutral-700">Nom</FormLabel>
                                 <FormControl>
-                                    <Input type="text" v-bind="componentField" />
+                                    <Input type="text" v-bind="componentField"  class="rounded-lg" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -269,7 +267,7 @@ const onSubmit = handleSubmit(async (values) => {
                             <FormItem class="gap-1">
                                 <FormLabel class="text-sm font-medium text-neutral-700">Pseudo</FormLabel>
                                 <FormControl>
-                                    <Input type="text" v-bind="componentField" />
+                                    <Input type="text" v-bind="componentField" class="rounded-lg" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -284,6 +282,7 @@ const onSubmit = handleSubmit(async (values) => {
                                         placeholder="6 12 34 56 78"
                                         initial-country="fr"
                                         :preferred-countries="['fr', 'be', 'ch', 'ca']"
+                                        class="rounded-lg"
                                     />
                                 </FormControl>
                                 <FormMessage />
@@ -336,7 +335,7 @@ const onSubmit = handleSubmit(async (values) => {
 
                     <!-- Bouton -->
                     <div class="flex justify-end pt-4">
-                        <Button type="submit" variant="default" :disabled="!meta.dirty || isSubmitting">
+                        <Button type="submit" variant="default" rounded="lg" :disabled="!meta.dirty || isSubmitting">
                             <span class="font-semibold tracking-wide">
                                 {{ isSubmitting ? 'ENREGISTREMENT...' : 'ENREGISTRER LES MODIFICATIONS' }}
                             </span>

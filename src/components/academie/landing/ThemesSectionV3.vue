@@ -1,129 +1,292 @@
 <script setup lang="ts">
 /**
- * ThemesSection V3 - Cards avec icônes et fonds colorés
- * Style moderne avec coins arrondis sm
+ * ThemesSection V3 - Formations Infocash Académie + Rythme
+ * Chaque formation = 1 abonnement séparé (sauf Bonus = fidélité)
+ * Inclut la timeline du rythme hebdomadaire
  */
 import { computed } from 'vue'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
 
+const emit = defineEmits<{
+  scrollToPricing: []
+}>()
+
 const icons = computed(() => ({
-  crown: byPrefixAndName.fas?.['crown'],
-  coins: byPrefixAndName.fas?.['coins'],
-  chartPie: byPrefixAndName.fas?.['chart-pie'],
-  rocket: byPrefixAndName.fas?.['rocket'],
-  gift: byPrefixAndName.fas?.['gift'],
+  graduationCap: byPrefixAndName.fas?.['graduation-cap'],
+  arrowRight: byPrefixAndName.fas?.['arrow-right'],
+  arrowDown: byPrefixAndName.fas?.['arrow-down'],
+  star: byPrefixAndName.fas?.['star'],
+  lock: byPrefixAndName.fas?.['lock'],
+  envelope: byPrefixAndName.fas?.['envelope'],
+  video: byPrefixAndName.fas?.['video'],
+  comments: byPrefixAndName.fas?.['comments'],
 }))
 
 const getIconDef = (key: keyof typeof icons.value): IconDefinition | object => {
   return icons.value[key] ?? {}
 }
 
-interface Theme {
+interface Formation {
   id: string
+  number: string
   name: string
+  subtitle: string
   description: string
   color: string
-  icon: 'coins' | 'chartPie' | 'rocket' | 'gift'
-  premium?: boolean
+  textColor: string
+  isBonus?: boolean
 }
 
-const themes: Theme[] = [
+const formations: Formation[] = [
   {
     id: 'metaux',
+    number: '01',
     name: 'Métaux précieux',
-    description: 'Investir dans l\'or et l\'argent physique. Comprendre les cycles et la protection de votre patrimoine.',
+    subtitle: 'Or & Argent physique',
+    description: 'Apprenez à investir dans l\'or et l\'argent. Comprendre les cycles, le stockage et la protection de votre patrimoine.',
     color: '#F2CC00',
-    icon: 'coins',
+    textColor: 'text-black',
   },
   {
     id: 'portefeuille',
+    number: '02',
     name: 'Portefeuille permanent',
-    description: 'Stratégie long terme basée sur la diversification. Un patrimoine résilient.',
+    subtitle: 'Stratégie long terme',
+    description: 'Construisez un portefeuille résilient basé sur la diversification. Performant dans toutes les conditions de marché.',
     color: '#A8C7EA',
-    icon: 'chartPie',
+    textColor: 'text-slate-900',
   },
   {
     id: 'liberte',
+    number: '03',
     name: 'Liberté financière',
-    description: 'Revenus passifs, optimisation fiscale et stratégies de croissance.',
+    subtitle: 'Indépendance & revenus',
+    description: 'Les clés pour atteindre l\'indépendance financière. Revenus passifs, optimisation et stratégies de croissance.',
     color: '#F4BFA6',
-    icon: 'rocket',
+    textColor: 'text-slate-900',
   },
   {
     id: 'bonus',
-    name: 'Bonus mystère',
-    description: 'Contenus exclusifs réservés aux abonnés Premium.',
+    number: '04',
+    name: 'Bonus exclusif',
+    subtitle: 'Déblocable avec vos étoiles',
+    description: 'Contenus premium réservés aux membres fidèles. Astuces fiscales avancées et opportunités confidentielles.',
     color: '#1D1D1D',
-    icon: 'gift',
-    premium: true,
+    textColor: 'text-white',
+    isBonus: true,
   },
 ]
+
+// Types de contenu hebdomadaire
+const contentTypes = [
+  { day: 'Lundi', title: 'Newsletter', icon: 'envelope' as const },
+  { day: 'Mardi', title: 'Tutoriel', icon: 'video' as const },
+  { day: 'Jeudi', title: 'Consultation', icon: 'comments' as const },
+]
+
+const scrollToPricing = () => {
+  emit('scrollToPricing')
+}
 </script>
 
 <template>
   <section class="py-16 md:py-24 bg-white">
-    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
-      <!-- Version indicator -->
-      <div class="text-center mb-4">
-        <Badge variant="outline" class="text-xs">VERSION 3 - Icônes + fonds colorés</Badge>
-      </div>
-
+    <div class="max-w-6xl mx-auto px-4 md:px-6 lg:px-8">
       <!-- Header -->
-      <div class="text-center mb-12">
-        <h2 class="font-heading font-bold text-2xl md:text-3xl text-foreground mb-4">
-          4 thématiques pour maîtriser vos finances
+      <div class="text-center mb-10">
+        <Badge variant="outline" rounded="sm" class="mb-4 gap-2">
+          <FontAwesomeIcon v-if="icons.graduationCap" :icon="icons.graduationCap" class="size-3" />
+          Infocash Académie
+        </Badge>
+
+        <h2 class="font-heading font-bold text-3xl md:text-4xl text-foreground mb-4">
+          3 formations indépendantes
         </h2>
-        <p class="text-muted-foreground max-w-2xl mx-auto">
-          Choisissez les sujets qui correspondent à vos objectifs.
+
+        <p class="text-muted-foreground max-w-2xl mx-auto mb-2">
+          Choisissez la ou les formations qui correspondent à vos objectifs. Chaque formation est un abonnement séparé avec ses propres contenus exclusifs.
         </p>
+
+        <p class="text-foreground font-medium mb-6">
+          À partir de <span class="text-primary font-bold">9,90€/mois</span> par formation
+        </p>
+
+        <Button
+          variant="secondary"
+          size="lg"
+          rounded="sm"
+          class="gap-2"
+          @click="scrollToPricing"
+        >
+          VOIR LES FORMULES
+          <FontAwesomeIcon v-if="icons.arrowDown" :icon="icons.arrowDown" class="size-4" />
+        </Button>
       </div>
 
-      <!-- Grid 4 colonnes -->
+      <!-- Grid des formations -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div
-          v-for="theme in themes"
-          :key="theme.id"
-          class="relative rounded-sm p-6 border-2 hover:shadow-lg transition-all duration-300 group flex flex-col"
-          :style="{
-            borderColor: theme.color,
-            backgroundColor: `${theme.color}10`,
-          }"
+          v-for="formation in formations"
+          :key="formation.id"
+          class="relative overflow-hidden cursor-pointer group"
         >
-          <!-- Badge Premium -->
-          <Badge
-            v-if="theme.premium"
-            variant="default"
-            rounded="sm"
-            class="absolute top-3 right-3 bg-primary text-primary-foreground gap-1 text-xs"
-          >
-            <FontAwesomeIcon v-if="icons.crown" :icon="icons.crown" class="size-2.5" />
-            Premium
-          </Badge>
-
-          <!-- Icône -->
+          <!-- Card avec couleur de fond -->
           <div
-            class="w-10 h-10 rounded-sm flex items-center justify-center mb-4"
-            :style="{ backgroundColor: theme.color }"
+            class="relative h-[320px] sm:h-[380px] flex flex-col transition-all duration-500 rounded-lg"
+            :style="{ backgroundColor: formation.color }"
+          >
+            <!-- Numéro en grand (semi-transparent) -->
+            <div
+              :class="[
+                'absolute top-4 left-4 font-heading font-bold text-6xl sm:text-7xl opacity-30',
+                formation.textColor,
+              ]"
+            >
+              {{ formation.number }}
+            </div>
+
+            <!-- Badge fidélité pour Bonus -->
+            <div v-if="formation.isBonus" class="absolute top-4 right-4">
+              <Badge variant="default" class="bg-primary text-secondary gap-1.5">
+                <FontAwesomeIcon v-if="icons.star" :icon="icons.star" class="size-3" />
+                Fidélité
+              </Badge>
+            </div>
+
+            <!-- Spacer pour pousser le contenu en bas -->
+            <div class="flex-1" />
+
+            <!-- Contenu en bas -->
+            <div class="p-4 sm:p-5">
+              <!-- Titre -->
+              <h3 :class="['font-heading font-bold text-lg sm:text-xl', formation.textColor]">
+                {{ formation.name }}
+              </h3>
+
+              <!-- Sous-titre -->
+              <p :class="['text-sm opacity-70 mb-1', formation.textColor]">
+                {{ formation.subtitle }}
+              </p>
+
+              <!-- Description (apparaît au hover) -->
+              <div class="overflow-hidden transition-all duration-500 max-h-0 group-hover:max-h-24 opacity-0 group-hover:opacity-100">
+                <p :class="['text-sm leading-relaxed mb-3 opacity-80', formation.textColor]">
+                  {{ formation.description }}
+                </p>
+              </div>
+
+              <!-- CTA -->
+              <div :class="['flex items-center gap-2 text-sm font-medium', formation.textColor]">
+                <template v-if="formation.isBonus">
+                  <FontAwesomeIcon v-if="icons.lock" :icon="icons.lock" class="size-3 opacity-70" />
+                  <span>Débloquer avec mes étoiles</span>
+                </template>
+                <template v-else>
+                  <span>Découvrir la formation</span>
+                  <FontAwesomeIcon
+                    v-if="icons.arrowRight"
+                    :icon="icons.arrowRight"
+                    class="size-3 group-hover:translate-x-1 transition-transform"
+                  />
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Rythme (intégrée) -->
+      <div class="mt-16 pt-12 border-t border-border">
+        <!-- Légende des contenus -->
+        <div class="flex flex-wrap items-center justify-center gap-6 mb-8">
+          <div
+            v-for="content in contentTypes"
+            :key="content.day"
+            class="flex items-center gap-2"
           >
             <FontAwesomeIcon
-              v-if="icons[theme.icon]"
-              :icon="getIconDef(theme.icon)"
-              class="size-5"
-              :class="theme.premium ? 'text-white' : 'text-white'"
+              v-if="icons[content.icon]"
+              :icon="getIconDef(content.icon)"
+              class="size-5 text-muted-foreground"
             />
+            <span class="text-sm">
+              <span class="font-semibold text-foreground">{{ content.day }}</span>
+              <span class="text-muted-foreground"> : {{ content.title }}</span>
+            </span>
           </div>
-
-          <!-- Contenu -->
-          <h3 class="font-heading font-bold text-lg text-foreground mb-2">
-            {{ theme.name }}
-          </h3>
-          <p class="text-muted-foreground text-sm leading-relaxed flex-1">
-            {{ theme.description }}
-          </p>
         </div>
+
+        <!-- Timeline 4 semaines -->
+        <div class="relative">
+          <!-- Ligne de connexion (desktop) -->
+          <div class="hidden lg:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-border" />
+
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div
+              v-for="(formation, weekIndex) in formations"
+              :key="`week-${formation.id}`"
+              class="relative"
+            >
+              <!-- Header semaine -->
+              <div
+                class="rounded-t-lg px-4 py-3"
+                :style="{ backgroundColor: formation.color }"
+              >
+                <p :class="['font-heading font-bold text-sm', formation.textColor]">
+                  Semaine {{ weekIndex + 1 }}
+                </p>
+                <p :class="['text-xs opacity-70', formation.textColor]">
+                  {{ formation.name }}
+                </p>
+              </div>
+
+              <!-- Contenus de la semaine -->
+              <div class="bg-neutral-50 rounded-b-lg p-4 space-y-3">
+                <div
+                  v-for="content in contentTypes"
+                  :key="`${formation.id}-${content.day}`"
+                  class="flex items-center gap-3"
+                >
+                  <FontAwesomeIcon
+                    v-if="icons[content.icon]"
+                    :icon="getIconDef(content.icon)"
+                    class="size-5 shrink-0"
+                    :style="{ color: formation.color }"
+                  />
+                  <div>
+                    <p class="text-[10px] uppercase tracking-wide text-muted-foreground">{{ content.day }}</p>
+                    <p class="font-medium text-sm text-foreground">{{ content.title }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Indicateur de cycle -->
+        <div class="flex items-center justify-center gap-2 mt-8">
+          <div
+            v-for="formation in formations"
+            :key="`dot-${formation.id}`"
+            class="w-3 h-3 rounded-full"
+            :style="{ backgroundColor: formation.color }"
+          />
+          <FontAwesomeIcon
+            v-if="icons.arrowRight"
+            :icon="icons.arrowRight"
+            class="size-4 text-muted-foreground mx-2"
+          />
+          <span class="text-muted-foreground text-sm">puis on recommence !</span>
+        </div>
+
+        <!-- Note -->
+        <p class="text-center text-muted-foreground text-xs mt-4">
+          * Avec un abonnement multi-formations, recevez plusieurs contenus par semaine !
+        </p>
       </div>
     </div>
   </section>

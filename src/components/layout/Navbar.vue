@@ -86,7 +86,7 @@ const icons = computed(() => ({
  * Navigation items avec sous-menus
  */
 const navItems = [
-    { label: 'Notre Maison', href: '/', type: 'link' },
+    { label: 'Accueil', href: '/', type: 'link' },
     {
         label: 'Académie',
         type: 'dropdown',
@@ -220,10 +220,10 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                                     <AccordionTrigger
                                         :class="[
                                             'w-full px-3 py-2.5 text-left text-sm font-medium rounded-xl hover:no-underline',
-                                            'hover:bg-[#1D1D1D]/5 transition-colors',
-                                            'data-[state=open]:bg-[#1D1D1D]/5',
+                                            'hover:bg-secondary/5 transition-colors',
+                                            'data-[state=open]:bg-secondary/5',
                                             '[&>svg]:ml-auto [&>svg]:h-4 [&>svg]:w-4 [&>svg]:transition-transform',
-                                            isDropdownActive(item.items) ? 'text-[#1D1D1D] font-semibold' : 'text-[#1D1D1D]'
+                                            isDropdownActive(item.items) ? 'text-secondary font-semibold' : 'text-secondary'
                                         ]"
                                     >
                                         {{ item.label }}
@@ -236,9 +236,9 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                                                 @click="handleNavClick(subItem.href)"
                                                 :class="[
                                                     'w-full pl-7 pr-3 py-2 text-left text-xs font-normal rounded-xl transition-colors',
-                                                    'text-neutral-600 hover:bg-[#1D1D1D]/5 hover:text-[#1D1D1D]',
+                                                    'text-neutral-600 hover:bg-secondary/5 hover:text-secondary',
                                                     isActiveRoute(subItem.href)
-                                                        ? 'bg-[#1D1D1D]/10 text-[#1D1D1D] font-semibold'
+                                                        ? 'bg-secondary/10 text-secondary font-semibold'
                                                         : ''
                                                 ]"
                                             >
@@ -257,14 +257,14 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                         <template v-if="isAuthenticated">
                             <!-- Avatar + Nom -->
                             <div class="flex items-center gap-3 px-3 py-2 mb-2">
-                                <Avatar class="h-9 w-9 border border-[#1D1D1D]/10">
+                                <Avatar class="h-9 w-9 border border-secondary/10">
                                     <AvatarImage v-if="avatarUrl" :src="avatarUrl" :alt="displayName" />
-                                    <AvatarFallback class="bg-[#1D1D1D] text-white font-semibold text-xs">
+                                    <AvatarFallback class="bg-secondary text-white font-semibold text-xs">
                                         {{ avatarInitials }}
                                     </AvatarFallback>
                                 </Avatar>
                                 <div class="flex flex-col overflow-hidden">
-                                    <p class="text-sm font-semibold text-[#1D1D1D] truncate">
+                                    <p class="text-sm font-semibold text-secondary truncate">
                                         {{ displayName }}
                                     </p>
                                 </div>
@@ -273,7 +273,7 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                             <!-- Liens compte -->
                             <button
                                 @click="handleAccount"
-                                class="w-full px-3 py-2 text-left flex items-center text-sm font-normal rounded-xl text-neutral-600 hover:bg-[#1D1D1D]/5 hover:text-[#1D1D1D] transition-colors"
+                                class="w-full px-3 py-2 text-left flex items-center text-sm font-normal rounded-xl text-neutral-600 hover:bg-secondary/5 hover:text-secondary transition-colors"
                             >
                                 <FontAwesomeIcon v-if="icons.userCircle" :icon="icons.userCircle" class="h-4 w-4 mr-3 shrink-0" />
                                 <span>Mon compte</span>
@@ -281,7 +281,7 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
 
                             <button
                                 @click="handleOrders"
-                                class="w-full px-3 py-2 text-left flex items-center text-sm font-normal rounded-xl text-neutral-600 hover:bg-[#1D1D1D]/5 hover:text-[#1D1D1D] transition-colors"
+                                class="w-full px-3 py-2 text-left flex items-center text-sm font-normal rounded-xl text-neutral-600 hover:bg-secondary/5 hover:text-secondary transition-colors"
                             >
                                 <FontAwesomeIcon v-if="icons.box" :icon="icons.box" class="h-4 w-4 mr-3 shrink-0" />
                                 <span>Mes commandes</span>
@@ -302,14 +302,14 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                         <template v-else>
                             <button
                                 @click="handleLogin"
-                                class="w-full px-3 py-3 flex items-center justify-center text-sm font-medium rounded-2xl bg-[#1D1D1D] text-white hover:bg-[#2D2D2D] transition-colors"
+                                class="w-full px-3 py-3 flex items-center justify-center text-sm font-medium rounded-2xl bg-secondary text-white hover:bg-[#2D2D2D] transition-colors"
                             >
                                 Se connecter
                             </button>
 
                             <button
                                 @click="handleRegister"
-                                class="w-full px-3 py-2.5 text-left flex items-center justify-center text-sm font-medium rounded-xl text-[#1D1D1D] hover:bg-[#1D1D1D]/5 transition-colors mt-2"
+                                class="w-full px-3 py-2.5 text-left flex items-center justify-center text-sm font-medium rounded-xl text-secondary hover:bg-secondary/5 transition-colors mt-2"
                             >
                                 Créer un compte
                             </button>
@@ -322,22 +322,22 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
             <div class="flex items-center shrink-0">
                 <RouterLink to="/" class="flex items-center gap-2">
                     <img src="/logoInfocash.png" alt="Logo Infocash"
-                         class="w-8 h-8 md:w-36 md:h-8 object-contain" />
+                         class="w-32 h-8 md:w-36 md:h-8 object-contain" />
                 </RouterLink>
             </div>
 
             <!-- Desktop: Navigation Pill Glassmorphism (visible >= 768px) -->
             <div class="hidden md:flex flex-1 justify-center">
-                <nav class="nav-pill flex items-center gap-1 px-1 py-1 rounded-sm backdrop-blur-sm bg-white/80 border border-[rgba(32,32,32,0.08)]">
+                <nav class="nav-pill flex items-center gap-1 px-1 py-1 rounded-lg backdrop-blur-sm bg-white/80 border border-[rgba(32,32,32,0.08)]">
                     <template v-for="item in navItems" :key="item.label">
                         <!-- Lien simple -->
                         <RouterLink
                             v-if="item.type === 'link'"
                             :to="item.href"
                             :class="[
-                                'px-3 py-2 font-medium text-[#1D1D1D] rounded-sm transition-all duration-500',
-                                'hover:bg-accent-yellow/25',
-                                isActiveRoute(item.href) ? 'bg-accent-yellow font-semibold' : ''
+                                'px-3 py-2 font-medium text-secondary rounded-lg transition-all duration-500',
+                                'hover:bg-accent',
+                                isActiveRoute(item.href) ? 'bg-primary font-semibold' : ''
                             ]"
                         >
                             {{ item.label }}
@@ -349,22 +349,22 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                                 <NavigationMenuItem>
                                     <NavigationMenuTrigger
                                         :class="[
-                                            'px-3 py-2 font-medium text-primary rounded-sm transition-all duration-500 bg-transparent',
-                                            'hover:bg-accent-yellow/25 data-[state=open]:bg-accent-yellow/25',
-                                            isDropdownActive(item.items) ? 'bg-accent-yellow font-semibold' : ''
+                                            'h-full px-3 py-2.5 font-medium text-foreground rounded-lg transition-all duration-500 bg-transparent',
+                                            'hover:bg-accent data-[state=open]:bg-accent',
+                                            isDropdownActive(item.items) ? 'bg-primary font-semibold' : ''
                                         ]"
                                     >
                                         {{ item.label }}
                                     </NavigationMenuTrigger>
-                                    <NavigationMenuContent>
+                                    <NavigationMenuContent class="bg-secondary-foreground">
                                         <ul class="grid w-[400px] gap-2 p-2.5">
                                             <li v-for="subItem in item.items" :key="subItem.label">
                                                 <NavigationMenuLink as-child>
                                                     <RouterLink
                                                         :to="subItem.href"
-                                                        class="block select-none space-y-1 rounded-sm p-3 leading-none no-underline outline-none transition-colors hover:bg-accent-yellow/25"
+                                                        class="block select-none space-y-1 rounded-lg p-3 leading-none no-underline outline-none transition-colors hover:bg-accent-yellow/25"
                                                     >
-                                                        <div class="text-sm font-semibold leading-none text-[#1D1D1D]">
+                                                        <div class="text-sm font-semibold leading-none text-secondary">
                                                             {{ subItem.label }}
                                                         </div>
                                                         <p class="line-clamp-2 text-sm leading-snug text-neutral-500 mt-1.5">
@@ -392,9 +392,9 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                         <div class="hidden md:inline-block">
                             <Button
                                 v-if="authPageMode === 'login'"
-                                color="primary"
+                                variant="secondary"
                                 size="sm"
-                                rounded="sm"
+                                rounded="lg"
                                 @click="handleRegister"
                             >
                                 Inscription
@@ -402,9 +402,9 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                             <!-- Si en mode register, afficher le bouton connexion -->
                             <Button
                                 v-else
-                                color="primary"
+                                variant="secondary"
                                 size="sm"
-                                rounded="sm"
+                                rounded="lg"
                                 @click="handleLogin"
                             >
                                 Connexion
@@ -415,8 +415,8 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                     <!-- Sur les autres pages : CTA noir connexion (desktop) -->
                     <template v-else>
                         <Button
-                            variant="default"
-                            color="primary"
+                            variant="secondary"
+                            rounded="lg"
                             size="sm"
                             class="hidden md:block"
                             @click="handleLogin"
@@ -431,26 +431,26 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                     <DropdownMenu>
                         <DropdownMenuTrigger as-child>
                             <button
-                                class="hidden md:inline-flex rounded-full focus:outline-none focus:ring-2 focus:ring-[#1D1D1D]/20 focus:ring-offset-2">
-                                <Avatar class="h-10 w-10 cursor-pointer border-2 border-[#1D1D1D]/10">
+                                class="hidden md:inline-flex rounded-full focus:outline-none focus:ring-2 focus:ring-secondary/20 focus:ring-offset-2">
+                                <Avatar class="h-10 w-10 cursor-pointer border-2 border-secondary/10">
                                     <AvatarImage v-if="avatarUrl" :src="avatarUrl" :alt="displayName" />
-                                    <AvatarFallback class="bg-[#1D1D1D] text-white font-semibold text-sm">
+                                    <AvatarFallback class="bg-secondary text-white font-semibold text-sm">
                                         {{ avatarInitials }}
                                     </AvatarFallback>
                                 </Avatar>
                             </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" class="w-56 rounded-sm">
-                            <DropdownMenuLabel class="text-[#1D1D1D]">{{ displayName }}</DropdownMenuLabel>
+                        <DropdownMenuContent align="end" class="w-56 rounded-lg bg-secondary-foreground">
+                            <DropdownMenuLabel class="text-secondary">{{ displayName }}</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem @click="handleAccount" class="cursor-pointer rounded-lg">
                                 <FontAwesomeIcon v-if="icons.userCircle" :icon="icons.userCircle"
-                                    class="h-4 w-4 mr-2 text-[#1D1D1D]" />
+                                    class="h-4 w-4 mr-2 text-secondary" />
                                 Mon compte
                             </DropdownMenuItem>
                             <DropdownMenuItem @click="handleOrders" class="cursor-pointer rounded-lg">
-                                <FontAwesomeIcon v-if="icons.box" :icon="icons.box" class="h-4 w-4 mr-2 text-[#1D1D1D]" />
-                                Mes commandes
+                                <FontAwesomeIcon v-if="icons.box" :icon="icons.box" class="h-4 w-4 mr-2 text-secondary" />
+                                Mes formations
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem @click="handleLogout" class="cursor-pointer text-red-600 rounded-lg">

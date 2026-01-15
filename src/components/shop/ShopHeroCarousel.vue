@@ -180,7 +180,7 @@ onUnmounted(() => {
     <!-- Carrousel avec produits -->
     <section
         v-else
-        class="hero-carousel bg-gradient-to-br from-primary via-primary/90 to-primary/80"
+        class="hero-carousel bg-gradient-to-br from-secondary via-secondary/90 to-secondary/80"
     >
         <Carousel
             class="w-full h-full"
@@ -263,7 +263,7 @@ onUnmounted(() => {
                                     <Button
                                         size="lg"
                                         rounded="sm"
-                                        class="bg-white text-primary hover:bg-white/90 font-semibold"
+                                        class="bg-white text-secondary hover:bg-white/90 font-semibold"
                                         @click="handleViewProduct(reference)"
                                     >
                                         Découvrir

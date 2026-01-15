@@ -127,7 +127,7 @@ const handleAddToCart = (e: Event) => {
 
 <template>
   <Card
-    class="product-card group relative cursor-pointer border-2 border-primary shadow-md rounded-lg py-0 gap-0 transition-all duration-500 overflow-hidden"
+    class="product-card group relative cursor-pointer border-2 border-secondary shadow-md rounded-lg py-0 gap-0 transition-all duration-500 overflow-hidden"
     @click="handleViewDetails"
   >
     <CardContent class="p-2.5 flex flex-col gap-2.5 flex-1">
@@ -148,7 +148,7 @@ const handleAddToCart = (e: Event) => {
           <Badge
             v-if="filterTag"
             variant="outline"
-            class="border-primary bg-white rounded-lg"
+            class="border-secondary bg-white rounded-lg"
           >
             {{ filterTag.displayName }}
           </Badge>
@@ -157,7 +157,7 @@ const handleAddToCart = (e: Event) => {
           <Badge
             v-if="recoTag"
             variant="outline"
-            class="border-primary bg-white rounded-lg"
+            class="border-secondary bg-white rounded-lg"
           >
             <FontAwesomeIcon v-if="icons.tag" :icon="icons.tag" class="size-3" />
             {{ recoTag.displayName }}
@@ -165,14 +165,14 @@ const handleAddToCart = (e: Event) => {
         </div>
 
         <!-- Titre -->
-        <h3 class="font-heading font-bold text-lg leading-tight text-foreground line-clamp-2 group-hover:text-primary-foreground transition-colors duration-500">
+        <h3 class="font-heading font-bold text-lg leading-tight text-foreground line-clamp-2 group-hover:text-secondary-foreground transition-colors duration-500">
           {{ decodedName }}
         </h3>
 
         <!-- Description -->
         <p
           v-if="shortDescription"
-          class="text-muted-foreground text-sm leading-relaxed line-clamp-2 group-hover:text-primary-foreground/80 transition-colors duration-500"
+          class="text-muted-foreground text-sm leading-relaxed line-clamp-2 group-hover:text-secondary-foreground/80 transition-colors duration-500"
         >
           {{ shortDescription }}
         </p>
@@ -181,7 +181,7 @@ const handleAddToCart = (e: Event) => {
 
     <CardFooter class="flex-col items-stretch gap-2.5 px-2.5 pb-2.5 mt-auto">
       <!-- Prix -->
-      <p class="font-bold text-xl text-primary group-hover:text-primary-foreground transition-colors duration-500">
+      <p class="font-bold text-xl text-secondary group-hover:text-secondary-foreground transition-colors duration-500">
         {{ priceDisplay }}
       </p>
 
@@ -221,8 +221,8 @@ const handleAddToCart = (e: Event) => {
   inset: 0;
   background: linear-gradient(
     145deg,
-    var(--primary) 31%,
-    color-mix(in srgb, var(--primary) 75%, transparent) 95%
+    var(--secondary) 31%,
+    color-mix(in srgb, var(--secondary) 75%, transparent) 95%
   );
   opacity: 0;
   transition: opacity 500ms ease;

@@ -59,15 +59,15 @@ const activeTab = ref('profile')
 
                 <!-- Tabs Navigation -->
                 <Tabs v-model="activeTab" class="w-full">
-                    <TabsList class="grid w-full grid-cols-3">
-                        <TabsTrigger value="profile">
-                            <span style="font-family: Roboto, sans-serif;">Profil</span>
+                    <TabsList class="grid w-full grid-cols-3 rounded-lg ">
+                        <TabsTrigger value="profile" class="rounded-lg">
+                            <span style="font-family: Roboto, sans-serif;" >Profil</span>
                         </TabsTrigger>
-                        <TabsTrigger value="subscription">
-                            <span style="font-family: Roboto, sans-serif;">Abonnements</span>
+                        <TabsTrigger value="subscription" class="rounded-lg">
+                            <span style="font-family: Roboto, sans-serif;" >Abonnements</span>
                         </TabsTrigger>
-                        <TabsTrigger value="purchases">
-                            <span style="font-family: Roboto, sans-serif;">Mes achats</span>
+                        <TabsTrigger value="purchases" class="rounded-lg">
+                            <span style="font-family: Roboto, sans-serif;" >Mes achats</span>
                         </TabsTrigger>
                     </TabsList>
 

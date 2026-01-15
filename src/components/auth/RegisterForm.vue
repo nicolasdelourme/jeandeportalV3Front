@@ -107,8 +107,8 @@ const passwordStrength = computed(() => {
     if (score < 60) return {
         score,
         label: 'Faible',
-        barColor: 'var(--color-primary)',
-        bgColor: 'rgba(var(--color-primary-rgb), 0.2)'
+        barColor: 'var(--color-secondary)',
+        bgColor: 'rgba(var(--color-secondary-rgb), 0.2)'
     }
     if (score < 80) return {
         score,
@@ -402,7 +402,7 @@ const onSubmit = handleSubmit((values) => {
         </FormField>
 
         <!-- Bouton de soumission -->
-        <Button type="submit" color="primary" class="w-full" size="lg" :disabled="isSubmitting">
+        <Button type="submit" variant="secondary" rounded="lg" class="w-full" size="lg" :disabled="isSubmitting">
             <span class="font-bold" style="font-family: Roboto, sans-serif;">
                 {{ isSubmitting ? 'Chargement...' : 'Créer mon compte' }}
             </span>
@@ -412,9 +412,9 @@ const onSubmit = handleSubmit((values) => {
         <div class="pt-6 border-t border-neutral-200">
             <p class="text-xs text-neutral-500 text-center" style="font-family: Roboto, sans-serif;">
                 En créant un compte, vous acceptez nos
-                <a href="#" class="text-primary hover:underline">Conditions Générales d'Utilisation</a>
+                <a href="#" class="text-secondary hover:underline">Conditions Générales d'Utilisation</a>
                 et notre
-                <a href="#" class="text-primary hover:underline">Politique de Confidentialité</a>
+                <a href="#" class="text-secondary hover:underline">Politique de Confidentialité</a>
             </p>
         </div>
     </form>

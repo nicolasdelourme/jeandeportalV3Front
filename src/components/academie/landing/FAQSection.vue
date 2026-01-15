@@ -18,7 +18,7 @@ interface FAQItem {
 const faqItems: FAQItem[] = [
   {
     question: 'Comment fonctionne l\'abonnement ?',
-    answer: 'L\'abonnement est mensuel et sans engagement. Vous choisissez votre formule (Essentiel, Standard ou Premium) et sélectionnez les thématiques qui vous intéressent. Chaque semaine, vous recevez les contenus correspondants : newsletter le lundi, tutoriel vidéo le mardi, et consultation live le jeudi.',
+    answer: 'L\'abonnement est mensuel ou annuel, sans engagement. Vous choisissez votre formule (Essentiel, Standard ou Premium) et sélectionnez les formations qui vous intéressent. Chaque semaine, vous recevez les contenus correspondants : newsletter le lundi, tutoriel vidéo le mardi, et consultation live le jeudi.',
   },
   {
     question: 'Puis-je changer de formule à tout moment ?',
@@ -26,15 +26,15 @@ const faqItems: FAQItem[] = [
   },
   {
     question: 'Comment fonctionnent les étoiles ?',
-    answer: 'Les étoiles sont créditées automatiquement chaque mois selon votre formule : 1 pour Essentiel, 5 pour Standard, 10 pour Premium. Elles s\'accumulent et vous permettent de débloquer des récompenses exclusives une fois les paliers atteints (50, 100, 200 ou 500 étoiles).',
+    answer: 'Les étoiles sont créditées automatiquement chaque mois selon votre formule : 1 pour Essentiel, 5 pour Standard, 10 pour Premium. Elles s\'accumulent et vous permettent de débloquer des récompenses exclusives : question prioritaire (10★), dossier spécial (30★), question confidentielle (50★), tiers de confiance (100★), bonus mystère (200★).',
   },
   {
     question: 'Qu\'est-ce que le carton d\'invitation ?',
-    answer: 'Le carton d\'invitation est un avantage exclusif Premium. Chaque trimestre, vous recevez un code unique à partager avec un proche. Ce code lui permet de bénéficier d\'un mois d\'essai gratuit de la formule Essentiel. Si cette personne s\'abonne ensuite, vous recevez 25 étoiles bonus.',
+    answer: 'Le carton d\'invitation vous permet de partager un code unique avec un proche. Ce code lui offre un mois d\'essai gratuit de la formule Essentiel. Si cette personne s\'abonne ensuite, vous recevez 25 étoiles bonus. La fréquence dépend de votre formule : occasionnel (Essentiel), 2/an (Standard) ou 4/an (Premium).',
   },
   {
     question: 'Comment accéder aux replays des consultations ?',
-    answer: 'Tous les abonnés ont accès aux replays des consultations live de leurs thématiques. Les replays sont disponibles sous 24h après le live et restent accessibles tant que votre abonnement est actif. Vous les retrouvez dans votre espace membre, classés par thématique et date.',
+    answer: 'Tous les abonnés ont accès aux replays des consultations live de leurs formations. Les replays sont disponibles sous 24h après le live et restent accessibles tant que votre abonnement est actif. Vous les retrouvez dans votre espace membre, classés par formation et date.',
   },
   {
     question: 'Puis-je annuler mon abonnement ?',
@@ -80,7 +80,7 @@ const faqItems: FAQItem[] = [
         </p>
         <a
           href="mailto:contact@infocash.fr"
-          class="text-primary font-semibold hover:underline"
+          class="text-secondary font-semibold hover:underline"
         >
           Contactez-nous
         </a>

@@ -1,10 +1,9 @@
 <script setup lang="ts">
 /**
- * StarsRewardSection V4 - Style gaming fond sombre + animation auto scroll
- * Barre de progression avec paliers visuels
+ * StarsRewardSection V4 - Système d'étoiles et récompenses
+ * Style Figma avec présentation détaillée des récompenses
  */
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
-import { Badge } from '@/components/ui/badge'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
@@ -17,6 +16,8 @@ const icons = computed(() => ({
   handshake: byPrefixAndName.fas?.['handshake'],
   gift: byPrefixAndName.fas?.['gift'],
   crown: byPrefixAndName.fas?.['crown'],
+  check: byPrefixAndName.fas?.['check'],
+  lock: byPrefixAndName.fas?.['lock'],
 }))
 
 const getIconDef = (key: keyof typeof icons.value): IconDefinition | object => {
@@ -26,15 +27,41 @@ const getIconDef = (key: keyof typeof icons.value): IconDefinition | object => {
 interface Reward {
   stars: number
   title: string
+  description: string
   icon: 'question' | 'fileLines' | 'userSecret' | 'handshake' | 'gift'
 }
 
 const rewards: Reward[] = [
-  { stars: 10, title: 'Question prioritaire', icon: 'question' },
-  { stars: 30, title: 'Dossier spécial', icon: 'fileLines' },
-  { stars: 50, title: 'Question confidentielle', icon: 'userSecret' },
-  { stars: 100, title: 'Tiers de confiance', icon: 'handshake' },
-  { stars: 200, title: 'Bonus mystère', icon: 'gift' },
+  {
+    stars: 10,
+    title: 'Question prioritaire',
+    description: 'Posez votre question en consultation et passez en priorité pour une réponse détaillée.',
+    icon: 'question',
+  },
+  {
+    stars: 30,
+    title: 'Dossier spécial',
+    description: 'Accédez à un dossier approfondi sur un sujet clé : fiscalité, stratégie, opportunités.',
+    icon: 'fileLines',
+  },
+  {
+    stars: 50,
+    title: 'Question confidentielle',
+    description: 'Posez une question privée par email avec une réponse personnalisée sous 48h.',
+    icon: 'userSecret',
+  },
+  {
+    stars: 100,
+    title: 'Tiers de confiance',
+    description: 'Accès à notre réseau de partenaires vérifiés : courtiers, conseillers, experts.',
+    icon: 'handshake',
+  },
+  {
+    stars: 200,
+    title: 'Bonus mystère',
+    description: 'Débloquez l\'accès complet à la formation Bonus avec tous ses contenus exclusifs.',
+    icon: 'gift',
+  },
 ]
 
 const subscriptions = [
@@ -50,6 +77,7 @@ const currentMonth = ref(0)
 const isPlaying = ref(false)
 const hasPlayed = ref(false)
 const animationInterval = ref<ReturnType<typeof setInterval> | null>(null)
+const highlightedRewards = ref<Set<number>>(new Set())
 
 // Calculs
 const selectedSubscription = computed(() => subscriptions.find(s => s.id === selectedSub.value)!)
@@ -69,7 +97,7 @@ const startAnimation = () => {
       return
     }
     currentMonth.value++
-  }, 500)
+  }, 400)
 }
 
 const stopAnimation = () => {
@@ -89,9 +117,29 @@ const resetAnimation = () => {
 // Reset et relance quand on change d'abonnement
 watch(selectedSub, () => {
   resetAnimation()
+  highlightedRewards.value.clear()
   setTimeout(() => {
     startAnimation()
   }, 300)
+})
+
+// Highlight bref quand on passe un palier (un seul à la fois)
+let highlightTimeout: ReturnType<typeof setTimeout> | null = null
+
+watch(currentStars, (newStars, oldStars) => {
+  rewards.forEach((reward) => {
+    if (newStars >= reward.stars && oldStars < reward.stars) {
+      // Clear previous highlight
+      highlightedRewards.value.clear()
+      if (highlightTimeout) clearTimeout(highlightTimeout)
+
+      // Add new highlight
+      highlightedRewards.value.add(reward.stars)
+      highlightTimeout = setTimeout(() => {
+        highlightedRewards.value.delete(reward.stars)
+      }, 1000)
+    }
+  })
 })
 
 // IntersectionObserver pour démarrer au scroll
@@ -128,15 +176,10 @@ const getRewardPosition = (stars: number) => (stars / 200) * 100
 </script>
 
 <template>
-  <section ref="sectionRef" class="py-16 md:py-24 bg-primary text-white">
+  <section ref="sectionRef" class="py-16 md:py-24 bg-secondary text-white">
     <div class="max-w-5xl mx-auto px-4 md:px-6 lg:px-8">
-      <!-- Version indicator -->
-      <div class="text-center mb-4">
-        <Badge variant="outline" class="text-xs bg-white text-primary">VERSION 4 - Gaming dark + auto scroll</Badge>
-      </div>
-
       <!-- Header -->
-      <div class="text-center mb-10">
+      <div class="text-center mb-8">
         <h2 class="font-heading font-bold text-2xl md:text-3xl text-white mb-4">
           Gagnez des étoiles, débloquez des récompenses
         </h2>
@@ -145,56 +188,57 @@ const getRewardPosition = (stars: number) => (stars / 200) * 100
         </p>
       </div>
 
-      <!-- Sélecteur d'offre -->
-      <div class="flex flex-wrap justify-center gap-3 mb-10">
+      <!-- Sélecteur d'offre (style Figma) -->
+      <div class="flex flex-wrap justify-center gap-3 mb-8">
         <button
           v-for="sub in subscriptions"
           :key="sub.id"
           :class="[
-            'flex items-center gap-3 px-5 py-3 rounded-sm transition-all duration-300',
+            'flex items-center gap-3 px-5 py-3 rounded-lg transition-all duration-300',
             selectedSub === sub.id
-              ? 'bg-accent-yellow text-primary shadow-lg'
-              : 'bg-white/10 text-white hover:bg-white/20',
+              ? 'bg-primary text-secondary border-2 border-primary shadow-lg'
+              : 'bg-white/10 text-white border-2 border-transparent hover:bg-white/20',
           ]"
           @click="selectedSub = sub.id"
         >
           <div class="flex items-center gap-1">
-            <FontAwesomeIcon v-if="icons.star" :icon="icons.star" :class="selectedSub === sub.id ? 'text-primary' : 'text-accent-yellow'" class="size-4" />
+            <FontAwesomeIcon
+              v-if="icons.star"
+              :icon="icons.star"
+              :class="selectedSub === sub.id ? 'text-secondary' : 'text-primary'"
+              class="size-4"
+            />
             <span class="font-bold">+{{ sub.stars }}</span>
           </div>
-          <div class="text-left">
-            <p class="font-semibold text-sm">{{ sub.name }}</p>
-            <p :class="['text-xs', selectedSub === sub.id ? 'text-primary/70' : 'text-white/50']">
-              {{ sub.monthsTo200 }} mois pour 200★
-            </p>
-          </div>
+          <span class="font-semibold text-sm">{{ sub.name }}</span>
           <FontAwesomeIcon
             v-if="sub.id === 'premium' && icons.crown"
             :icon="icons.crown"
-            :class="['size-4 ml-1', selectedSub === sub.id ? 'text-primary' : 'text-accent-yellow']"
+            :class="['size-4', selectedSub === sub.id ? 'text-secondary' : 'text-primary']"
           />
         </button>
       </div>
 
-      <!-- Compteur de mois et étoiles -->
-      <div class="flex justify-center gap-8 mb-8">
+      <!-- Compteur mois = étoiles -->
+      <div class="flex items-center justify-center gap-4 mb-8">
         <div class="text-center">
-          <p class="font-heading font-bold text-4xl text-white">{{ currentMonth }}</p>
+          <p class="font-heading font-bold text-4xl md:text-5xl text-white">{{ currentMonth }}</p>
           <p class="text-white/60 text-sm">mois</p>
         </div>
+        <p class="font-heading font-bold text-4xl md:text-5xl text-white">=</p>
         <div class="text-center">
-          <p class="font-heading font-bold text-4xl text-accent-yellow">{{ currentStars }}</p>
+          <p class="font-heading font-bold text-4xl md:text-5xl text-primary">{{ currentStars }}</p>
           <p class="text-white/60 text-sm">étoiles</p>
         </div>
       </div>
 
       <!-- Barre de progression -->
-      <div class="relative mb-6">
+      <div class="relative mb-12">
         <!-- Barre de fond -->
         <div class="h-4 bg-white/20 rounded-full overflow-hidden">
           <!-- Progression -->
           <div
-            class="h-full bg-gradient-to-r from-accent-yellow/80 to-accent-yellow rounded-full transition-all duration-300"
+            class="h-full bg-gradient-to-r from-primary/80 to-primary rounded-full transition-all duration-300"
             :style="{ width: `${progressPercent}%` }"
           />
         </div>
@@ -208,56 +252,67 @@ const getRewardPosition = (stars: number) => (stars / 200) * 100
         >
           <div
             :class="[
-              'w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-300',
+              'w-9 h-9 rounded-full border-2 flex items-center justify-center transition-all duration-300',
               currentStars >= reward.stars
-                ? 'bg-accent-yellow border-accent-yellow scale-110'
-                : 'bg-primary border-white/40',
+                ? 'bg-primary border-primary'
+                : 'bg-secondary border-primary',
             ]"
           >
             <FontAwesomeIcon
               v-if="icons[reward.icon]"
               :icon="getIconDef(reward.icon)"
               :class="[
-                'size-3.5',
-                currentStars >= reward.stars ? 'text-primary' : 'text-white/40',
+                'size-4',
+                currentStars >= reward.stars ? 'text-secondary' : 'text-primary',
               ]"
             />
           </div>
           <!-- Label étoiles -->
-          <p
-            :class="[
-              'absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs font-bold whitespace-nowrap',
-              currentStars >= reward.stars ? 'text-accent-yellow' : 'text-white/40',
-            ]"
-          >
+          <p class="absolute top-11 left-1/2 -translate-x-1/2 text-xs font-bold whitespace-nowrap text-primary">
             {{ reward.stars }}★
           </p>
         </div>
       </div>
 
-      <!-- Légende des récompenses -->
-      <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 mt-12 mb-8">
-        <div
-          v-for="reward in rewards"
-          :key="reward.stars"
-          :class="[
-            'text-center p-3 rounded-sm transition-all duration-300',
-            currentStars >= reward.stars ? 'bg-accent-yellow/20' : 'bg-white/5',
-          ]"
-        >
-          <p :class="['font-semibold text-xs', currentStars >= reward.stars ? 'text-accent-yellow' : 'text-white/40']">
-            {{ reward.title }}
-          </p>
+      <!-- Section détails des récompenses (statique) -->
+      <div class="mt-10">
+        <h3 class="font-heading font-bold text-lg md:text-xl text-white text-center mb-6">
+          Ce que vous pouvez débloquer
+        </h3>
+
+        <div class="space-y-3">
+          <div
+            v-for="reward in rewards"
+            :key="reward.stars"
+            :class="[
+              'flex items-center gap-4 p-4 rounded-lg transition-all duration-700 ease-in-out',
+              highlightedRewards.has(reward.stars)
+                ? 'bg-primary/25 shadow-[0_0_20px_rgba(255,221,0,0.3)]'
+                : 'bg-white/5',
+            ]"
+          >
+            <!-- Badge étoiles -->
+            <div class="w-14 h-10 bg-primary/20 rounded-lg flex items-center justify-center shrink-0">
+              <span class="font-bold text-sm text-primary">{{ reward.stars }}★</span>
+            </div>
+
+            <!-- Icône -->
+            <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
+              <FontAwesomeIcon
+                v-if="icons[reward.icon]"
+                :icon="getIconDef(reward.icon)"
+                class="size-4 text-secondary"
+              />
+            </div>
+
+            <!-- Contenu -->
+            <div class="flex-1 min-w-0">
+              <h4 class="font-semibold text-white text-sm">{{ reward.title }}</h4>
+              <p class="text-white/60 text-xs leading-relaxed">{{ reward.description }}</p>
+            </div>
+          </div>
         </div>
       </div>
-
-      <!-- Message de fin -->
-      <p
-        v-if="currentStars >= 200"
-        class="text-center text-accent-yellow font-semibold mt-6"
-      >
-        🎉 Toutes les récompenses débloquées en {{ currentMonth }} mois avec {{ selectedSubscription.name }} !
-      </p>
     </div>
   </section>
 </template>

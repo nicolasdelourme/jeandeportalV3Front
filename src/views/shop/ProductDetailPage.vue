@@ -17,6 +17,9 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { AspectRatio } from '@/components/ui/aspect-ratio'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import FormatSelector from '@/components/shop/FormatSelector.vue'
 import StickyCart from '@/components/shop/StickyCart.vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -267,23 +270,48 @@ const displayTags = computed((): ParsedTag[] => {
   <DefaultLayout>
     <div class="min-h-screen bg-background">
       <!-- État de chargement -->
-      <div v-if="shopStore.isLoading" class="flex items-center justify-center min-h-[60vh]">
-        <div class="text-center">
-          <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary/20 border-t-primary" />
-          <p class="mt-4 text-muted-foreground">Chargement du produit...</p>
+      <div v-if="shopStore.isLoading" class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-10">
+        <div class="grid grid-cols-1 lg:grid-cols-[280px_1fr_340px] gap-6 lg:gap-10">
+          <!-- Skeleton image -->
+          <div>
+            <Skeleton class="w-full aspect-[2/3] rounded-lg" />
+            <div class="hidden lg:flex gap-2 mt-3">
+              <Skeleton v-for="i in 4" :key="i" class="w-14 h-14 rounded-lg" />
+            </div>
+          </div>
+          <!-- Skeleton contenu -->
+          <div class="space-y-6">
+            <Skeleton class="h-6 w-24 rounded-sm" />
+            <Skeleton class="h-10 w-3/4" />
+            <Skeleton class="h-4 w-32" />
+            <div class="space-y-2">
+              <Skeleton class="h-4 w-full" />
+              <Skeleton class="h-4 w-full" />
+              <Skeleton class="h-4 w-2/3" />
+            </div>
+          </div>
+          <!-- Skeleton sidebar -->
+          <div>
+            <Skeleton class="h-64 w-full rounded-lg" />
+          </div>
         </div>
       </div>
 
       <!-- Produit non trouvé -->
       <div v-else-if="!reference" class="flex items-center justify-center min-h-[60vh]">
-        <div class="text-center max-w-md mx-auto px-4">
-          <div class="bg-destructive/10 border border-destructive/20 rounded-lg p-6">
-            <p class="text-destructive font-semibold mb-2">Produit introuvable</p>
-            <p class="text-muted-foreground text-sm mb-4">Ce produit n'existe pas ou a été supprimé.</p>
-            <Button @click="handleBack" variant="outline" size="sm">
-              Retour à la boutique
-            </Button>
-          </div>
+        <div class="max-w-md mx-auto px-4">
+          <Alert variant="destructive">
+            <FontAwesomeIcon v-if="icons.shield" :icon="icons.shield" class="size-4" />
+            <AlertTitle>Produit introuvable</AlertTitle>
+            <AlertDescription class="mt-2">
+              Ce produit n'existe pas ou a été supprimé.
+              <div class="mt-4">
+                <Button @click="handleBack" variant="outline" size="sm">
+                  Retour à la boutique
+                </Button>
+              </div>
+            </AlertDescription>
+          </Alert>
         </div>
       </div>
 
@@ -403,7 +431,7 @@ const displayTags = computed((): ParsedTag[] => {
 
               <!-- Actions secondaires (Favoris + Partage) -->
               <div class="flex gap-3 pt-4">
-                <Button @click="toggleFavorite" variant="outline" size="sm" class="gap-2 rounded-lg">
+                <Button @click="toggleFavorite" variant="outline" color="secondary" size="sm" class="gap-2 rounded-lg hover:bg-secondary hover:border-secondary">
                   <FontAwesomeIcon
                     v-if="isFavorite && icons.heartSolid"
                     :icon="icons.heartSolid"
@@ -416,16 +444,19 @@ const displayTags = computed((): ParsedTag[] => {
                   />
                   {{ isFavorite ? 'Favori' : 'Ajouter aux favoris' }}
                 </Button>
-                <Button @click="handleShare" variant="outline" size="sm" class="gap-2 rounded-lg relative">
-                  <FontAwesomeIcon v-if="icons.share" :icon="icons.share" class="w-4 h-4" />
-                  Partager
-                  <span
-                    v-if="showShareMenu"
-                    class="absolute -bottom-8 left-0 bg-green-600 text-white text-xs px-2 py-1 rounded-lg whitespace-nowrap z-10"
-                  >
-                    Lien copié !
-                  </span>
-                </Button>
+                <TooltipProvider>
+                  <Tooltip :open="showShareMenu">
+                    <TooltipTrigger as-child>
+                      <Button @click="handleShare" variant="outline" color="secondary" size="sm" class="gap-2 rounded-lg hover:bg-secondary hover:border-secondary">
+                        <FontAwesomeIcon v-if="icons.share" :icon="icons.share" class="w-4 h-4" />
+                        Partager
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" class="bg-green-600 text-white border-green-600">
+                      Lien copié !
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
             </div>
 
@@ -499,9 +530,10 @@ const displayTags = computed((): ParsedTag[] => {
                       @click="handleAddToCart"
                       :disabled="!selectedPrice"
                       variant="outline"
+                      color="secondary"
                       size="lg"
                       rounded="lg"
-                      class="w-full justify-center"
+                      class="w-full justify-center hover:bg-secondary hover:border-secondary"
                     >
                       <FontAwesomeIcon
                         v-if="isInCart && icons.check"

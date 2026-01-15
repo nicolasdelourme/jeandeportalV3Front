@@ -86,7 +86,7 @@ const onSubmit = handleSubmit((values) => {
         </div>
 
         <!-- Bouton de soumission -->
-        <Button type="submit" color="primary" class="w-full" size="lg" :disabled="isSubmitting">
+        <Button type="submit" variant="secondary" rounded="lg" class="w-full" size="lg" :disabled="isSubmitting">
             <span class="font-bold text-sm" style="font-family: Roboto, sans-serif;">
                 {{ isSubmitting ? 'Envoi en cours...' : 'Envoyer le lien de réinitialisation' }}
             </span>
