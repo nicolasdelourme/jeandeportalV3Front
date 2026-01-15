@@ -311,7 +311,7 @@ function goToCart() {
             <FontAwesomeIcon
               v-if="icons.creditCard"
               :icon="icons.creditCard"
-              class="h-10 w-10 text-primary"
+              class="h-10 w-10 text-secondary"
             />
             <h1 class="text-4xl md:text-5xl font-bold text-neutral-800" style="font-family: Roboto, sans-serif;">
               Finaliser ma commande

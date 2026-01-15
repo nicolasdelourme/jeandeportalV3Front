@@ -70,13 +70,13 @@ function formatPrice(price: number): string {
         <FontAwesomeIcon
           v-if="icons.shoppingCart"
           :icon="icons.shoppingCart"
-          class="h-5 w-5 text-[#1a2d40]"
+          class="h-5 w-5 text-consultations-nd"
         />
         <!-- Badge avec nombre d'articles -->
         <Badge
           v-if="cartStore.itemCount > 0"
           variant="default"
-          color="primary"
+          color="secondary"
           class="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
         >
           {{ cartStore.itemCount > 99 ? '99+' : cartStore.itemCount }}
@@ -122,7 +122,7 @@ function formatPrice(price: number): string {
             class="flex gap-3 p-2 rounded-lg hover:bg-neutral-50 transition-colors"
           >
             <!-- Image avec badge quantité -->
-            <div class="w-16 h-16 flex-shrink-0 bg-neutral-100 rounded-md overflow-hidden relative">
+            <div class="w-16 h-16 shrink-0 bg-neutral-100 rounded-md overflow-hidden relative">
               <img
                 v-if="item.images && item.images[0]"
                 :src="item.images[0]"
@@ -146,7 +146,7 @@ function formatPrice(price: number): string {
                 {{ item.name }}
               </p>
               <div class="flex items-center gap-2 mt-1">
-                <p class="font-semibold text-sm text-primary">
+                <p class="font-semibold text-sm text-secondary">
                   {{ formatPrice(item.price) }}
                 </p>
               </div>
@@ -155,7 +155,7 @@ function formatPrice(price: number): string {
             <!-- Bouton supprimer -->
             <button
               @click="handleRemoveItem(item.itemId)"
-              class="flex-shrink-0 text-neutral-400 hover:text-red-600 transition-colors p-1"
+              class="shrink-0 text-neutral-400 hover:text-red-600 transition-colors p-1"
               title="Retirer du panier"
               :disabled="cartStore.isLoading"
             >
@@ -174,7 +174,7 @@ function formatPrice(price: number): string {
         <!-- Total -->
         <div class="flex items-center justify-between font-semibold text-lg">
           <span style="font-family: Roboto, sans-serif;">Total</span>
-          <span class="text-primary">{{ formatPrice(cartStore.subtotal) }}</span>
+          <span class="text-secondary">{{ formatPrice(cartStore.subtotal) }}</span>
         </div>
 
         <!-- CTAs -->
@@ -197,9 +197,10 @@ function formatPrice(price: number): string {
           <Button
             @click="goToCart"
             variant="outline"
+            color="secondary"
             size="lg"
             rounded="lg"
-            class="w-full"
+            class="w-full hover:bg-secondary hover:border-secondary"
           >
             <FontAwesomeIcon
               v-if="icons.eye"

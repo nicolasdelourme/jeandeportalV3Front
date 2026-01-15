@@ -91,7 +91,7 @@ function goToCheckout() {
               <FontAwesomeIcon
                 v-if="icons.shoppingCart"
                 :icon="icons.shoppingCart"
-                class="h-10 w-10 text-primary"
+                class="h-10 w-10 text-secondary"
               />
               <h1 class="text-4xl md:text-5xl font-bold text-neutral-800" style="font-family: Roboto, sans-serif;">
                 Mon panier
@@ -121,7 +121,7 @@ function goToCheckout() {
             />
           </template>
           <template #action>
-            <Button @click="goToShop" variant="default" color="primary" size="lg">
+            <Button @click="goToShop" variant="secondary" size="lg">
               Découvrir la boutique
             </Button>
           </template>
@@ -172,7 +172,7 @@ function goToCheckout() {
                       {{ item.name }}
                     </h3>
                     <div class="flex items-center gap-2 mt-2">
-                      <p class="font-bold text-lg text-primary">
+                      <p class="font-bold text-lg text-secondary">
                         {{ formatPrice(item.price) }}
                       </p>
                     </div>
@@ -226,7 +226,7 @@ function goToCheckout() {
               <!-- Total TTC -->
               <div class="flex justify-between text-lg font-bold">
                 <span>Total TTC</span>
-                <span class="text-primary">{{ formatPrice(cartStore.subtotal) }}</span>
+                <span class="text-secondary">{{ formatPrice(cartStore.subtotal) }}</span>
               </div>
 
               <p class="text-xs text-neutral-500">
@@ -253,8 +253,9 @@ function goToCheckout() {
             <Button
               @click="goToShop"
               variant="outline"
+              color="secondary"
               rounded="lg"
-              class="w-full mt-3"
+              class="w-full mt-3 hover:bg-secondary hover:border-secondary"
             >
               <FontAwesomeIcon
                 v-if="icons.arrowLeft"
