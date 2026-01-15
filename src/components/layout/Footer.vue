@@ -71,9 +71,9 @@ const navigate = (path: string) => {
                             class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer">
                             Notre Maison
                         </a>
-                        <a @click="navigate('/consultations-nicolas-delourme')"
+                        <a @click="navigate('/academie')"
                             class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer">
-                            Consultations Privées
+                            Académie
                         </a>
                         <a @click="navigate('/boutique')"
                             class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer">
@@ -145,9 +145,9 @@ const navigate = (path: string) => {
                                 class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer py-1">
                                 Notre Maison
                             </a>
-                            <a @click="navigate('/consultations-nicolas-delourme')"
+                            <a @click="navigate('/academie')"
                                 class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer py-1">
-                                Consultations Privées
+                                Académie
                             </a>
                             <a @click="navigate('/boutique')"
                                 class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer py-1">

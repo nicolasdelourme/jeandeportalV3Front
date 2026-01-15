@@ -95,14 +95,6 @@ const navItems = [
             { label: 'Catalogue', href: '/academie/catalogue', description: 'Tous les contenus disponibles' },
         ]
     },
-    {
-        label: 'Consultations Privées',
-        type: 'dropdown',
-        items: [
-            { label: 'À propos', href: '/consultations-nicolas-delourme/a-propos', description: 'Découvrez nos consultations exclusives' },
-            { label: 'Catalogue', href: '/consultations-nicolas-delourme', description: 'Explorez toutes les consultations disponibles' },
-        ]
-    },
     { label: 'Boutique', href: '/boutique', type: 'link' },
 ] as const
 
