@@ -5,6 +5,7 @@
  * Inclut la timeline du rythme hebdomadaire
  */
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -88,8 +89,14 @@ const contentTypes = [
   { day: 'Jeudi', title: 'Consultation', icon: 'comments' as const },
 ]
 
+const router = useRouter()
+
 const scrollToPricing = () => {
   emit('scrollToPricing')
+}
+
+const goToFormation = (formationId: string) => {
+  router.push(`/academie/formation/${formationId}`)
 }
 </script>
 
@@ -133,6 +140,7 @@ const scrollToPricing = () => {
           v-for="formation in formations"
           :key="formation.id"
           class="relative overflow-hidden cursor-pointer group"
+          @click="goToFormation(formation.id)"
         >
           <!-- Card avec couleur de fond -->
           <div
