@@ -17,6 +17,7 @@ import ShopHeroCarousel from '@/components/shop/ShopHeroCarousel.vue'
 import ShopFilters from '@/components/shop/ShopFilters.vue'
 import EditorialGrid from '@/components/shop/EditorialGrid.vue'
 import type { ShopReference } from '@/types/shop-api.types'
+import { decodeHTMLEntities } from '@/types/shop-api.types'
 import { CartError } from '@/types/cart.types'
 
 const router = useRouter()
@@ -51,7 +52,7 @@ const handleAddToCart = async (reference: ShopReference) => {
     }
     await cartStore.addItem(Number(productId))
 
-    toast.success(`${reference.name} ajouté au panier`)
+    toast.success(`${decodeHTMLEntities(reference.name)} ajouté au panier`)
   } catch (error) {
     if (error instanceof CartError) {
       toast.error(error.message)
