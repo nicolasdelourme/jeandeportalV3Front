@@ -66,14 +66,14 @@ const handleValueChange = (value: string | number | bigint | boolean | Record<st
 <template>
   <div class="flex items-center gap-2">
     <!-- Icône -->
-    <FontAwesomeIcon v-if="icons.sort" :icon="icons.sort" class="w-5 h-5 text-primary" />
+    <FontAwesomeIcon v-if="icons.sort" :icon="icons.sort" class="w-5 h-5 text-secondary" />
 
     <!-- Select shadcn-vue -->
     <Select :model-value="activeSortOption" @update:model-value="handleValueChange">
       <SelectTrigger class="w-[180px]">
         <SelectValue :placeholder="activeLabel" />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent class="bg-secondary-foreground">
         <SelectItem
           v-for="option in sortOptions"
           :key="option.value"

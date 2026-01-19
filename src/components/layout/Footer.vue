@@ -46,17 +46,17 @@ const navigate = (path: string) => {
                     <div class="flex flex-col gap-4 w-full">
                         <div class="flex flex-col gap-1">
                             <h3 class="font-bold text-xl text-white leading-7" style="font-family: Roboto, sans-serif;">
-                                Éditions Jean de Portal
+                                Infocash Académie
                             </h3>
                             <p class="font-medium text-sm text-[#6c757d] leading-4"
                                 style="font-family: Roboto, sans-serif;">
-                                L'expertise patrimoniale de référence
+                                L'éducation financière premium
                             </p>
                         </div>
                         <p class="font-normal text-[14px] text-[#b0bec5] leading-[22px]"
                             style="font-family: Roboto, sans-serif;">
-                            Depuis plus de 15 ans, nous accompagnons les investisseurs avertis avec des publications de
-                            référence et des consultations privées exclusives.
+                            Formations, tutoriels et consultations exclusives pour maîtriser vos investissements
+                            et construire votre liberté financière.
                         </p>
                     </div>
                 </div>
@@ -69,7 +69,7 @@ const navigate = (path: string) => {
                     <div class="flex flex-col gap-2 text-[14px] leading-5" style="font-family: Roboto, sans-serif;">
                         <a @click="navigate('/')"
                             class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer">
-                            Notre Maison
+                            Accueil
                         </a>
                         <a @click="navigate('/academie')"
                             class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer">
@@ -79,25 +79,26 @@ const navigate = (path: string) => {
                             class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer">
                             Boutique
                         </a>
-                        <a href="#" class="font-normal text-[#b0bec5] hover:text-white transition-colors">
-                            Contact
+                        <a @click="navigate('/notre-maison')"
+                            class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer">
+                            Notre Maison
                         </a>
                     </div>
                 </div>
 
-                <!-- Colonne 3 : Consultations avec YouTube -->
+                <!-- Colonne 3 : YouTube -->
                 <div class="flex-1 flex flex-col gap-3">
                     <h4 class="font-semibold text-[18px] text-white leading-6" style="font-family: Roboto, sans-serif;">
-                        Suivez nos consultations
+                        Suivez-nous
                     </h4>
                     <div class="flex flex-col gap-6">
                         <p class="font-normal text-[14px] text-[#b0bec5] leading-[22px]"
                             style="font-family: Roboto, sans-serif;">
-                            Retrouvez tous nos lives et replays de consultations exclusives sur YouTube
+                            Retrouvez tous nos contenus gratuits sur la chaîne YouTube Infocash
                         </p>
 
                         <!-- Lien YouTube -->
-                        <a href="https://youtube.com" target="_blank" rel="noopener noreferrer">
+                        <a href="https://www.youtube.com/@infocash" target="_blank" rel="noopener noreferrer">
                             <FontAwesomeIcon v-if="icons.youtube" :icon="icons.youtube"
                                 class="fa-2xl w-6 h-6 text-white hover:text-primary transition-colors" />
                         </a>
@@ -117,17 +118,17 @@ const navigate = (path: string) => {
                         <div class="flex flex-col gap-3">
                             <div class="flex flex-col gap-1">
                                 <h3 class="font-bold text-lg text-white leading-6" style="font-family: Roboto, sans-serif;">
-                                    Éditions Jean de Portal
+                                    Infocash Académie
                                 </h3>
                                 <p class="font-medium text-sm text-[#6c757d] leading-4"
                                     style="font-family: Roboto, sans-serif;">
-                                    L'expertise patrimoniale de référence
+                                    L'éducation financière premium
                                 </p>
                             </div>
                             <p class="font-normal text-sm text-[#b0bec5] leading-[22px]"
                                 style="font-family: Roboto, sans-serif;">
-                                Depuis plus de 15 ans, nous accompagnons les investisseurs avertis avec des publications de
-                                référence et des consultations privées exclusives.
+                                Formations, tutoriels et consultations exclusives pour maîtriser vos investissements
+                                et construire votre liberté financière.
                             </p>
                         </div>
                     </AccordionContent>
@@ -143,7 +144,7 @@ const navigate = (path: string) => {
                         <div class="flex flex-col gap-3 text-sm leading-5" style="font-family: Roboto, sans-serif;">
                             <a @click="navigate('/')"
                                 class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer py-1">
-                                Notre Maison
+                                Accueil
                             </a>
                             <a @click="navigate('/academie')"
                                 class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer py-1">
@@ -153,8 +154,9 @@ const navigate = (path: string) => {
                                 class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer py-1">
                                 Boutique
                             </a>
-                            <a href="#" class="font-normal text-[#b0bec5] hover:text-white transition-colors py-1">
-                                Contact
+                            <a @click="navigate('/notre-maison')"
+                                class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer py-1">
+                                Notre Maison
                             </a>
                         </div>
                     </AccordionContent>
@@ -170,11 +172,11 @@ const navigate = (path: string) => {
                         <div class="flex flex-col gap-4">
                             <p class="font-normal text-sm text-[#b0bec5] leading-[22px]"
                                 style="font-family: Roboto, sans-serif;">
-                                Retrouvez tous nos lives et replays de consultations exclusives sur YouTube
+                                Retrouvez tous nos contenus gratuits sur la chaîne YouTube Infocash
                             </p>
 
                             <!-- Lien YouTube -->
-                            <a href="https://youtube.com" target="_blank" rel="noopener noreferrer"
+                            <a href="https://www.youtube.com/@infocash" target="_blank" rel="noopener noreferrer"
                                class="inline-flex">
                                 <FontAwesomeIcon v-if="icons.youtube" :icon="icons.youtube"
                                     class="fa-2xl w-6 h-6 text-white hover:text-primary transition-colors" />
@@ -198,7 +200,7 @@ const navigate = (path: string) => {
 
                     <!-- Copyright -->
                     <p class="text-[#6c757d] w-full md:w-auto text-left md:text-right">
-                        Copyright © {{ currentYear }} Éditions Jean de Portal. Tous droits réservés.
+                        © {{ currentYear }} Infocash Académie. Tous droits réservés.
                     </p>
                 </div>
             </div>

@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@/lib/icons'
 import { useCartStore } from '@/stores/cart.store'
+import { AspectRatio } from '../ui/aspect-ratio'
 
 export type CardSize = 'featured' | 'medium' | 'small' | 'wide'
 
@@ -127,18 +128,18 @@ const handleAddToCart = (e: Event) => {
 
 <template>
   <Card
-    class="product-card group relative cursor-pointer border-2 border-secondary shadow-md rounded-lg py-0 gap-0 transition-all duration-500 overflow-hidden"
+    class="product-card group relative cursor-pointer border border-secondary shadow-md rounded-lg py-0 gap-0 transition-all duration-500 overflow-hidden"
     @click="handleViewDetails"
   >
     <CardContent class="p-2.5 flex flex-col gap-2.5 flex-1">
       <!-- Image -->
-      <div class="relative overflow-hidden rounded-lg bg-neutral-100">
+      <AspectRatio :ratio="1/1" class="relative overflow-hidden rounded-lg bg-neutral-100 group-hover:bg-neutral-100/10 transition-colors duration-300">
         <img
           :src="mainImage"
           :alt="decodedName"
           class="w-full h-full object-contain"
         />
-      </div>
+      </AspectRatio>
 
       <!-- Contenu - flex-1 pour pousser prix+CTA en bas -->
       <div class="flex flex-col gap-2 flex-1">
@@ -192,9 +193,12 @@ const handleAddToCart = (e: Event) => {
         <Button
           size="default"
           rounded="lg"
-          color="success"
-          class="w-full bg-success hover:bg-success/90 text-success-foreground"
+          variant="outline"
+          color="primary"
+          class="w-full text-primary-foreground group-hover:text-primary-foreground group-hover:bg-white hover:bg-primary hover:border-primary hover:text-primary-foreground transition-colors duration-300"
+          :class='isInCart && icons.check ? "bg-primary":""'
           @click="handleAddToCart"
+          :disabled="isInCart && icons.check"
         >
           <FontAwesomeIcon
             v-if="isInCart && icons.check"

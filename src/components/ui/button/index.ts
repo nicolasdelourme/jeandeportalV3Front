@@ -14,7 +14,7 @@ export const buttonVariants = cva(
                 secondary:
                     "bg-secondary text-secondary-foreground border-none hover:shadow-lg hover:text-primary focus-visible:ring-2 focus-visible:ring-offset-2",
                 outline:
-                    "border-2 focus-visible:ring-2 focus-visible:ring-offset-2 hover:text-white",
+                    "border focus-visible:ring-2 focus-visible:ring-offset-2 hover:text-white",
                 ghost: "border-none bg-transparent hover:bg-opacity-10 focus-visible:ring-2 focus-visible:ring-offset-2",
                 link: "border-none bg-transparent underline-offset-4 hover:underline normal-case tracking-normal font-semibold",
             },

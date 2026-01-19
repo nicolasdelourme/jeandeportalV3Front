@@ -130,6 +130,9 @@ import {
 // BRANDS (fab) - Brand Icons
 // ============================================================================
 import {
+  faCcVisa,
+  faCcMastercard,
+  faCcAmex,
   faYoutube,
 } from '@awesome.me/kit-0aac173ed2/icons/classic/brands'
 
@@ -293,6 +296,9 @@ export const far = {
  * Usage: icons.fab.youtube ou icons.fab['youtube']
  */
 export const fab = {
+  'cc-visa': faCcVisa,
+  'cc-mastercard': faCcMastercard,
+  'cc-amex': faCcAmex,
   'youtube': faYoutube,
 } as const
 

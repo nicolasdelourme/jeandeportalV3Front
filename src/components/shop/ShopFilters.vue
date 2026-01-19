@@ -79,11 +79,11 @@ const activeFiltersCount = computed(() => {
       <!-- Pills de filtres (basés sur les tags filter_*) -->
       <div class="flex gap-2 overflow-x-auto scrollbar-hide flex-1">
         <Button
-          variant="outline"
+          :variant='!shopStore.hasActiveFilters ? "default" : "outline"'
           size="sm"
           rounded="default"
-          :color="!shopStore.hasActiveFilters ? 'secondary' : 'neutral-400'"
-          :class="!shopStore.hasActiveFilters ? 'bg-secondary/10' : ''"
+          color="secondary"
+          
           @click="resetFilters"
         >
           Tous
@@ -127,7 +127,7 @@ const activeFiltersCount = computed(() => {
               v-if="activeFiltersCount > 0"
               variant="default"
               color="secondary"
-              class="ml-1 px-1.5 py-0 text-xs"
+              class="ml-1 px-1.5 py-0 text-xs border"
             >
               {{ activeFiltersCount }}
             </Badge>

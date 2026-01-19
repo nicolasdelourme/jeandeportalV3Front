@@ -14,6 +14,9 @@ import LoginForm from '@/components/auth/LoginForm.vue'
 import RegisterForm from '@/components/auth/RegisterForm.vue'
 import ForgotPasswordForm from '@/components/auth/ForgotPasswordForm.vue'
 import AuthModeToggle from '@/components/auth/AuthModeToggle.vue'
+import { Button } from '@/components/ui/button'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { byPrefixAndName } from '@/lib/icons'
 
 const router = useRouter()
 const route = useRoute()
@@ -253,11 +256,12 @@ onMounted(() => {
             <!-- État de succès après inscription -->
             <div v-else-if="mode === 'register' && registrationSuccess" class="space-y-6 text-center">
                 <!-- Icône email -->
-                <div class="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                    <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
+                <div class="mx-auto w-16 h-16 bg-secondary rounded-full flex items-center justify-center">
+                    <FontAwesomeIcon
+                        v-if="byPrefixAndName.fas?.['envelope']"
+                        :icon="byPrefixAndName.fas['envelope']"
+                        class="size-8 text-primary"
+                    />
                 </div>
 
                 <!-- Message de confirmation -->
@@ -267,19 +271,23 @@ onMounted(() => {
                     </h3>
                     <p class="text-sm text-neutral-600">
                         Un email de vérification a été envoyé à
-                        <span class="font-medium text-neutral-900">{{ registrationEmail }}</span>.
+                    </p>
+                    <p class="font-medium text-neutral-900">{{ registrationEmail }}</p>
+                    <p class="text-sm text-neutral-600">
                         Cliquez sur le lien dans l'email pour activer votre compte.
                     </p>
                 </div>
 
                 <!-- Bouton vers la connexion -->
-                <button
+                <Button
                     type="button"
+                    variant="secondary"
+                    rounded="lg"
                     @click="goToLoginFromSuccess"
-                    class="w-full py-2.5 px-4 text-sm font-medium rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors"
+                    class="w-full transition-colors"
                 >
                     Aller à la connexion
-                </button>
+                </Button>
 
                 <!-- Note -->
                 <p class="text-xs text-neutral-500">

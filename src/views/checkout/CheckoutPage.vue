@@ -63,6 +63,10 @@ const icons = computed(() => ({
   arrowLeft: byPrefixAndName.fas?.['arrow-left'],
   lock: byPrefixAndName.fas?.['lock'],
   spinner: byPrefixAndName.fas?.['spinner'],
+  // Cartes bancaires (brands)
+  ccVisa: byPrefixAndName.fab?.['cc-visa'],
+  ccMastercard: byPrefixAndName.fab?.['cc-mastercard'],
+  ccAmex: byPrefixAndName.fab?.['cc-amex'],
 }))
 
 const addresses = computed(() => user.value?.addresses || [])
@@ -442,11 +446,13 @@ function goToCart() {
 
               <!-- Bouton continuer -->
               <div class="flex gap-4">
-                <Button variant="outline" @click="goToCart">
+                <Button variant="outline" color="secondary" rounded="lg" class="hover:bg-secondary hover:border-secondary" @click="goToCart">
                   <FontAwesomeIcon v-if="icons.arrowLeft" :icon="icons.arrowLeft" class="h-4 w-4 mr-2" />
                   Retour au panier
                 </Button>
                 <Button
+                  variant="secondary"
+                  rounded="lg"
                   @click="proceedToPayment"
                   :disabled="!canProceedToPayment || isLoading"
                   class="flex-1"
@@ -479,7 +485,7 @@ function goToCart() {
                     <p class="text-sm font-medium text-neutral-500 mb-1">Facturation</p>
                     <p class="text-sm">{{ formatAddress(selectedBillingAddress) }}</p>
                   </div>
-                  <Button variant="link" size="sm" class="px-0" @click="backToAddresses">
+                  <Button variant="link" color="secondary" size="sm" class="px-0 underline" @click="backToAddresses">
                     Modifier les adresses
                   </Button>
                 </CardContent>
@@ -497,6 +503,14 @@ function goToCart() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
+                  <!-- Logos cartes acceptées -->
+                  <div class="flex items-center gap-4 mb-4">
+                    <div class="flex items-center justify-center w-full gap-4">
+                      <FontAwesomeIcon v-if="icons.ccVisa" :icon="icons.ccVisa" class="h-16 w-16 text-[#1A1F71] fa-2x" />
+                      <FontAwesomeIcon v-if="icons.ccMastercard" :icon="icons.ccMastercard" class="h-16 w-16 text-[#EB001B] fa-2x" />
+                      <FontAwesomeIcon v-if="icons.ccAmex" :icon="icons.ccAmex" class="h-16 w-16 text-[#006FCF] fa-2x" />
+                    </div>
+                  </div>
                   <div id="card-element" class="p-4 border border-gray-200 rounded-lg min-h-[50px]">
                     <!-- Stripe Card Element sera monté ici -->
                   </div>
@@ -506,12 +520,14 @@ function goToCart() {
 
               <!-- Boutons -->
               <div class="flex gap-4">
-                <Button variant="outline" @click="backToAddresses">
+                <Button variant="outline" color="secondary" rounded="lg" class="hover:bg-secondary hover:border-secondary" @click="backToAddresses">
                   <FontAwesomeIcon v-if="icons.arrowLeft" :icon="icons.arrowLeft" class="h-4 w-4 mr-2" />
                   Retour
                 </Button>
                 <Button
                   @click="confirmPayment"
+                  variant="secondary"
+                  rounded="lg"
                   :disabled="!cardElementReady || isLoading"
                   class="flex-1"
                 >
@@ -598,7 +614,7 @@ function goToCart() {
                 <!-- Liste des articles -->
                 <div class="space-y-3">
                   <div v-for="item in cartStore.items" :key="item.itemId" class="flex gap-3">
-                    <div class="w-12 h-12 flex-shrink-0 bg-neutral-100 rounded overflow-hidden">
+                    <div class="w-12 h-12 shrink-0 bg-neutral-100 rounded-lg overflow-hidden">
                       <img
                         v-if="item.images?.[0]"
                         :src="item.images[0]"
@@ -629,7 +645,7 @@ function goToCart() {
                   <Separator />
                   <div class="flex justify-between font-bold text-lg">
                     <span>Total TTC</span>
-                    <span class="text-primary">{{ formatPrice(cartStore.subtotal) }}</span>
+                    <span class="text-secondary">{{ formatPrice(cartStore.subtotal) }}</span>
                   </div>
                 </div>
               </CardContent>
