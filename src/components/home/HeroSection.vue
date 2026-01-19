@@ -42,11 +42,11 @@ const props = withDefaults(defineProps<Props>(), {
  * Actions
  */
 const handleDiscoverFormulas = () => {
-    router.push('/consultations-nicolas-delourme/invitation')
+    router.push('/academie')
 }
 
 const handleViewCalendar = () => {
-    router.push('/consultations-nicolas-delourme')
+    router.push('/academie')
 }
 
 const handleScrollDown = () => {
@@ -120,13 +120,13 @@ const handleScrollDown = () => {
                             </p>
                         </Button>
 
-                        <!-- Bouton Voir le calendrier -->
+                        <!-- Bouton Découvrir l'Académie -->
                         <Button @click="handleViewCalendar" variant="outline" color="neutral-900"
                                 class="text-white w-full md:w-auto">
                             <p style="font-family: Roboto, sans-serif;">
                                 <!-- Texte court sur mobile, complet sur desktop -->
-                                <span class="md:hidden">Le calendrier</span>
-                                <span class="hidden md:inline">Voir le calendrier des consultations</span>
+                                <span class="md:hidden">L'Académie</span>
+                                <span class="hidden md:inline">Découvrir l'Académie Infocash</span>
                             </p>
                         </Button>
                     </div>

@@ -154,11 +154,11 @@ const colors = [
                         </div>
                     </div>
 
-                    <!-- Bouton vers consultations -->
+                    <!-- Bouton vers l'Académie -->
                     <div class="mt-6 text-center pt-6 border-t border-gray-200">
                         <Button as-child variant="default" color="primary" size="lg" rounded="sm">
-                            <RouterLink to="/consultations-nicolas-delourme">
-                                Accéder aux consultations
+                            <RouterLink to="/academie">
+                                Découvrir l'Académie
                             </RouterLink>
                         </Button>
                     </div>

@@ -43,30 +43,6 @@ const routes: RouteRecordRaw[] = [
         component: () => import("@/views/academie/FormationDetailPage.vue"),
     },
     {
-        path: "/consultations-nicolas-delourme",
-        name: "consultations-catalogue",
-        component: () =>
-            import(
-                "@/views/consultations/ConsultationsNicolasDelourmePage.vue"
-            ),
-    },
-    {
-        path: "/consultations-nicolas-delourme/a-propos",
-        name: "consultations-a-propos",
-        component: () => import("@/views/consultations/MarketingPage.vue"),
-    },
-    {
-        path: "/consultations-nicolas-delourme/invitation",
-        name: "consultations-invitation",
-        component: () => import("@/views/consultations/InvitationPage.vue"),
-    },
-    {
-        path: "/consultations-nicolas-delourme/watch/:id",
-        name: "consultation-player",
-        component: () =>
-            import("@/views/consultations/ConsultationPlayerPage.vue"),
-    },
-    {
         path: "/auth",
         name: "auth",
         component: () => import("@/views/auth/AuthPage.vue"),

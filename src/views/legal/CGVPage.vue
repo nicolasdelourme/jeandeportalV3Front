@@ -59,8 +59,7 @@ import DefaultLayout from '@/components/layout/DefaultLayout.vue'
                         </p>
                         <ul class="list-disc pl-6 space-y-2 text-neutral-600">
                             <li><strong>Produits numériques</strong> : ebooks, guides PDF, formations vidéo téléchargeables</li>
-                            <li><strong>Abonnements</strong> : accès aux contenus premium (newsletters, tutoriels, consultations) selon différentes formules (Essentiel, Standard, Premium)</li>
-                            <li><strong>Consultations</strong> : sessions de conseil en ligne (webinaires, replay)</li>
+                            <li><strong>Abonnements</strong> : accès aux contenus premium de l'Académie (newsletters, tutoriels) selon différentes formules (Essentiel, Standard, Premium)</li>
                         </ul>
                     </section>
 
@@ -140,14 +139,10 @@ import DefaultLayout from '@/components/layout/DefaultLayout.vue'
                             accessibles immédiatement après validation du paiement depuis l'espace
                             personnel du Client.
                         </p>
-                        <p class="text-neutral-600 leading-relaxed mb-4">
-                            <strong>Abonnements :</strong> L'accès aux contenus premium est activé
+                        <p class="text-neutral-600 leading-relaxed">
+                            <strong>Abonnements :</strong> L'accès aux contenus premium de l'Académie est activé
                             immédiatement après validation du paiement et reste actif pendant toute
                             la durée de l'abonnement.
-                        </p>
-                        <p class="text-neutral-600 leading-relaxed">
-                            <strong>Consultations :</strong> Les liens d'accès aux webinaires ou replays
-                            sont communiqués par email et/ou accessibles depuis l'espace personnel.
                         </p>
                     </section>
 

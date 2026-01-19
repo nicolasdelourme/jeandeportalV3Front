@@ -17,10 +17,10 @@ const router = useRouter()
  */
 const icons = computed(() => ({
     basket: byPrefixAndName.fas?.['basket-shopping'],
-    consultationsNd: byPrefixAndName.fak?.['consultations-nd'],
+    graduationCap: byPrefixAndName.fas?.['graduation-cap'],
 }))
 
-type IconKey = 'basket' | 'consultationsNd'
+type IconKey = 'basket' | 'graduationCap'
 
 /**
  * Helper pour récupérer une icône de manière typée
@@ -37,7 +37,7 @@ const handleExploreBoutique = () => {
 }
 
 const handleViewFormulas = () => {
-    router.push('/consultations-nicolas-delourme/invitation')
+    router.push('/academie')
 }
 </script>
 
@@ -116,26 +116,26 @@ const handleViewFormulas = () => {
                     </Button>
                 </div>
 
-                <!-- Carte 2 : Abonnement mensuel ou annuel -->
+                <!-- Carte 2 : Abonnement Académie -->
                 <div class="flex-1 bg-white border border-neutral-200 rounded-md p-8 flex flex-col items-center gap-6">
                     <!-- Icône -->
                     <div class="w-16 h-16 rounded-md flex items-center justify-center"
                         style="background: linear-gradient(135deg, var(--color-primary), var(--color-primary))">
-                        <FontAwesomeIcon v-if="getIcon('consultationsNd')" :icon="getIcon('consultationsNd')"
+                        <FontAwesomeIcon v-if="getIcon('graduationCap')" :icon="getIcon('graduationCap')"
                             class="w-8 h-8 text-white" size="2xl" />
                     </div>
 
                     <!-- Titre -->
                     <h3 class="font-bold text-2xl text-neutral-800 text-center leading-8"
                         style="font-family: Roboto, sans-serif;">
-                        Abonnement mensuel ou annuel
+                        Abonnement Académie
                     </h3>
 
                     <!-- Description -->
                     <p class="font-normal text-base text-neutral-600 text-center leading-6 flex-1"
                         style="font-family: Roboto, sans-serif;">
-                        Choisissez une ou plusieurs thématiques, résiliable à tout moment. Accès complet aux lives
-                        et replays.
+                        Choisissez une ou plusieurs thématiques, résiliable à tout moment. Accès complet aux
+                        newsletters, tutoriels et contenus exclusifs.
                     </p>
 
                     <!-- Stats -->
@@ -143,31 +143,31 @@ const handleViewFormulas = () => {
                         <div class="flex flex-col items-center gap-1">
                             <p class="font-bold text-3xl text-primary leading-8"
                                 style="font-family: Roboto, sans-serif;">
-                                1
+                                3
                             </p>
                             <p class="font-medium text-sm text-neutral-600 leading-5"
                                 style="font-family: Roboto, sans-serif;">
-                                Live/semaine
+                                Thématiques
                             </p>
                         </div>
                         <div class="flex flex-col items-center gap-1">
                             <p class="font-bold text-3xl text-primary leading-8"
                                 style="font-family: Roboto, sans-serif;">
-                                PDF
+                                4
                             </p>
                             <p class="font-medium text-sm text-neutral-600 leading-5"
                                 style="font-family: Roboto, sans-serif;">
-                                Inclus
+                                Contenus/mois
                             </p>
                         </div>
                         <div class="flex flex-col items-center gap-1">
                             <p class="font-bold text-3xl text-primary leading-8"
                                 style="font-family: Roboto, sans-serif;">
-                                ∞
+                                9,90€
                             </p>
                             <p class="font-medium text-sm text-neutral-600 leading-5"
                                 style="font-family: Roboto, sans-serif;">
-                                Replays
+                                À partir de
                             </p>
                         </div>
                     </div>
@@ -175,7 +175,7 @@ const handleViewFormulas = () => {
                     <!-- Bouton CTA -->
                     <Button @click="handleViewFormulas" color="primary" class="w-full mt-auto" size="lg">
                         <p class="font-bold" style="font-family: Roboto, sans-serif;">
-                            Voir les formules
+                            Découvrir l'Académie
                         </p>
                     </Button>
                 </div>

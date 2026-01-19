@@ -16,15 +16,15 @@ const router = useRouter()
  * Icônes FontAwesome
  */
 const icons = computed(() => ({
-    consultationsNd: byPrefixAndName.fak?.['consultations-nd'],
+    graduationCap: byPrefixAndName.fas?.['graduation-cap'],
     book: byPrefixAndName.fas?.['book'],
 }))
 
 /**
  * Actions
  */
-const handleLearnMoreConsultations = () => {
-    router.push('/consultations-nicolas-delourme')
+const handleLearnMoreAcademie = () => {
+    router.push('/academie')
 }
 
 const handleDiscoverCollections = () => {
@@ -60,31 +60,31 @@ const handleDiscoverCollections = () => {
 
             <!-- Deux cartes -->
             <div class="flex flex-col md:flex-row gap-6 md:gap-8 items-stretch justify-center w-full">
-                <!-- Carte 1 : Consultations Privées -->
+                <!-- Carte 1 : Académie Infocash -->
                 <div class="flex-1 bg-white border border-neutral-200 rounded-md p-6 relative flex flex-col">
                     <!-- Image avec badges -->
                     <div class="relative h-64">
                         <img src="https://www.figma.com/api/mcp/asset/afbc6451-6700-4b48-a488-72ab19a253da"
-                            alt="Consultations Privées"
+                            alt="Académie Infocash"
                             class="w-full h-full object-cover rounded-md shadow-[0px_8px_24px_0px_rgba(0,0,0,0.1)]" />
 
 
                         <div class="absolute top-3 flex justify-between items-center w-full px-3">
-                            <!-- Badge "Live Exclusif" -->
+                            <!-- Badge "Contenus Premium" -->
                             <div class="bg-neutral-200 flex gap-3 items-center px-4 py-2 rounded-full shadow-sm">
                                 <div
                                     class="bg-primary animate-pulse duration-1000 opacity-[0.876]  rounded-full w-3 h-3" />
                                 <p class="font-bold text-xs text-neutral-800 leading-5"
                                     style="font-family: Roboto, sans-serif;">
-                                    Live Exclusif
+                                    Contenus Premium
                                 </p>
                             </div>
 
-                            <!-- Badge "Notre nouveau format" -->
+                            <!-- Badge "Abonnement" -->
                             <div class=" bg-yellow-500 px-4 py-2 rounded-full">
                                 <p class="font-bold text-xs text-white tracking-[0.6px] uppercase leading-4"
                                     style="font-family: Roboto, sans-serif;">
-                                    Notre nouveau format
+                                    Abonnement mensuel
                                 </p>
                             </div>
                         </div>
@@ -95,21 +95,21 @@ const handleDiscoverCollections = () => {
                         <!-- Titre avec icône -->
                         <div class="flex gap-2 items-center">
                             <div class="">
-                                <FontAwesomeIcon v-if="icons.consultationsNd" :icon="icons.consultationsNd" size="2xl"
+                                <FontAwesomeIcon v-if="icons.graduationCap" :icon="icons.graduationCap" size="2xl"
                                     class="w-8 h-8 text-primary" />
                             </div>
                             <h3 class="font-bold text-3xl text-neutral-800 leading-9"
                                 style="font-family: Roboto, sans-serif;">
-                                Consultations Privées
+                                Académie Infocash
                             </h3>
                         </div>
 
                         <!-- Description -->
                         <p class="font-normal text-base text-neutral-600 flex-1"
                             style="font-family: Roboto, sans-serif;">
-                            Rejoignez nos lives hebdomadaires exclusifs où Nicolas Delourme et ses experts répondent à
-                            vos questions personnalisées. Recevez des dossiers PDF détaillés après chaque consultation
-                            et accédez aux replays à vie. Un format unique pour un accompagnement sur-mesure.
+                            Accédez à notre espace premium avec des newsletters exclusives, tutoriels vidéo et
+                            contenus thématiques sur les métaux précieux, le portefeuille permanent et la liberté
+                            financière. Un accompagnement complet pour développer votre expertise patrimoniale.
                         </p>
 
                         <!-- Stats -->
@@ -118,41 +118,41 @@ const handleDiscoverCollections = () => {
                                 class="flex-1 bg-neutral-100 flex flex-col gap-1 items-center justify-center py-4 rounded-md shadow-sm">
                                 <p class="font-bold text-3xl text-primary leading-8"
                                     style="font-family: Roboto, sans-serif;">
-                                    1
+                                    3
                                 </p>
                                 <p class="font-medium text-xs text-neutral-600 leading-4"
                                     style="font-family: Roboto, sans-serif;">
-                                    Live/semaine
+                                    Thématiques
                                 </p>
                             </div>
                             <div
                                 class="flex-1 bg-neutral-100 flex flex-col gap-1 items-center justify-center py-4 rounded-md shadow-sm">
                                 <p class="font-bold text-3xl text-primary leading-8"
                                     style="font-family: Roboto, sans-serif;">
-                                    PDF
+                                    4
                                 </p>
                                 <p class="font-medium text-xs text-neutral-600 leading-4"
                                     style="font-family: Roboto, sans-serif;">
-                                    Inclus
+                                    Contenus/mois
                                 </p>
                             </div>
                             <div
                                 class="flex-1 bg-neutral-100 flex flex-col gap-1 items-center justify-center py-4 rounded-md shadow-sm">
                                 <p class="font-bold text-3xl text-primary leading-8"
                                     style="font-family: Roboto, sans-serif;">
-                                    ∞
+                                    9,90€
                                 </p>
                                 <p class="font-medium text-xs text-neutral-600 leading-4"
                                     style="font-family: Roboto, sans-serif;">
-                                    Replays
+                                    À partir de
                                 </p>
                             </div>
                         </div>
 
                         <!-- Bouton CTA -->
-                        <Button @click="handleLearnMoreConsultations" class="w-full mt-auto" size="lg">
+                        <Button @click="handleLearnMoreAcademie" class="w-full mt-auto" size="lg">
                             <p class="font-bold " style="font-family: Roboto, sans-serif;">
-                                En savoir plus sur les consultations
+                                Découvrir l'Académie
                             </p>
                         </Button>
                     </div>

@@ -16,6 +16,8 @@ dist-ssr
 .env
 .env.local
 .env.*.local
+.env.production
+.env.real 
 
 # NPM config with tokens
 .npmrc
