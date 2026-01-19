@@ -126,7 +126,7 @@ function handleClose() {
             <label class="text-sm font-medium text-muted-foreground">
               Email actuel
             </label>
-            <p class="text-sm font-medium text-primary">
+            <p class="text-sm font-medium text-secondary">
               {{ currentEmail }}
             </p>
           </div>
@@ -157,12 +157,15 @@ function handleClose() {
           <Button
             variant="outline"
             type="button"
+            color="secondary"
             @click="handleClose"
+            class="hover:bg-secondary hover:border-secondary"
             :disabled="isSubmitting"
           >
             Annuler
           </Button>
           <Button
+          variant="secondary"
             type="submit"
             :disabled="isSubmitting || !values.newEmail"
           >

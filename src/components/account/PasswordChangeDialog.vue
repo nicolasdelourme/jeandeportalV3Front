@@ -72,7 +72,7 @@ function handleClose() {
       </DialogHeader>
 
       <div class="py-4">
-        <p class="text-center font-medium text-primary text-lg">
+        <p class="text-center font-medium text-secondary text-lg">
           {{ userEmail }}
         </p>
         <p class="text-sm text-muted-foreground text-center mt-3">
@@ -83,6 +83,8 @@ function handleClose() {
       <DialogFooter class="gap-2 sm:gap-0">
         <Button
           variant="outline"
+          color="secondary"
+          class="hover:bg-secondary hover:border-secondary"
           @click="handleClose"
           :disabled="isSubmitting"
         >
@@ -91,6 +93,7 @@ function handleClose() {
         <Button
           @click="handleConfirm"
           :disabled="isSubmitting || !userEmail"
+          variant="secondary"
         >
           <span style="font-family: Roboto, sans-serif">
             {{ isSubmitting ? 'Envoi en cours...' : "Envoyer l'email" }}

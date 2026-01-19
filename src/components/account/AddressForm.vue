@@ -240,11 +240,11 @@ const getIcon = (iconKey: keyof typeof icons.value): IconDefinition | undefined 
 
     <!-- Actions -->
     <div class="flex gap-3 pt-4">
-      <Button type="submit" class="flex items-center gap-2">
+      <Button variant="secondary" type="submit" class="flex items-center gap-2">
         <FontAwesomeIcon v-if="getIcon('check')" :icon="getIcon('check')!" />
         {{ mode === 'create' ? 'Ajouter l\'adresse' : 'Enregistrer les modifications' }}
       </Button>
-      <Button type="button" variant="outline" @click="onCancel">
+      <Button type="button" variant="outline" color="secondary" class="hover:bg-secondary hover:border-secondary" @click="onCancel">
         <FontAwesomeIcon v-if="getIcon('xmark')" :icon="getIcon('xmark')!" class="mr-2" />
         Annuler
       </Button>

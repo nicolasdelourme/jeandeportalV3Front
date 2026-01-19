@@ -483,7 +483,7 @@ const formatPrice = (price: number, period: 'mensuel' | 'annuel'): string => {
                                 <TableCell class="text-muted-foreground">{{ invoice.date }}</TableCell>
                                 <TableCell class="text-right">{{ invoice.amount }} €</TableCell>
                                 <TableCell class="text-center">
-                                    <Button variant="ghost" size="icon" class="h-8 w-8">
+                                    <Button variant="ghost" color="secondary" size="icon" class="h-8 w-8">
                                         <FontAwesomeIcon
                                             v-if="icons.download"
                                             :icon="icons.download"

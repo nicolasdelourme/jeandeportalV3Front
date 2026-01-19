@@ -216,7 +216,7 @@ const onSubmit = handleSubmit(async (values) => {
                 <div class="hidden flex items-center gap-6">
                     <Avatar class="h-24 w-24">
                         <AvatarImage v-if="avatarUrl" :src="avatarUrl" alt="Photo de profil" />
-                        <AvatarFallback class="text-2xl bg-primary text-white">{{ avatarInitials }}</AvatarFallback>
+                        <AvatarFallback class="text-2xl bg-secondary text-white">{{ avatarInitials }}</AvatarFallback>
                     </Avatar>
                     <div class="space-y-2">
                         <h3 class="font-semibold text-sm text-neutral-700">
@@ -335,7 +335,7 @@ const onSubmit = handleSubmit(async (values) => {
 
                     <!-- Bouton -->
                     <div class="flex justify-end pt-4">
-                        <Button type="submit" variant="default" rounded="lg" :disabled="!meta.dirty || isSubmitting">
+                        <Button type="submit" variant="secondary" rounded="lg" :disabled="!meta.dirty || isSubmitting">
                             <span class="font-semibold tracking-wide">
                                 {{ isSubmitting ? 'ENREGISTREMENT...' : 'ENREGISTRER LES MODIFICATIONS' }}
                             </span>

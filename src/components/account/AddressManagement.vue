@@ -239,10 +239,11 @@ const formatFullAddress = (address: Address) => {
         </div>
         <Button
           variant="outline"
+          color="secondary"
           size="sm"
           rounded="lg"
           @click="openCreateForm"
-          class="flex items-center gap-1.5"
+          class="flex items-center gap-1.5 hover:bg-secondary hover:border-secondary"
           :disabled="isLoading"
         >
           <FontAwesomeIcon v-if="getIcon('plus')" :icon="getIcon('plus')" class="w-3 h-3" />
@@ -257,7 +258,7 @@ const formatFullAddress = (address: Address) => {
         <FontAwesomeIcon
           v-if="getIcon('spinner')"
           :icon="getIcon('spinner')"
-          class="w-5 h-5 animate-spin text-primary"
+          class="w-5 h-5 animate-spin text-secondary"
         />
         <span class="ml-2 text-sm text-muted-foreground">Chargement...</span>
       </div>
@@ -273,6 +274,7 @@ const formatFullAddress = (address: Address) => {
           <div class="absolute top-3 right-3 flex gap-1">
             <Button
               variant="ghost"
+              color="secondary"
               size="sm"
               @click="openEditForm(address)"
               class="h-8 w-8 p-0"

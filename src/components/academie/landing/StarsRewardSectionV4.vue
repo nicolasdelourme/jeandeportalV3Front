@@ -166,6 +166,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   stopAnimation()
+  if (highlightTimeout) clearTimeout(highlightTimeout)
   if (observer) {
     observer.disconnect()
   }
