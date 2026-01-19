@@ -149,50 +149,54 @@ export const useShopStore = defineStore('shop', () => {
 
   /**
    * Références filtrées ET triées
+   * Optimisé: pré-calcul des prix pour éviter O(n*m) dans chaque comparaison
    */
   const sortedReferences = computed(() => {
-    const sorted = [...filteredReferences.value]
+    const filtered = filteredReferences.value
+    const sortOption = activeSortOption.value
 
-    switch (activeSortOption.value) {
-      case 'name-asc':
-        return sorted.sort((a, b) => a.name.localeCompare(b.name, 'fr'))
-
-      case 'name-desc':
-        return sorted.sort((a, b) => b.name.localeCompare(a.name, 'fr'))
-
-      case 'price-asc':
-        return sorted.sort((a, b) => {
-          const minA = Math.min(
-            ...a.products.flatMap((p) => p.prices.map((price) => price.amount))
-          )
-          const minB = Math.min(
-            ...b.products.flatMap((p) => p.prices.map((price) => price.amount))
-          )
-          return minA - minB
-        })
-
-      case 'price-desc':
-        return sorted.sort((a, b) => {
-          const maxA = Math.max(
-            ...a.products.flatMap((p) => p.prices.map((price) => price.amount))
-          )
-          const maxB = Math.max(
-            ...b.products.flatMap((p) => p.prices.map((price) => price.amount))
-          )
-          return maxB - maxA
-        })
-
-      case 'newest':
-        // Tri par ID décroissant (supposant que les IDs sont chronologiques)
-        return sorted.sort((a, b) => parseInt(b.id) - parseInt(a.id))
-
-      case 'oldest':
-        // Tri par ID croissant
-        return sorted.sort((a, b) => parseInt(a.id) - parseInt(b.id))
-
-      default:
-        return sorted
+    // Tris simples sans pré-calcul nécessaire
+    if (sortOption === 'name-asc') {
+      return [...filtered].sort((a, b) => a.name.localeCompare(b.name, 'fr'))
     }
+
+    if (sortOption === 'name-desc') {
+      return [...filtered].sort((a, b) => b.name.localeCompare(a.name, 'fr'))
+    }
+
+    if (sortOption === 'newest') {
+      return [...filtered].sort((a, b) => parseInt(b.id) - parseInt(a.id))
+    }
+
+    if (sortOption === 'oldest') {
+      return [...filtered].sort((a, b) => parseInt(a.id) - parseInt(b.id))
+    }
+
+    // Tris par prix: pré-calcul des min/max une seule fois par référence
+    if (sortOption === 'price-asc' || sortOption === 'price-desc') {
+      const priceCache = new Map<string, { min: number; max: number }>()
+
+      for (const ref of filtered) {
+        const allPrices = ref.products.flatMap((p) => p.prices.map((price) => price.amount))
+        priceCache.set(ref.id, {
+          min: allPrices.length > 0 ? Math.min(...allPrices) : Infinity,
+          max: allPrices.length > 0 ? Math.max(...allPrices) : -Infinity,
+        })
+      }
+
+      if (sortOption === 'price-asc') {
+        return [...filtered].sort((a, b) => {
+          return priceCache.get(a.id)!.min - priceCache.get(b.id)!.min
+        })
+      }
+
+      // price-desc
+      return [...filtered].sort((a, b) => {
+        return priceCache.get(b.id)!.max - priceCache.get(a.id)!.max
+      })
+    }
+
+    return [...filtered]
   })
 
   /**

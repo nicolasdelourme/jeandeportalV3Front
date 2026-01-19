@@ -7,7 +7,7 @@
  */
 
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import type { User, LoginCredentials, RegisterCredentials, VerifyEmailResponse, UpdateProfileDto } from '@/types/auth.types'
 import { AuthError } from '@/types/auth.types'
 import { authService } from '@/services/auth.service'
@@ -110,14 +110,14 @@ export const useAuthStore = defineStore('auth', () => {
     async function waitForInitialization(): Promise<void> {
         if (isInitialized.value) return
 
-        // Attendre que isInitialized devienne true (polling simple)
+        // Utiliser watch au lieu de polling (plus efficace)
         return new Promise((resolve) => {
-            const checkInterval = setInterval(() => {
-                if (isInitialized.value) {
-                    clearInterval(checkInterval)
+            const unwatch = watch(isInitialized, (value) => {
+                if (value) {
+                    unwatch()
                     resolve()
                 }
-            }, 10)
+            }, { immediate: true })
         })
     }
 

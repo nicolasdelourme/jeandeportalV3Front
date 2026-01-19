@@ -33,4 +33,27 @@ export default defineConfig({
             },
         },
     },
+    // === OPTIMISATIONS BUILD ===
+    build: {
+        // Code splitting par vendor
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    'vue-vendor': ['vue', 'vue-router', 'pinia'],
+                    'ui-vendor': ['reka-ui'],
+                    'form-vendor': ['vee-validate', 'zod', '@vee-validate/zod'],
+                },
+            },
+        },
+        // Seuil warning chunk
+        chunkSizeWarningLimit: 500,
+        // Minification avec terser (supprime console.log en prod)
+        minify: 'terser',
+        terserOptions: {
+            compress: {
+                drop_console: true,
+                drop_debugger: true,
+            },
+        },
+    },
 });
