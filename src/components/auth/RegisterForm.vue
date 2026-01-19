@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
+import { byPrefixAndName } from '@/lib/icons'
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
 import { cn } from '@/lib/utils'
 

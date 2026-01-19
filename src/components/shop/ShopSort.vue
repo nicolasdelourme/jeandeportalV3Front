@@ -7,7 +7,7 @@ import { computed } from 'vue'
 import { useShopStore } from '@/stores/shop.store'
 import type { ShopSortOption } from '@/types/shop-api.types'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
+import { byPrefixAndName } from '@/lib/icons'
 import {
   Select,
   SelectContent,

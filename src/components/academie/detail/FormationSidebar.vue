@@ -8,7 +8,7 @@ import type { Formation } from '@/data/formations.data'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
+import { byPrefixAndName } from '@/lib/icons'
 import SubscriptionModal from '@/components/academie/SubscriptionModal.vue'
 
 const props = defineProps<{

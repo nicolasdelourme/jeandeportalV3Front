@@ -39,17 +39,17 @@ import type { Participant, ContentType } from "./ThemedCard.vue"
 
 // Icons
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"
-import { byPrefixAndName } from "@awesome.me/kit-0aac173ed2/icons"
+import { byPrefixAndName } from "@/lib/icons"
 
 // Définition des icônes depuis le kit FontAwesome
 const icons = {
-  clock: byPrefixAndName.far?.['clock'],
-  graduationCap: byPrefixAndName.far?.['graduation-cap'],
-  fileLines: byPrefixAndName.far?.['file-lines'],
-  newspaper: byPrefixAndName.far?.['newspaper'],
-  plus: byPrefixAndName.far?.['plus'],
-  download: byPrefixAndName.far?.['download'],
-  share: byPrefixAndName.far?.['share'],
+  clock: byPrefixAndName.far['clock'],
+  graduationCap: byPrefixAndName.far['graduation-cap'],
+  fileLines: byPrefixAndName.far['file-lines'],
+  newspaper: byPrefixAndName.far['newspaper'],
+  plus: byPrefixAndName.far['plus'],
+  download: byPrefixAndName.far['download'],
+  share: byPrefixAndName.far['share'],
 }
 
 interface Props {

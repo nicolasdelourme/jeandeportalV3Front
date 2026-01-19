@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
+import { byPrefixAndName } from '@/lib/icons'
 import type { ShopProduct, ShopPrice } from '@/types/shop-api.types'
 import { formatPrice } from '@/types/shop-api.types'
 

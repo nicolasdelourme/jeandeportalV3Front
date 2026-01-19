@@ -18,7 +18,7 @@ import AnnexesPlayer from '@/components/consultations/player/AnnexesPlayer.vue'
 import consultationsData from '@/data/consultations-full.json'
 import { Button } from '@/components/ui/button'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
+import { byPrefixAndName } from '@/lib/icons'
 
 /**
  * Types

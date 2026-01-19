@@ -7,7 +7,7 @@ import { ref, computed } from 'vue'
 import { useCartStore } from '@/stores/cart.store'
 import { Button } from '@/components/ui/button'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
+import { byPrefixAndName } from '@/lib/icons'
 import { CartError } from '@/types/cart.types'
 
 interface Props {

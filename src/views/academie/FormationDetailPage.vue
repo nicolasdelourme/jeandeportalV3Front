@@ -11,7 +11,7 @@ import { getThemeClasses } from '@/components/ui/themed-card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
+import { byPrefixAndName } from '@/lib/icons'
 
 // Composants detail
 import FormationHero from '@/components/academie/detail/FormationHero.vue'

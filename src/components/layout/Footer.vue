@@ -4,7 +4,7 @@
  * Footer global du site - responsive avec accordéons sur mobile
  */
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
+import { byPrefixAndName } from '@/lib/icons'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import {

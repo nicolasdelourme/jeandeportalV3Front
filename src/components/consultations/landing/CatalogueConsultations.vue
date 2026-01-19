@@ -16,7 +16,7 @@ import type { APIWebinar, FilterCategory } from '@/types/consultations-api.types
 import { getWebinarCategory, getWebinarThumbnail } from '@/types/consultations-api.types'
 import { sanitizeHtml } from '@/utils/html.utils'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
+import { byPrefixAndName } from '@/lib/icons'
 
 // Store Pinia
 const consultationsStore = useConsultationsStore()

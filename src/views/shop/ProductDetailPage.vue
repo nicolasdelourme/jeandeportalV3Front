@@ -23,7 +23,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import FormatSelector from '@/components/shop/FormatSelector.vue'
 import StickyCart from '@/components/shop/StickyCart.vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
+import { byPrefixAndName } from '@/lib/icons'
 import { formatPrice, decodeHTMLEntities, sanitizeHTML, getShopImageUrl, getDisplayTags, getFirstTagByPrefix } from '@/types/shop-api.types'
 import type { ShopProduct, ShopPrice, ParsedTag } from '@/types/shop-api.types'
 import { toast } from 'vue-sonner'

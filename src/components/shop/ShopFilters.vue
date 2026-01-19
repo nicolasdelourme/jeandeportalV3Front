@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/sheet'
 import ShopSort from './ShopSort.vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { byPrefixAndName } from '@awesome.me/kit-0aac173ed2/icons'
+import { byPrefixAndName } from '@/lib/icons'
 
 const shopStore = useShopStore()
 

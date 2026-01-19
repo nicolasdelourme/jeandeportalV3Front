@@ -10,7 +10,7 @@ import { useShopStore } from "@/stores/shop.store";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { byPrefixAndName } from "@awesome.me/kit-0aac173ed2/icons";
+import { byPrefixAndName } from "@/lib/icons";
 import {
     Carousel,
     CarouselContent,
@@ -29,9 +29,9 @@ const shopStore = useShopStore();
  * Icônes FontAwesome
  */
 const icons = computed(() => ({
-    arrowRight: byPrefixAndName.fas?.["arrow-right"],
-    chevronDown: byPrefixAndName.fas?.["chevron-down"],
-    tag: byPrefixAndName.fas?.["tag"],
+    arrowRight: byPrefixAndName.fas["arrow-right"],
+    chevronDown: byPrefixAndName.fas["chevron-down"],
+    tag: byPrefixAndName.fas["tag"],
 }));
 
 /**
