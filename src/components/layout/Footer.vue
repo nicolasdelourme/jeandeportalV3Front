@@ -192,10 +192,10 @@ const navigate = (path: string) => {
                     style="font-family: Roboto, sans-serif;">
                     <!-- Liens légaux - Grid 2x2 sur mobile, horizontal sur desktop -->
                     <div class="grid grid-cols-2 gap-x-4 gap-y-2 md:flex md:gap-6 text-[#b0bec5]">
-                        <a href="#" class="hover:text-white transition-colors">CGV</a>
-                        <a href="#" class="hover:text-white transition-colors">Mentions légales</a>
-                        <a href="#" class="hover:text-white transition-colors">RGPD</a>
-                        <a href="#" class="hover:text-white transition-colors">Cookies</a>
+                        <a @click="navigate('/cgv')" class="hover:text-white transition-colors cursor-pointer">CGV</a>
+                        <a @click="navigate('/mentions-legales')" class="hover:text-white transition-colors cursor-pointer">Mentions légales</a>
+                        <a @click="navigate('/confidentialite')" class="hover:text-white transition-colors cursor-pointer">RGPD</a>
+                        <a @click="navigate('/cookies')" class="hover:text-white transition-colors cursor-pointer">Cookies</a>
                     </div>
 
                     <!-- Copyright -->

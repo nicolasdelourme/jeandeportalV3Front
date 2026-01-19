@@ -139,6 +139,27 @@ const routes: RouteRecordRaw[] = [
             requiresAuth: true,
         },
     },
+    // Pages légales
+    {
+        path: "/mentions-legales",
+        name: "mentions-legales",
+        component: () => import("@/views/legal/MentionsLegalesPage.vue"),
+    },
+    {
+        path: "/cgv",
+        name: "cgv",
+        component: () => import("@/views/legal/CGVPage.vue"),
+    },
+    {
+        path: "/confidentialite",
+        name: "confidentialite",
+        component: () => import("@/views/legal/ConfidentialitePage.vue"),
+    },
+    {
+        path: "/cookies",
+        name: "cookies",
+        component: () => import("@/views/legal/CookiesPage.vue"),
+    },
     {
         path: "/:pathMatch(.*)*",
         name: "not-found",
