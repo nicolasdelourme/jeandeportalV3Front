@@ -332,7 +332,7 @@ export const useCartStore = defineStore('cart', () => {
         console.error('❌ [CART STORE] ATTENTION: basketCode est null/undefined dans la réponse!')
       }
 
-      toast.success('Article ajouté au panier')
+      // Toast géré par le composant appelant (avec le nom du produit)
       console.log('✅ [CART STORE] Article ajouté')
     } catch (error: any) {
       console.error('❌ [CART STORE] Erreur lors de l\'ajout:', error)
