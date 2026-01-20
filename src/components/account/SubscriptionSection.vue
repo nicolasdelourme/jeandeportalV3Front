@@ -261,10 +261,10 @@ const formatPrice = (price: number, period: 'mensuel' | 'annuel'): string => {
                     <!-- Message d'erreur si suspendu -->
                     <p
                         v-if="subscription.status === 'suspended'"
-                        class="text-sm text-red-500 mb-3"
+                        class="text-sm text-destructive mb-3"
                     >
                         Votre moyen de paiement a été refusé.
-                        <a href="#" class="underline hover:text-red-600">Merci de le mettre a jour.</a>
+                        <Button type="button" variant="link" color="destructive" class="underline px-0">Merci de le mettre à jour.</Button>
                     </p>
 
                     <!-- Détails -->
@@ -483,7 +483,7 @@ const formatPrice = (price: number, period: 'mensuel' | 'annuel'): string => {
                                 <TableCell class="text-muted-foreground">{{ invoice.date }}</TableCell>
                                 <TableCell class="text-right">{{ invoice.amount }} €</TableCell>
                                 <TableCell class="text-center">
-                                    <Button variant="ghost" color="secondary" size="icon" class="h-8 w-8">
+                                    <Button variant="ghost" color="secondary" size="icon" class="h-8 w-8" aria-label="Télécharger la facture">
                                         <FontAwesomeIcon
                                             v-if="icons.download"
                                             :icon="icons.download"

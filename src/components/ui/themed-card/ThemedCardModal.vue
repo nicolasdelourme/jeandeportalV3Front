@@ -182,13 +182,13 @@ const handleOpenChange = (value: boolean) => {
                 Consulter
               </Button>
               <div class="flex gap-2">
-                <Button variant="outline" size="icon" rounded="lg" color="neutral-400" @click="emit('add')">
+                <Button variant="outline" size="icon" rounded="lg" color="neutral-400" @click="emit('add')" aria-label="Ajouter à ma liste">
                   <FontAwesomeIcon v-if="icons.plus" :icon="icons.plus" class="size-4" />
                 </Button>
-                <Button variant="outline" size="icon" rounded="lg" color="neutral-400" @click="emit('download')">
+                <Button variant="outline" size="icon" rounded="lg" color="neutral-400" @click="emit('download')" aria-label="Télécharger">
                   <FontAwesomeIcon v-if="icons.download" :icon="icons.download" class="size-4" />
                 </Button>
-                <Button variant="outline" size="icon" rounded="lg" color="neutral-400" @click="emit('share')">
+                <Button variant="outline" size="icon" rounded="lg" color="neutral-400" @click="emit('share')" aria-label="Partager">
                   <FontAwesomeIcon v-if="icons.share" :icon="icons.share" class="size-4" />
                 </Button>
               </div>
@@ -319,6 +319,7 @@ const handleOpenChange = (value: boolean) => {
                 color="neutral-400"
                 class="flex-1"
                 @click="emit('add')"
+                aria-label="Ajouter à ma liste"
               >
                 <FontAwesomeIcon v-if="icons.plus" :icon="icons.plus" class="size-4" />
               </Button>
@@ -329,6 +330,7 @@ const handleOpenChange = (value: boolean) => {
                 color="neutral-400"
                 class="flex-1"
                 @click="emit('download')"
+                aria-label="Télécharger"
               >
                 <FontAwesomeIcon v-if="icons.download" :icon="icons.download" class="size-4" />
               </Button>

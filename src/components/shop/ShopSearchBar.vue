@@ -72,6 +72,7 @@ const clearSearch = () => {
       v-if="localSearchQuery.trim()"
       @click="clearSearch"
       class="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 transition-colors z-10"
+      aria-label="Effacer la recherche"
     >
       <FontAwesomeIcon v-if="icons.times" :icon="icons.times" class="w-5 h-5" />
     </button>

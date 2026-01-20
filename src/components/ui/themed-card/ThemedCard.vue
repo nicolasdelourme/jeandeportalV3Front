@@ -240,6 +240,7 @@ const getInitials = (name: string) => {
           rounded="lg"
           color="neutral-400"
           @click="emit('add')"
+          aria-label="Ajouter à ma liste"
         >
           <FontAwesomeIcon v-if="icons.plus" :icon="icons.plus" class="size-4" />
         </Button>
@@ -250,6 +251,7 @@ const getInitials = (name: string) => {
           rounded="lg"
           color="neutral-400"
           @click="emit('download')"
+          aria-label="Télécharger"
         >
           <FontAwesomeIcon v-if="icons.download" :icon="icons.download" class="size-4" />
         </Button>

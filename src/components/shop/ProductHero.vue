@@ -142,6 +142,7 @@ const goToImage = (index: number) => {
         size="icon"
         class="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 hidden md:flex"
         @click="previousImage"
+        aria-label="Image précédente"
       >
         <FontAwesomeIcon v-if="icons.chevronLeft" :icon="icons.chevronLeft" class="w-5 h-5" />
       </Button>
@@ -151,6 +152,7 @@ const goToImage = (index: number) => {
         size="icon"
         class="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 hidden md:flex"
         @click="nextImage"
+        aria-label="Image suivante"
       >
         <FontAwesomeIcon v-if="icons.chevronRight" :icon="icons.chevronRight" class="w-5 h-5" />
       </Button>

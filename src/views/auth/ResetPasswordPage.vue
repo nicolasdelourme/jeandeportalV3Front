@@ -277,6 +277,7 @@ const goToForgotPassword = () => {
                                         type="button"
                                         @click="showPassword = !showPassword"
                                         class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                                        :aria-label="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
                                     >
                                         <FontAwesomeIcon v-if="showPassword && getIcon('eyeSlash')" :icon="getIcon('eyeSlash')" class="w-4 h-4" />
                                         <FontAwesomeIcon v-else-if="getIcon('eye')" :icon="getIcon('eye')" class="w-4 h-4" />
@@ -333,6 +334,7 @@ const goToForgotPassword = () => {
                                         type="button"
                                         @click="showConfirmPassword = !showConfirmPassword"
                                         class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                                        :aria-label="showConfirmPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
                                     >
                                         <FontAwesomeIcon v-if="showConfirmPassword && getIcon('eyeSlash')" :icon="getIcon('eyeSlash')" class="w-4 h-4" />
                                         <FontAwesomeIcon v-else-if="getIcon('eye')" :icon="getIcon('eye')" class="w-4 h-4" />

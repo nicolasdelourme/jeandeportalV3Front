@@ -66,7 +66,7 @@ function formatPrice(price: number): string {
 <template>
   <Popover>
     <PopoverTrigger as-child>
-      <Button variant="ghost" color="neutral-800" size="sm" class="relative">
+      <Button variant="ghost" color="neutral-800" size="sm" class="relative" aria-label="Panier">
         <FontAwesomeIcon
           v-if="icons.shoppingCart"
           :icon="icons.shoppingCart"
@@ -156,7 +156,7 @@ function formatPrice(price: number): string {
             <button
               @click="handleRemoveItem(item.itemId)"
               class="shrink-0 text-neutral-400 hover:text-red-600 transition-colors p-1"
-              title="Retirer du panier"
+              aria-label="Retirer du panier"
               :disabled="cartStore.isLoading"
             >
               <FontAwesomeIcon v-if="icons.xmark" :icon="icons.xmark" class="h-4 w-4" />

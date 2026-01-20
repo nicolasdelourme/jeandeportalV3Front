@@ -423,7 +423,8 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                     <DropdownMenu>
                         <DropdownMenuTrigger as-child>
                             <button
-                                class="hidden md:inline-flex rounded-full focus:outline-none focus:ring-2 focus:ring-secondary/20 focus:ring-offset-2">
+                                class="hidden md:inline-flex rounded-full focus:outline-none focus:ring-2 focus:ring-secondary/20 focus:ring-offset-2"
+                                aria-label="Menu du compte">
                                 <Avatar class="h-10 w-10 cursor-pointer border-2 border-secondary/10">
                                     <AvatarImage v-if="avatarUrl" :src="avatarUrl" :alt="displayName" />
                                     <AvatarFallback class="bg-secondary text-white font-semibold text-sm">
