@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@/lib/icons'
+import { getThemeColor } from '@/lib/theme-colors'
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
 
 const emit = defineEmits<{
@@ -49,7 +50,7 @@ const formations: Formation[] = [
     name: 'Métaux précieux',
     subtitle: 'Or & Argent physique',
     description: 'Apprenez à investir dans l\'or et l\'argent. Comprendre les cycles, le stockage et la protection de votre patrimoine.',
-    color: '#F2CC00',
+    color: getThemeColor('metaux'),
     textColor: 'text-black',
   },
   {
@@ -58,7 +59,7 @@ const formations: Formation[] = [
     name: 'Portefeuille permanent',
     subtitle: 'Stratégie long terme',
     description: 'Construisez un portefeuille résilient basé sur la diversification. Performant dans toutes les conditions de marché.',
-    color: '#A8C7EA',
+    color: getThemeColor('portefeuille'),
     textColor: 'text-slate-900',
   },
   {
@@ -67,7 +68,7 @@ const formations: Formation[] = [
     name: 'Liberté financière',
     subtitle: 'Indépendance & revenus',
     description: 'Les clés pour atteindre l\'indépendance financière. Revenus passifs, optimisation et stratégies de croissance.',
-    color: '#F4BFA6',
+    color: getThemeColor('liberte'),
     textColor: 'text-slate-900',
   },
   {
@@ -76,7 +77,7 @@ const formations: Formation[] = [
     name: 'Bonus exclusif',
     subtitle: 'Déblocable avec vos étoiles',
     description: 'Contenus premium réservés aux membres fidèles. Astuces fiscales avancées et opportunités confidentielles.',
-    color: '#1D1D1D',
+    color: getThemeColor('bonus'),
     textColor: 'text-white',
     isBonus: true,
   },
