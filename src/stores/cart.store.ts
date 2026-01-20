@@ -247,7 +247,6 @@ export const useCartStore = defineStore('cart', () => {
       console.log(`✅ [CART STORE] Panier synchronisé: ${mapped.items.length} items, basketCode=${mapped.basketCode ? '***' : 'null'}`)
     } catch (error) {
       console.error('❌ [CART STORE] Erreur lors de la synchronisation:', error)
-      toast.error('Impossible de charger le panier')
       throw error
     } finally {
       cartState.value.isLoading = false
@@ -338,7 +337,6 @@ export const useCartStore = defineStore('cart', () => {
       console.log('✅ [CART STORE] Article ajouté')
     } catch (error) {
       console.error('❌ [CART STORE] Erreur lors de l\'ajout:', error)
-      toast.error(getErrorMessage(error))
       throw error
     } finally {
       cartState.value.isLoading = false
@@ -378,7 +376,6 @@ export const useCartStore = defineStore('cart', () => {
       console.log('✅ [CART STORE] Quantité mise à jour')
     } catch (error) {
       console.error('❌ [CART STORE] Erreur lors de la mise à jour:', error)
-      toast.error(getErrorMessage(error))
       throw error
     } finally {
       cartState.value.isLoading = false
@@ -425,7 +422,6 @@ export const useCartStore = defineStore('cart', () => {
       console.log('✅ [CART STORE] Article supprimé')
     } catch (error) {
       console.error('❌ [CART STORE] Erreur lors de la suppression:', error)
-      toast.error(getErrorMessage(error))
       throw error
     } finally {
       cartState.value.isLoading = false
@@ -457,7 +453,6 @@ export const useCartStore = defineStore('cart', () => {
       console.log('✅ [CART STORE] Panier vidé')
     } catch (error) {
       console.error('❌ [CART STORE] Erreur lors du vidage:', error)
-      toast.error(getErrorMessage(error))
       throw error
     } finally {
       cartState.value.isLoading = false
