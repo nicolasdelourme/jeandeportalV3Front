@@ -37,6 +37,10 @@ const iti = ref<Iti | null>(null)
 const isValid = ref(true)
 const isFocused = ref(false)
 
+// Références pour le cleanup des event listeners
+let inputHandler: (() => void) | null = null
+let countryChangeHandler: (() => void) | null = null
+
 /**
  * Classes CSS pour l'input (style shadcn)
  */
@@ -100,14 +104,18 @@ onMounted(() => {
         iti.value.setNumber(props.modelValue)
     }
 
-    // Écouter les événements
-    inputRef.value.addEventListener('input', updateNumber)
-    inputRef.value.addEventListener('countrychange', () => {
+    // Définir les handlers pour pouvoir les supprimer dans onUnmounted
+    inputHandler = updateNumber
+    countryChangeHandler = () => {
         if (iti.value) {
             emit('countryChange', iti.value.getSelectedCountryData())
             updateNumber()
         }
-    })
+    }
+
+    // Écouter les événements
+    inputRef.value.addEventListener('input', inputHandler)
+    inputRef.value.addEventListener('countrychange', countryChangeHandler)
 })
 
 /**
@@ -120,12 +128,27 @@ watch(() => props.modelValue, (newValue) => {
 })
 
 /**
- * Cleanup
+ * Cleanup - supprimer les event listeners et détruire l'instance
  */
 onUnmounted(() => {
+    // Supprimer les event listeners
+    if (inputRef.value) {
+        if (inputHandler) {
+            inputRef.value.removeEventListener('input', inputHandler)
+        }
+        if (countryChangeHandler) {
+            inputRef.value.removeEventListener('countrychange', countryChangeHandler)
+        }
+    }
+
+    // Détruire l'instance intl-tel-input
     if (iti.value) {
         iti.value.destroy()
     }
+
+    // Nettoyer les références
+    inputHandler = null
+    countryChangeHandler = null
 })
 
 const handleFocus = () => {

@@ -56,7 +56,7 @@ const getPriceDisplay = (ref: ShopReference) => {
 const emblaApi = ref<CarouselApi>();
 const current = ref(0);
 const count = ref(0);
-let autoplayInterval: ReturnType<typeof setInterval> | null = null;
+const autoplayInterval = ref<ReturnType<typeof setInterval> | null>(null);
 
 /**
  * Sélectionner 3 produits aléatoires du catalogue
@@ -94,9 +94,9 @@ const setApi = (api: CarouselApi) => {
  * Démarrer l'autoplay toutes les 5 secondes
  */
 const startAutoplay = () => {
-    if (autoplayInterval) clearInterval(autoplayInterval);
+    if (autoplayInterval.value) clearInterval(autoplayInterval.value);
 
-    autoplayInterval = setInterval(() => {
+    autoplayInterval.value = setInterval(() => {
         if (emblaApi.value) {
             const currentIndex = emblaApi.value.selectedScrollSnap();
             const snapCount = emblaApi.value.scrollSnapList().length;
@@ -114,9 +114,9 @@ const startAutoplay = () => {
  * Arrêter l'autoplay
  */
 const stopAutoplay = () => {
-    if (autoplayInterval) {
-        clearInterval(autoplayInterval);
-        autoplayInterval = null;
+    if (autoplayInterval.value) {
+        clearInterval(autoplayInterval.value);
+        autoplayInterval.value = null;
     }
 };
 
