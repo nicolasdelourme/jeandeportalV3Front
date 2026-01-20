@@ -86,6 +86,24 @@ export const useShopStore = defineStore('shop', () => {
   const references = computed(() => catalog.value.references)
 
   /**
+   * Cache des prix min/max par référence
+   * Calculé une seule fois quand le catalogue change (pas à chaque accès getter)
+   */
+  const priceDataByReference = computed(() => {
+    const priceMap = new Map<string, { min: number; max: number }>()
+
+    for (const ref of references.value) {
+      const allPrices = ref.products.flatMap((p) => p.prices.map((price) => price.amount))
+      priceMap.set(ref.id, {
+        min: allPrices.length > 0 ? Math.min(...allPrices) : Infinity,
+        max: allPrices.length > 0 ? Math.max(...allPrices) : -Infinity,
+      })
+    }
+
+    return priceMap
+  })
+
+  /**
    * Toutes les collections uniques disponibles
    */
   const availableCollections = computed(() => {
@@ -172,27 +190,19 @@ export const useShopStore = defineStore('shop', () => {
       return [...filtered].sort((a, b) => parseInt(a.id) - parseInt(b.id))
     }
 
-    // Tris par prix: pré-calcul des min/max une seule fois par référence
+    // Tris par prix: utilise le cache pré-calculé (priceDataByReference)
     if (sortOption === 'price-asc' || sortOption === 'price-desc') {
-      const priceCache = new Map<string, { min: number; max: number }>()
-
-      for (const ref of filtered) {
-        const allPrices = ref.products.flatMap((p) => p.prices.map((price) => price.amount))
-        priceCache.set(ref.id, {
-          min: allPrices.length > 0 ? Math.min(...allPrices) : Infinity,
-          max: allPrices.length > 0 ? Math.max(...allPrices) : -Infinity,
-        })
-      }
+      const priceCache = priceDataByReference.value
 
       if (sortOption === 'price-asc') {
         return [...filtered].sort((a, b) => {
-          return priceCache.get(a.id)!.min - priceCache.get(b.id)!.min
+          return (priceCache.get(a.id)?.min ?? Infinity) - (priceCache.get(b.id)?.min ?? Infinity)
         })
       }
 
       // price-desc
       return [...filtered].sort((a, b) => {
-        return priceCache.get(b.id)!.max - priceCache.get(a.id)!.max
+        return (priceCache.get(b.id)?.max ?? -Infinity) - (priceCache.get(a.id)?.max ?? -Infinity)
       })
     }
 
