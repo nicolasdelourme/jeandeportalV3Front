@@ -11,6 +11,7 @@ import type {
     CreateAddressDto
 } from '@/types/address.types'
 import { logger } from '@/utils/logger'
+import { getHttpErrorCode, getHttpErrorData } from '@/lib/error-utils'
 
 /**
  * Erreur spécifique aux adresses
@@ -54,18 +55,19 @@ class AddressService {
 
             logger.info(`✅ ${response.adress_array?.length || 0} adresse(s) récupérée(s)`)
             return response
-        } catch (error: any) {
+        } catch (error) {
             if (error instanceof AddressError) {
                 throw error
             }
 
             logger.error('❌ Erreur lors de la récupération des adresses:', error)
-            const errorMessage = error.response?.data?.message || 'Impossible de récupérer les adresses'
+            const httpData = getHttpErrorData<{ message?: string }>(error)
+            const errorMessage = httpData?.message || 'Impossible de récupérer les adresses'
 
             throw new AddressError(
                 errorMessage,
                 'FETCH_ERROR',
-                error.response?.status
+                getHttpErrorCode(error)
             )
         }
     }
@@ -106,18 +108,19 @@ class AddressService {
 
             logger.info('✅ Adresse créée avec succès')
             return response
-        } catch (error: any) {
+        } catch (error) {
             if (error instanceof AddressError) {
                 throw error
             }
 
             logger.error('❌ Erreur lors de la création de l\'adresse:', error)
-            const errorMessage = error.response?.data?.message || 'Impossible de créer l\'adresse'
+            const httpData = getHttpErrorData<{ message?: string }>(error)
+            const errorMessage = httpData?.message || 'Impossible de créer l\'adresse'
 
             throw new AddressError(
                 errorMessage,
                 'CREATE_ERROR',
-                error.response?.status
+                getHttpErrorCode(error)
             )
         }
     }
@@ -163,18 +166,19 @@ class AddressService {
 
             logger.info('✅ Adresse mise à jour avec succès')
             return response
-        } catch (error: any) {
+        } catch (error) {
             if (error instanceof AddressError) {
                 throw error
             }
 
             logger.error('❌ Erreur lors de la mise à jour de l\'adresse:', error)
-            const errorMessage = error.response?.data?.message || 'Impossible de mettre à jour l\'adresse'
+            const httpData = getHttpErrorData<{ message?: string }>(error)
+            const errorMessage = httpData?.message || 'Impossible de mettre à jour l\'adresse'
 
             throw new AddressError(
                 errorMessage,
                 'UPDATE_ERROR',
-                error.response?.status
+                getHttpErrorCode(error)
             )
         }
     }
@@ -200,18 +204,19 @@ class AddressService {
 
             logger.info('✅ Adresse supprimée avec succès')
             return response
-        } catch (error: any) {
+        } catch (error) {
             if (error instanceof AddressError) {
                 throw error
             }
 
             logger.error('❌ Erreur lors de la suppression de l\'adresse:', error)
-            const errorMessage = error.response?.data?.message || 'Impossible de supprimer l\'adresse'
+            const httpData = getHttpErrorData<{ message?: string }>(error)
+            const errorMessage = httpData?.message || 'Impossible de supprimer l\'adresse'
 
             throw new AddressError(
                 errorMessage,
                 'DELETE_ERROR',
-                error.response?.status
+                getHttpErrorCode(error)
             )
         }
     }

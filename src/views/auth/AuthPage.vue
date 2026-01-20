@@ -8,6 +8,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { useAuthStore } from '@/stores/auth.store'
 import { authService } from '@/services/auth.service'
+import { getErrorMessage } from '@/lib/error-utils'
 import DefaultLayout from '@/components/layout/DefaultLayout.vue'
 import AuthFormWrapper from '@/components/auth/AuthFormWrapper.vue'
 import LoginForm from '@/components/auth/LoginForm.vue'
@@ -79,9 +80,9 @@ const handleLoginSubmit = async (values: { email: string; password: string; reme
         console.log('🚀 [AUTH PAGE] Redirection vers:', finalUrl)
         await router.push(finalUrl)
         console.log('✅ [AUTH PAGE] router.push() terminé')
-    } catch (error: any) {
+    } catch (error) {
         console.error('❌ [AUTH PAGE] Erreur lors du login:', error)
-        errors.value.general = error.message || 'Identifiants incorrects. Veuillez réessayer.'
+        errors.value.general = getErrorMessage(error)
     } finally {
         isSubmitting.value = false
     }
@@ -121,9 +122,9 @@ const handleRegisterSubmit = async (values: {
         registrationSuccess.value = true
 
         toast.success('Un email de vérification a été envoyé !')
-    } catch (error: any) {
+    } catch (error) {
         console.error('Erreur:', error)
-        errors.value.general = error.message || 'Une erreur est survenue lors de la création du compte.'
+        errors.value.general = getErrorMessage(error)
     } finally {
         isSubmitting.value = false
     }
@@ -151,9 +152,9 @@ const handleForgotPasswordSubmit = async (values: { email: string }) => {
         const result = await authService.forgotPassword(values.email)
         toast.success(result.message)
         mode.value = 'login'
-    } catch (error: any) {
+    } catch (error) {
         console.error('Erreur:', error)
-        errors.value.general = error.message || 'Impossible d\'envoyer l\'email de réinitialisation.'
+        errors.value.general = getErrorMessage(error)
     } finally {
         isSubmitting.value = false
     }

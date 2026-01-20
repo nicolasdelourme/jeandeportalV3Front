@@ -9,6 +9,7 @@ import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
 import { toast } from 'vue-sonner'
+import { getErrorMessage } from '@/lib/error-utils'
 import { getLocalTimeZone, today, parseDate } from '@internationalized/date'
 import type { DateValue } from 'reka-ui'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -191,9 +192,9 @@ const onSubmit = handleSubmit(async (values) => {
         toast.success('Profil mis à jour avec succès !')
         // Réinitialiser le formulaire avec les nouvelles valeurs pour que dirty redevienne false
         resetForm({ values })
-    } catch (error: any) {
+    } catch (error) {
         console.error('Erreur:', error)
-        toast.error(error.message || 'Impossible de mettre à jour le profil')
+        toast.error(getErrorMessage(error))
     } finally {
         isSubmitting.value = false
     }

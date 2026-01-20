@@ -15,6 +15,7 @@ import { CartError, CART_CONFIG } from '@/types/cart.types'
 import { cartService } from '@/services/cart.service'
 import { decodeHtmlEntities } from '@/utils/html.utils'
 import { toast } from 'vue-sonner'
+import { getErrorMessage } from '@/lib/error-utils'
 
 /**
  * Clé localStorage pour le basketCode
@@ -271,17 +272,18 @@ export const useCartStore = defineStore('cart', () => {
     // Charger le panier depuis le backend (si on a un basketCode)
     try {
       await syncWithBackend()
-    } catch (error: any) {
+    } catch (error) {
       // Debug: voir l'erreur complète
+      const cartError = error as CartError
       console.log('🔍 [DEBUG] initialize error:', {
-        name: error?.name,
-        code: error?.code,
-        message: error?.message,
+        name: cartError?.name,
+        code: cartError?.code,
+        message: getErrorMessage(error),
         isCartError: error instanceof CartError
       })
 
       // Si le panier n'existe plus côté backend, supprimer le basketCode local
-      if (error?.code === 'BASKET_NOT_FOUND') {
+      if (cartError?.code === 'BASKET_NOT_FOUND') {
         console.warn('🛒 [CART STORE] Panier expiré/invalide, suppression du basketCode local')
         cartState.value.basketCode = null
         saveBasketCode(null)
@@ -334,9 +336,9 @@ export const useCartStore = defineStore('cart', () => {
 
       // Toast géré par le composant appelant (avec le nom du produit)
       console.log('✅ [CART STORE] Article ajouté')
-    } catch (error: any) {
+    } catch (error) {
       console.error('❌ [CART STORE] Erreur lors de l\'ajout:', error)
-      toast.error(error.message || 'Impossible d\'ajouter l\'article')
+      toast.error(getErrorMessage(error))
       throw error
     } finally {
       cartState.value.isLoading = false
@@ -374,9 +376,9 @@ export const useCartStore = defineStore('cart', () => {
       }
 
       console.log('✅ [CART STORE] Quantité mise à jour')
-    } catch (error: any) {
+    } catch (error) {
       console.error('❌ [CART STORE] Erreur lors de la mise à jour:', error)
-      toast.error(error.message || 'Impossible de modifier la quantité')
+      toast.error(getErrorMessage(error))
       throw error
     } finally {
       cartState.value.isLoading = false
@@ -421,9 +423,9 @@ export const useCartStore = defineStore('cart', () => {
 
       toast.success('Article retiré du panier')
       console.log('✅ [CART STORE] Article supprimé')
-    } catch (error: any) {
+    } catch (error) {
       console.error('❌ [CART STORE] Erreur lors de la suppression:', error)
-      toast.error(error.message || 'Impossible de supprimer l\'article')
+      toast.error(getErrorMessage(error))
       throw error
     } finally {
       cartState.value.isLoading = false
@@ -453,9 +455,9 @@ export const useCartStore = defineStore('cart', () => {
 
       toast.success('Panier vidé')
       console.log('✅ [CART STORE] Panier vidé')
-    } catch (error: any) {
+    } catch (error) {
       console.error('❌ [CART STORE] Erreur lors du vidage:', error)
-      toast.error(error.message || 'Impossible de vider le panier')
+      toast.error(getErrorMessage(error))
       throw error
     } finally {
       cartState.value.isLoading = false

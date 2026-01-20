@@ -7,6 +7,7 @@ import { apiClient } from '@/api/client'
 import type { LoginCredentials, RegisterCredentials, AuthResponse, AuthSuccessResponse, User, VerifyEmailResponse, ResetPasswordResponse, ChangeEmailResponse, ValidateEmailChangeResponse, UpdateProfileDto } from '@/types/auth.types'
 import { AuthError } from '@/types/auth.types'
 import { logger } from '@/utils/logger'
+import { getHttpErrorCode, getHttpErrorData } from '@/lib/error-utils'
 
 // MOCK MODE : Contrôlé par VITE_API_MODE
 // - "mock" (défaut en dev) : utilise les données fictives
@@ -66,7 +67,7 @@ export class AuthService {
             }
 
             return response
-        } catch (error: any) {
+        } catch (error) {
             // Si c'est déjà une AuthError, la re-lancer
             if (error instanceof AuthError) {
                 throw error
@@ -76,12 +77,13 @@ export class AuthService {
             logger.error('Erreur lors de la connexion:', error)
 
             // Essayer d'extraire le message d'erreur de la réponse
-            const errorMessage = error.response?.data?.message || 'Impossible de se connecter. Vérifiez vos identifiants.'
+            const httpData = getHttpErrorData<{ message?: string }>(error)
+            const errorMessage = httpData?.message || 'Impossible de se connecter. Vérifiez vos identifiants.'
 
             throw new AuthError(
                 errorMessage,
                 'INVALID_CREDENTIALS',
-                error.response?.status
+                getHttpErrorCode(error)
             )
         }
     }
@@ -126,7 +128,7 @@ export class AuthService {
             }
 
             return response
-        } catch (error: any) {
+        } catch (error) {
             // Si c'est déjà une AuthError, la re-lancer
             if (error instanceof AuthError) {
                 throw error
@@ -135,22 +137,25 @@ export class AuthService {
             // Gérer les erreurs HTTP/réseau
             logger.error('Erreur lors de l\'inscription:', error)
 
+            const httpCode = getHttpErrorCode(error)
+            const httpData = getHttpErrorData<{ message?: string }>(error)
+
             // Gérer les erreurs spécifiques
-            if (error.response?.status === 409) {
+            if (httpCode === 409) {
                 throw new AuthError(
-                    error.response?.data?.message || 'Un compte existe déjà avec cet email.',
+                    httpData?.message || 'Un compte existe déjà avec cet email.',
                     'USER_EXISTS',
                     409
                 )
             }
 
             // Essayer d'extraire le message d'erreur de la réponse
-            const errorMessage = error.response?.data?.message || 'Impossible de créer le compte. Veuillez réessayer.'
+            const errorMessage = httpData?.message || 'Impossible de créer le compte. Veuillez réessayer.'
 
             throw new AuthError(
                 errorMessage,
                 'UNKNOWN_ERROR',
-                error.response?.status
+                httpCode
             )
         }
     }
@@ -172,15 +177,16 @@ export class AuthService {
                 )
                 return response
             }
-        } catch (error: any) {
+        } catch (error) {
             logger.error('Erreur lors de la vérification de l\'email:', error)
 
-            const errorMessage = error.response?.data?.message || 'Impossible de vérifier l\'email. Le lien est peut-être expiré.'
+            const httpData = getHttpErrorData<{ message?: string }>(error)
+            const errorMessage = httpData?.message || 'Impossible de vérifier l\'email. Le lien est peut-être expiré.'
 
             throw new AuthError(
                 errorMessage,
                 'UNKNOWN_ERROR',
-                error.response?.status
+                getHttpErrorCode(error)
             )
         }
     }
@@ -205,12 +211,12 @@ export class AuthService {
                 const response = await apiClient.get<User>('/me')
                 return response
             }
-        } catch (error: any) {
+        } catch (error) {
             logger.error('Erreur lors de la récupération du profil:', error)
             throw new AuthError(
                 'Impossible de récupérer le profil utilisateur.',
                 'TOKEN_EXPIRED',
-                error.response?.status
+                getHttpErrorCode(error)
             )
         }
     }
@@ -228,12 +234,13 @@ export class AuthService {
                 const response = await apiClient.post<User>('/updateMe', data)
                 return response
             }
-        } catch (error: any) {
+        } catch (error) {
             logger.error('Erreur lors de la mise à jour du profil:', error)
+            const httpData = getHttpErrorData<{ message?: string }>(error)
             throw new AuthError(
-                error.response?.data?.message || 'Impossible de mettre à jour le profil.',
+                httpData?.message || 'Impossible de mettre à jour le profil.',
                 'UNKNOWN_ERROR',
-                error.response?.status
+                getHttpErrorCode(error)
             )
         }
     }
@@ -251,7 +258,7 @@ export class AuthService {
                 // Appel API réel (GET, pas POST!)
                 await apiClient.get('/logout')
             }
-        } catch (error: any) {
+        } catch (error) {
             logger.error('Erreur lors de la déconnexion:', error)
             // On ne lève pas d'erreur car la déconnexion locale doit quand même se faire
         }
@@ -276,12 +283,12 @@ export class AuthService {
                     message: 'Si un compte existe avec cet email, un lien de réinitialisation a été envoyé.'
                 }
             }
-        } catch (error: any) {
+        } catch (error) {
             logger.error('Erreur lors de la réinitialisation:', error)
             throw new AuthError(
                 'Impossible d\'envoyer l\'email de réinitialisation.',
                 'NETWORK_ERROR',
-                error.response?.status
+                getHttpErrorCode(error)
             )
         }
     }
@@ -303,15 +310,16 @@ export class AuthService {
                 )
                 return response
             }
-        } catch (error: any) {
+        } catch (error) {
             logger.error('Erreur lors de la vérification du code:', error)
 
-            const errorMessage = error.response?.data?.message || 'Le lien de réinitialisation est invalide ou a expiré.'
+            const httpData = getHttpErrorData<{ message?: string }>(error)
+            const errorMessage = httpData?.message || 'Le lien de réinitialisation est invalide ou a expiré.'
 
             throw new AuthError(
                 errorMessage,
                 'UNKNOWN_ERROR',
-                error.response?.status
+                getHttpErrorCode(error)
             )
         }
     }
@@ -339,15 +347,16 @@ export class AuthService {
                 )
                 return response
             }
-        } catch (error: any) {
+        } catch (error) {
             logger.error('Erreur lors de la réinitialisation du mot de passe:', error)
 
-            const errorMessage = error.response?.data?.message || 'Impossible de réinitialiser le mot de passe.'
+            const httpData = getHttpErrorData<{ message?: string }>(error)
+            const errorMessage = httpData?.message || 'Impossible de réinitialiser le mot de passe.'
 
             throw new AuthError(
                 errorMessage,
                 'UNKNOWN_ERROR',
-                error.response?.status
+                getHttpErrorCode(error)
             )
         }
     }
@@ -391,16 +400,17 @@ export class AuthService {
                 // Si format inconnu mais pas d'erreur explicite, considérer comme succès
                 return { status: 'success' }
             }
-        } catch (error: any) {
+        } catch (error) {
             console.error('🔍 [DEBUG] Erreur dans requestEmailChange:', error)
             logger.error('Erreur lors de la demande de modification d\'email:', error)
 
-            const errorMessage = error.response?.data?.message || 'Impossible de demander la modification d\'email.'
+            const httpData = getHttpErrorData<{ message?: string }>(error)
+            const errorMessage = httpData?.message || 'Impossible de demander la modification d\'email.'
 
             throw new AuthError(
                 errorMessage,
                 'UNKNOWN_ERROR',
-                error.response?.status
+                getHttpErrorCode(error)
             )
         }
     }
@@ -422,15 +432,16 @@ export class AuthService {
                 )
                 return response
             }
-        } catch (error: any) {
+        } catch (error) {
             logger.error('Erreur lors de la validation du changement d\'email:', error)
 
-            const errorMessage = error.response?.data?.message || 'Le lien de validation est invalide ou a expiré.'
+            const httpData = getHttpErrorData<{ message?: string }>(error)
+            const errorMessage = httpData?.message || 'Le lien de validation est invalide ou a expiré.'
 
             throw new AuthError(
                 errorMessage,
                 'UNKNOWN_ERROR',
-                error.response?.status
+                getHttpErrorCode(error)
             )
         }
     }

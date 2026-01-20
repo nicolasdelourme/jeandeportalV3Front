@@ -87,23 +87,25 @@ class ShopService {
       console.log(`✅ Shop catalog loaded: ${data.references.length} references`)
 
       return data
-    } catch (error: any) {
+    } catch (error) {
       if (error instanceof ShopAPIError) {
         throw error
       }
 
-      // Gestion des erreurs Axios
-      if (error.response) {
+      // Gestion des erreurs Axios (type guard)
+      const axiosError = error as { response?: { status: number; statusText: string }; request?: unknown; code?: string; name?: string }
+
+      if (axiosError.response) {
         // Le serveur a répondu avec un code d'erreur
         throw new ShopAPIError(
-          `Erreur HTTP: ${error.response.status} ${error.response.statusText}`,
-          error.response.status
+          `Erreur HTTP: ${axiosError.response.status} ${axiosError.response.statusText}`,
+          axiosError.response.status
         )
       }
 
-      if (error.request) {
+      if (axiosError.request) {
         // La requête a été faite mais pas de réponse
-        if (error.code === 'ECONNABORTED' || error.name === 'AbortError') {
+        if (axiosError.code === 'ECONNABORTED' || axiosError.name === 'AbortError') {
           throw new ShopAPIError('Requête annulée ou timeout')
         }
         throw new ShopAPIError('Aucune réponse du serveur')

@@ -8,6 +8,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { useAuthStore } from '@/stores/auth.store'
+import { getErrorMessage } from '@/lib/error-utils'
 import DefaultLayout from '@/components/layout/DefaultLayout.vue'
 import AuthFormWrapper from '@/components/auth/AuthFormWrapper.vue'
 import { Button } from '@/components/ui/button'
@@ -46,9 +47,9 @@ onMounted(async () => {
         } else {
             message.value = result.message || 'Le lien de vérification est invalide ou a expiré.'
         }
-    } catch (error: any) {
+    } catch (error) {
         isSuccess.value = false
-        message.value = error.message || 'Une erreur est survenue lors de la vérification.'
+        message.value = getErrorMessage(error)
     } finally {
         isLoading.value = false
     }

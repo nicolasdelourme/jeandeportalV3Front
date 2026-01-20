@@ -16,6 +16,7 @@ import type { CartItem, CartReceipt } from '@/types/cart.types'
 import { CartError, CART_CONFIG } from '@/types/cart.types'
 import { logger } from '@/utils/logger'
 import { decodeHtmlEntities } from '@/utils/html.utils'
+import { getHttpErrorData } from '@/lib/error-utils'
 
 /**
  * URL de base pour les images du backend
@@ -83,10 +84,11 @@ class CartService {
 
             logger.info('✅ [CART SERVICE] Article ajouté avec succès')
             return response
-        } catch (error: any) {
+        } catch (error) {
             logger.error('❌ [CART SERVICE] Erreur lors de l\'ajout au panier:', error)
+            const httpData = getHttpErrorData<{ message?: string }>(error)
             throw new CartError(
-                error.response?.data?.message || 'Impossible d\'ajouter l\'article au panier',
+                httpData?.message || 'Impossible d\'ajouter l\'article au panier',
                 'API_ERROR'
             )
         }
@@ -124,21 +126,16 @@ class CartService {
 
             logger.info(`✅ [CART SERVICE] Panier récupéré: ${response.basket.count || 0} items`)
             return response
-        } catch (error: any) {
+        } catch (error) {
             // Si c'est déjà un CartError (ex: BASKET_NOT_FOUND), le re-throw tel quel
             if (error instanceof CartError) {
                 throw error
             }
 
             logger.error('❌ [CART SERVICE] Erreur lors de la récupération du panier:', error)
-            // Debug: afficher plus de détails sur l'erreur
-            console.log('🔍 [DEBUG] fetchCart error details:', {
-                message: error.message,
-                response: error.response?.data,
-                status: error.response?.status
-            })
+            const httpData = getHttpErrorData<{ message?: string }>(error)
             throw new CartError(
-                error.response?.data?.message || 'Impossible de récupérer le panier',
+                httpData?.message || 'Impossible de récupérer le panier',
                 'API_ERROR'
             )
         }
@@ -184,14 +181,15 @@ class CartService {
             }
 
             return response
-        } catch (error: any) {
+        } catch (error) {
             if (error instanceof CartError) {
                 throw error
             }
 
             logger.error('❌ [CART SERVICE] Erreur lors de la mise à jour de quantité:', error)
+            const httpData = getHttpErrorData<{ message?: string }>(error)
             throw new CartError(
-                error.response?.data?.message || 'Impossible de modifier la quantité',
+                httpData?.message || 'Impossible de modifier la quantité',
                 'API_ERROR'
             )
         }
@@ -235,14 +233,15 @@ class CartService {
 
             logger.info('✅ [CART SERVICE] Article supprimé du panier')
             return response
-        } catch (error: any) {
+        } catch (error) {
             if (error instanceof CartError) {
                 throw error
             }
 
             logger.error('❌ [CART SERVICE] Erreur lors de la suppression:', error)
+            const httpData = getHttpErrorData<{ message?: string }>(error)
             throw new CartError(
-                error.response?.data?.message || 'Impossible de supprimer l\'article',
+                httpData?.message || 'Impossible de supprimer l\'article',
                 'API_ERROR'
             )
         }
@@ -281,7 +280,7 @@ class CartService {
 
             logger.info('✅ [CART SERVICE] Panier vidé')
             return response
-        } catch (error: any) {
+        } catch (error) {
             if (error instanceof CartError) {
                 throw error
             }

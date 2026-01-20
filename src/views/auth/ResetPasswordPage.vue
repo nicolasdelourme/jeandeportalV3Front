@@ -11,6 +11,7 @@ import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
 import { toast } from 'vue-sonner'
 import { authService } from '@/services/auth.service'
+import { getErrorMessage } from '@/lib/error-utils'
 import DefaultLayout from '@/components/layout/DefaultLayout.vue'
 import AuthFormWrapper from '@/components/auth/AuthFormWrapper.vue'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form'
@@ -148,9 +149,9 @@ onMounted(async () => {
         if (result.status !== 'success') {
             errorMessage.value = result.message || 'Le lien de réinitialisation est invalide ou a expiré.'
         }
-    } catch (error: any) {
+    } catch (error) {
         isCodeValid.value = false
-        errorMessage.value = error.message || 'Le lien de réinitialisation est invalide ou a expiré.'
+        errorMessage.value = getErrorMessage(error)
     } finally {
         isVerifying.value = false
     }
@@ -176,8 +177,8 @@ const onSubmit = handleSubmit(async (formValues) => {
         } else {
             errorMessage.value = result.message || 'Une erreur est survenue.'
         }
-    } catch (error: any) {
-        errorMessage.value = error.message || 'Une erreur est survenue lors de la réinitialisation.'
+    } catch (error) {
+        errorMessage.value = getErrorMessage(error)
     } finally {
         isSubmitting.value = false
     }

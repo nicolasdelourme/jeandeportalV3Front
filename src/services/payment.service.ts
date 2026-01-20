@@ -7,6 +7,7 @@ import { apiClient } from '@/api/client'
 import type { InitPaymentRequest, InitPaymentResponse, InitPaymentResult } from '@/types/payment.types'
 import { PaymentError } from '@/types/payment.types'
 import { logger } from '@/utils/logger'
+import { getHttpErrorCode, getHttpErrorData } from '@/lib/error-utils'
 
 /**
  * Service de paiement
@@ -57,15 +58,18 @@ class PaymentService {
         clientSecret: response.client_secret,
         publicKey: response.stripePublicKey
       }
-    } catch (error: any) {
+    } catch (error) {
       if (error instanceof PaymentError) {
         throw error
       }
 
       logger.error('❌ [PAYMENT SERVICE] Erreur lors de l\'initialisation:', error)
 
+      const httpCode = getHttpErrorCode(error)
+      const httpData = getHttpErrorData<{ message?: string }>(error)
+
       // Gérer les erreurs spécifiques
-      if (error.response?.status === 404) {
+      if (httpCode === 404) {
         throw new PaymentError(
           'Panier non trouvé ou expiré',
           'BASKET_EXPIRED',
@@ -73,12 +77,12 @@ class PaymentService {
         )
       }
 
-      const errorMessage = error.response?.data?.message || 'Erreur lors de l\'initialisation du paiement'
+      const errorMessage = httpData?.message || 'Erreur lors de l\'initialisation du paiement'
 
       throw new PaymentError(
         errorMessage,
         'NETWORK_ERROR',
-        error.response?.status
+        httpCode
       )
     }
   }

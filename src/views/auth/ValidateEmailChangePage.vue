@@ -9,6 +9,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { authService } from '@/services/auth.service'
 import { useAuthStore } from '@/stores/auth.store'
+import { getErrorMessage } from '@/lib/error-utils'
 import DefaultLayout from '@/components/layout/DefaultLayout.vue'
 import AuthFormWrapper from '@/components/auth/AuthFormWrapper.vue'
 import { Button } from '@/components/ui/button'
@@ -49,9 +50,9 @@ onMounted(async () => {
         } else {
             message.value = result.message || 'Le lien de validation est invalide ou a expiré.'
         }
-    } catch (error: any) {
+    } catch (error) {
         isSuccess.value = false
-        message.value = error.message || 'Une erreur est survenue lors de la validation.'
+        message.value = getErrorMessage(error)
     } finally {
         isLoading.value = false
     }

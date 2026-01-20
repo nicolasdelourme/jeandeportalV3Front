@@ -8,6 +8,7 @@ import { toast } from 'vue-sonner'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
+import { getErrorMessage } from '@/lib/error-utils'
 import {
   Dialog,
   DialogContent,
@@ -83,9 +84,9 @@ const onSubmit = handleSubmit(async (formValues) => {
       console.log('🔍 [DEBUG] Status non-success:', result.status, result.message)
       toast.error(result.message || 'Impossible de demander le changement d\'email')
     }
-  } catch (error: any) {
+  } catch (error) {
     console.error('🔍 [DEBUG] Erreur dans onSubmit:', error)
-    toast.error(error.message || 'Impossible de demander le changement d\'email')
+    toast.error(getErrorMessage(error))
   } finally {
     isSubmitting.value = false
   }

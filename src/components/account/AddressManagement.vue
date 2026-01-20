@@ -9,6 +9,7 @@ import type { UserAddress } from '@/types/auth.types'
 import { toast } from 'vue-sonner'
 import { useAuth } from '@/composables/useAuth'
 import { addressService } from '@/services/address.service'
+import { getErrorMessage } from '@/lib/error-utils'
 
 import AddressForm from './AddressForm.vue'
 import { Button } from '@/components/ui/button'
@@ -133,9 +134,9 @@ const handleSubmit = async (data: CreateAddressDto) => {
     // Rafraîchir les données utilisateur
     await refreshUser()
     closeForm()
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erreur lors de la sauvegarde de l\'adresse:', error)
-    toast.error(error.message || 'Une erreur est survenue')
+    toast.error(getErrorMessage(error))
   } finally {
     isLoading.value = false
   }
@@ -160,9 +161,9 @@ const deleteAddress = async () => {
     // Rafraîchir les données utilisateur
     await refreshUser()
     toast.success('Adresse supprimée avec succès')
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erreur lors de la suppression de l\'adresse:', error)
-    toast.error(error.message || 'Impossible de supprimer cette adresse')
+    toast.error(getErrorMessage(error))
   } finally {
     isDeleting.value = false
     isDeleteDialogOpen.value = false
@@ -181,9 +182,9 @@ const setAsDefaultShipping = async (addressId: string) => {
     // Rafraîchir les données utilisateur
     await refreshUser()
     toast.success('Adresse de livraison par défaut mise à jour')
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erreur lors de la mise à jour:', error)
-    toast.error(error.message || 'Une erreur est survenue')
+    toast.error(getErrorMessage(error))
   } finally {
     isLoading.value = false
   }
@@ -200,9 +201,9 @@ const setAsDefaultBilling = async (addressId: string) => {
     // Rafraîchir les données utilisateur
     await refreshUser()
     toast.success('Adresse de facturation par défaut mise à jour')
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erreur lors de la mise à jour:', error)
-    toast.error(error.message || 'Une erreur est survenue')
+    toast.error(getErrorMessage(error))
   } finally {
     isLoading.value = false
   }
