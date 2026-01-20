@@ -31,6 +31,7 @@ const icons = computed(() => ({
   times: byPrefixAndName.fas?.['times'],
   star: byPrefixAndName.fas?.['star'],
   crown: byPrefixAndName.fas?.['crown'],
+  circleCheck: byPrefixAndName.fas?.['circle-check'],
 }))
 
 // État
@@ -148,17 +149,19 @@ const handleOpenChange = (value: boolean) => {
           </div>
         </div>
 
-        <!-- Cartes des plans -->
+        <!-- Cartes des plans (style aligné avec PricingSection) -->
         <div class="grid grid-cols-3 gap-3 mb-6">
           <div
             v-for="plan in plans"
             :key="plan.id"
             :class="[
-              'relative rounded-lg p-4 cursor-pointer transition-all border-2',
+              'relative rounded-sm p-4 cursor-pointer transition-all duration-300 border-2',
               selectedPlan === plan.id
-                ? 'border-secondary shadow-lg'
-                : 'border-transparent hover:border-neutral-200',
-              plan.isPremium ? 'bg-secondary text-white' : 'bg-neutral-50',
+                ? 'border-accent-yellow shadow-lg ring-2 ring-accent-yellow/20'
+                : plan.recommended
+                  ? 'border-accent-yellow/50 hover:border-accent-yellow'
+                  : 'border-border hover:border-accent-yellow/50',
+              'bg-white',
             ]"
             @click="selectPlan(plan.id)"
           >
@@ -166,55 +169,52 @@ const handleOpenChange = (value: boolean) => {
             <Badge
               v-if="plan.recommended"
               variant="default"
-              class="absolute -top-2 left-1/2 -translate-x-1/2 bg-primary text-secondary text-[10px]"
+              rounded="sm"
+              class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-accent-yellow text-primary text-[10px] font-semibold"
             >
+              <FontAwesomeIcon v-if="icons.crown" :icon="icons.crown" class="size-2.5 mr-1" />
               Recommandé
             </Badge>
 
-            <!-- Couronne Premium -->
-            <div v-if="plan.isPremium" class="flex justify-center mb-1">
-              <FontAwesomeIcon v-if="icons.crown" :icon="icons.crown" class="size-4 text-primary" />
-            </div>
-
             <!-- Nom -->
-            <h4 :class="['font-heading font-bold text-center', plan.isPremium ? 'text-white' : 'text-foreground']">
+            <h4 class="font-heading font-bold text-center text-foreground pt-1">
               {{ plan.name }}
             </h4>
 
             <!-- Prix -->
             <p class="text-center mt-2">
-              <span :class="['font-heading font-bold text-xl', plan.isPremium ? 'text-primary' : 'text-foreground']">
+              <span class="font-heading font-bold text-xl text-foreground">
                 {{ formatPrice(getPrice(plan)) }}
               </span>
-              <span :class="['text-xs', plan.isPremium ? 'text-white/70' : 'text-muted-foreground']">
+              <span class="text-xs text-muted-foreground">
                 {{ isAnnual ? '/an' : '/mois' }}
               </span>
             </p>
 
             <!-- Étoiles -->
-            <div class="flex items-center justify-center gap-1 mt-2">
-              <FontAwesomeIcon v-if="icons.star" :icon="icons.star" class="size-3 text-primary" />
-              <span :class="['text-xs', plan.isPremium ? 'text-white/70' : 'text-muted-foreground']">
+            <div class="flex items-center justify-center gap-1 mt-2 py-2 bg-accent-yellow/10 rounded-sm">
+              <FontAwesomeIcon v-if="icons.star" :icon="icons.star" class="size-3 text-accent-yellow" />
+              <span class="text-xs font-medium text-foreground">
                 +{{ plan.stars }}/mois
               </span>
             </div>
 
-            <!-- Indicateur de sélection -->
+            <!-- Indicateur de sélection (circle-check différent du check simple des features) -->
             <div
               v-if="selectedPlan === plan.id"
-              class="absolute top-2 right-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center"
+              class="absolute top-2 right-2"
             >
-              <FontAwesomeIcon v-if="icons.check" :icon="icons.check" class="size-3 text-secondary" />
+              <FontAwesomeIcon v-if="icons.circleCheck" :icon="icons.circleCheck" class="size-5 text-accent-yellow" />
             </div>
           </div>
         </div>
 
-        <!-- Features condensées -->
-        <div class="space-y-2 mb-6">
+        <!-- Features condensées (style aligné avec PricingSection) -->
+        <div class="space-y-2 mb-6 border-t border-border pt-4">
           <div
             v-for="feature in features"
             :key="feature.label"
-            class="grid grid-cols-4 gap-2 text-sm"
+            class="grid grid-cols-4 gap-2 text-sm py-1"
           >
             <span class="text-muted-foreground">{{ feature.label }}</span>
             <div
@@ -225,12 +225,12 @@ const handleOpenChange = (value: boolean) => {
               <FontAwesomeIcon
                 v-if="getFeatureValue(feature, plan.id) && icons.check"
                 :icon="icons.check"
-                class="size-4 text-green-500"
+                class="size-4 text-success"
               />
               <FontAwesomeIcon
                 v-else-if="icons.times"
                 :icon="icons.times"
-                class="size-4 text-neutral-300"
+                class="size-4 text-muted-foreground/50"
               />
             </div>
           </div>
@@ -238,10 +238,10 @@ const handleOpenChange = (value: boolean) => {
 
         <!-- CTA -->
         <Button
-          variant="secondary"
+          variant="default"
           size="lg"
-          rounded="lg"
-          class="w-full"
+          rounded="sm"
+          class="w-full bg-accent-yellow hover:bg-accent-yellow/90 text-primary font-semibold"
           :disabled="!selectedPlan"
           @click="confirmSelection"
         >
