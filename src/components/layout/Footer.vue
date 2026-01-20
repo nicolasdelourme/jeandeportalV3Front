@@ -67,19 +67,19 @@ const navigate = (path: string) => {
                         Navigation
                     </h4>
                     <div class="flex flex-col gap-2 text-[14px] leading-5" style="font-family: Roboto, sans-serif;">
-                        <a @click="navigate('/')"
+                        <a href="/" @click.prevent="navigate('/')"
                             class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer">
                             Accueil
                         </a>
-                        <a @click="navigate('/academie')"
+                        <a href="/academie" @click.prevent="navigate('/academie')"
                             class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer">
                             Académie
                         </a>
-                        <a @click="navigate('/boutique')"
+                        <a href="/boutique" @click.prevent="navigate('/boutique')"
                             class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer">
                             Boutique
                         </a>
-                        <a @click="navigate('/notre-maison')"
+                        <a href="/notre-maison" @click.prevent="navigate('/notre-maison')"
                             class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer">
                             Notre Maison
                         </a>
@@ -98,7 +98,7 @@ const navigate = (path: string) => {
                         </p>
 
                         <!-- Lien YouTube -->
-                        <a href="https://www.youtube.com/@infocash" target="_blank" rel="noopener noreferrer">
+                        <a href="https://www.youtube.com/@infocash" target="_blank" rel="noopener noreferrer" aria-label="Chaîne YouTube Infocash">
                             <FontAwesomeIcon v-if="icons.youtube" :icon="icons.youtube"
                                 class="fa-2xl w-6 h-6 text-white hover:text-primary transition-colors" />
                         </a>
@@ -142,19 +142,19 @@ const navigate = (path: string) => {
                     </AccordionTrigger>
                     <AccordionContent class="pb-4">
                         <div class="flex flex-col gap-3 text-sm leading-5" style="font-family: Roboto, sans-serif;">
-                            <a @click="navigate('/')"
+                            <a href="/" @click.prevent="navigate('/')"
                                 class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer py-1">
                                 Accueil
                             </a>
-                            <a @click="navigate('/academie')"
+                            <a href="/academie" @click.prevent="navigate('/academie')"
                                 class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer py-1">
                                 Académie
                             </a>
-                            <a @click="navigate('/boutique')"
+                            <a href="/boutique" @click.prevent="navigate('/boutique')"
                                 class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer py-1">
                                 Boutique
                             </a>
-                            <a @click="navigate('/notre-maison')"
+                            <a href="/notre-maison" @click.prevent="navigate('/notre-maison')"
                                 class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer py-1">
                                 Notre Maison
                             </a>
@@ -177,7 +177,7 @@ const navigate = (path: string) => {
 
                             <!-- Lien YouTube -->
                             <a href="https://www.youtube.com/@infocash" target="_blank" rel="noopener noreferrer"
-                               class="inline-flex">
+                               class="inline-flex" aria-label="Chaîne YouTube Infocash">
                                 <FontAwesomeIcon v-if="icons.youtube" :icon="icons.youtube"
                                     class="fa-2xl w-6 h-6 text-white hover:text-primary transition-colors" />
                             </a>
@@ -192,10 +192,10 @@ const navigate = (path: string) => {
                     style="font-family: Roboto, sans-serif;">
                     <!-- Liens légaux - Grid 2x2 sur mobile, horizontal sur desktop -->
                     <div class="grid grid-cols-2 gap-x-4 gap-y-2 md:flex md:gap-6 text-[#b0bec5]">
-                        <a @click="navigate('/cgv')" class="hover:text-white transition-colors cursor-pointer">CGV</a>
-                        <a @click="navigate('/mentions-legales')" class="hover:text-white transition-colors cursor-pointer">Mentions légales</a>
-                        <a @click="navigate('/confidentialite')" class="hover:text-white transition-colors cursor-pointer">RGPD</a>
-                        <a @click="navigate('/cookies')" class="hover:text-white transition-colors cursor-pointer">Cookies</a>
+                        <a href="/cgv" @click.prevent="navigate('/cgv')" class="hover:text-white transition-colors cursor-pointer">CGV</a>
+                        <a href="/mentions-legales" @click.prevent="navigate('/mentions-legales')" class="hover:text-white transition-colors cursor-pointer">Mentions légales</a>
+                        <a href="/confidentialite" @click.prevent="navigate('/confidentialite')" class="hover:text-white transition-colors cursor-pointer">RGPD</a>
+                        <a href="/cookies" @click.prevent="navigate('/cookies')" class="hover:text-white transition-colors cursor-pointer">Cookies</a>
                     </div>
 
                     <!-- Copyright -->
