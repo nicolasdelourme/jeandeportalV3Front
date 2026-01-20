@@ -10,7 +10,7 @@ import { byPrefixAndName } from '@/lib/icons'
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import Badge from '../ui/badge/Badge.vue'
+import { Badge } from '@/components/ui/badge'
 import CollectionCard from './CollectionCard.vue'
 import {
     Accordion,

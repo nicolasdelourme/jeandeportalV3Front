@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@/lib/icons'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import Badge from '../ui/badge/Badge.vue'
+import { Badge } from '@/components/ui/badge'
 
 const router = useRouter()
 

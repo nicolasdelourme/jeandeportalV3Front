@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@/lib/icons'
 import { useCartStore } from '@/stores/cart.store'
-import { AspectRatio } from '../ui/aspect-ratio'
+import { AspectRatio } from '@/components/ui/aspect-ratio'
 
 export type CardSize = 'featured' | 'medium' | 'small' | 'wide'
 
