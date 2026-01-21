@@ -2,11 +2,13 @@
 /**
  * PricingSection V3 - Style tableau comparatif horizontal
  * Vue tableau avec features en lignes + toggle mensuel/annuel
+ * Données dynamiques depuis l'API /fetchOneClickCatalog
  */
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { Button } from '@/components/ui/button'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@/lib/icons'
+import { useSubscriptionCatalogStore, type UIPricingPlan } from '@/stores/subscription-catalog.store'
 
 const icons = computed(() => ({
   check: byPrefixAndName.fas?.['check'],
@@ -15,23 +17,30 @@ const icons = computed(() => ({
   crown: byPrefixAndName.fas?.['crown'],
 }))
 
+// Store
+const subscriptionStore = useSubscriptionCatalogStore()
+
+// Charger le catalogue au montage
+onMounted(() => {
+  subscriptionStore.fetchCatalog()
+})
+
 // Billing period toggle
 const isAnnual = ref(false)
 const annualDiscount = 2 // 2 mois offerts
 
-interface PricingPlan {
-  id: string
-  name: string
-  priceMonthly: number
-  recommended?: boolean
-  isPremium?: boolean
-}
-
-const plans: PricingPlan[] = [
-  { id: 'essentiel', name: 'Essentiel', priceMonthly: 9.90 },
-  { id: 'standard', name: 'Standard', priceMonthly: 14.90, recommended: true },
-  { id: 'premium', name: 'Premium', priceMonthly: 19.90, isPremium: true },
+// Plans de fallback (si l'API ne répond pas)
+const fallbackPlans: UIPricingPlan[] = [
+  { id: 'essentiel', planId: 0, name: 'Essentiel', priceMonthly: 9.90, stars: 1 },
+  { id: 'standard', planId: 0, name: 'Standard', priceMonthly: 14.90, recommended: true, stars: 5 },
+  { id: 'premium', planId: 0, name: 'Premium', priceMonthly: 19.90, isPremium: true, stars: 10 },
 ]
+
+// Plans dynamiques depuis le store avec fallback
+const plans = computed<UIPricingPlan[]>(() => {
+  const storePlans = subscriptionStore.getPricingPlans()
+  return storePlans.length > 0 ? storePlans : fallbackPlans
+})
 
 interface Feature {
   label: string
@@ -50,8 +59,12 @@ const features: Feature[] = [
   { label: 'Carton d\'invitation', essentiel: 'Occasionnel', standard: '2/ans', premium: '4/ans' },
 ]
 
-const getPrice = (plan: PricingPlan) => {
+const getPrice = (plan: UIPricingPlan) => {
   if (isAnnual.value) {
+    // Utiliser le prix annuel si disponible, sinon calculer
+    if (plan.priceYearly) {
+      return plan.priceYearly
+    }
     // Prix annuel = 10 mois au lieu de 12 (2 mois offerts)
     return plan.priceMonthly * (12 - annualDiscount)
   }
@@ -108,7 +121,7 @@ const getFeatureValue = (feature: Feature, planId: string) => {
         <!-- Header du tableau -->
         <div class="grid grid-cols-4 border-b border-border">
           <!-- Cellule vide en haut à gauche -->
-          <div class="p-4 bg-neutral-50" />
+          <div class="p-4 bg-neutral-50"></div>
 
           <!-- Headers des plans -->
           <div

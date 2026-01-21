@@ -1,18 +1,19 @@
 <script setup lang="ts">
 /**
- * Page de Checkout
- * Gère le processus de paiement complet:
- * 1. Sélection des adresses
- * 2. Affichage Stripe Payment Element
- * 3. Confirmation du paiement
+ * Page de Checkout Unifiee
+ * Gere le processus de paiement pour:
+ * - Boutique (PaymentIntent) via route /commander
+ * - Abonnements OneClick (SetupIntent) via route /abonnement/checkout
+ *
+ * Le type de checkout est determine par la meta de la route (checkoutType)
  */
 import { ref, computed, onMounted, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { loadStripe, type Stripe, type StripeElements, type StripeCardElement } from '@stripe/stripe-js'
-import { useCartStore } from '@/stores/cart.store'
+import { useCheckoutFlow, isOneClickItem, type CheckoutType } from '@/composables/useCheckoutFlow'
 import { useAuth } from '@/composables/useAuth'
-import { paymentService } from '@/services/payment.service'
 import type { CheckoutStep } from '@/types/payment.types'
+import type { OneClickBasketItem } from '@/types/oneclick-basket.types'
 import { toast } from 'vue-sonner'
 import DefaultLayout from '@/components/layout/DefaultLayout.vue'
 import { Button } from '@/components/ui/button'
@@ -24,22 +25,46 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@/lib/icons'
+import CheckoutSubscriptionSummary from '@/components/checkout/CheckoutSubscriptionSummary.vue'
 
 // ============================================
-// Stores et Router
+// Router et Type de checkout
 // ============================================
 const router = useRouter()
-const cartStore = useCartStore()
+const route = useRoute()
 const { user } = useAuth()
 
+// Determiner le type de checkout depuis la meta de la route
+const checkoutType = computed<CheckoutType>(() => {
+  return (route.meta.checkoutType as CheckoutType) || 'shop'
+})
+
+// Utiliser le composable avec le type de checkout
+const {
+  basketCode,
+  isEmpty,
+  items,
+  totalPrice,
+  subtotalExclVAT,
+  vatAmount,
+  isLoading: flowIsLoading,
+  initPayment,
+  confirmPayment,
+  resetBasket,
+  checkoutTitle,
+  isSubscription,
+  successMessage,
+  buttonLabel,
+} = useCheckoutFlow(checkoutType.value)
+
 // ============================================
-// État du checkout
+// Etat du checkout
 // ============================================
 const currentStep = ref<CheckoutStep>('addresses')
 const isLoading = ref(false)
 const error = ref<string | null>(null)
 
-// Sélection des adresses
+// Selection des adresses
 const selectedShippingId = ref<number | null>(null)
 const selectedBillingId = ref<number | null>(null)
 const useSameAddress = ref(true)
@@ -63,7 +88,6 @@ const icons = computed(() => ({
   arrowLeft: byPrefixAndName.fas?.['arrow-left'],
   lock: byPrefixAndName.fas?.['lock'],
   spinner: byPrefixAndName.fas?.['spinner'],
-  // Cartes bancaires (brands)
   ccVisa: byPrefixAndName.fab?.['cc-visa'],
   ccMastercard: byPrefixAndName.fab?.['cc-mastercard'],
   ccAmex: byPrefixAndName.fab?.['cc-amex'],
@@ -89,6 +113,31 @@ const selectedBillingAddress = computed(() => {
   return addresses.value.find(a => Number(a.id) === id)
 })
 
+// Titre de page dynamique
+const pageTitle = computed(() => {
+  return isSubscription ? 'Finaliser mon abonnement' : 'Finaliser ma commande'
+})
+
+const pageSubtitle = computed(() => {
+  return isSubscription
+    ? 'Configurez votre methode de paiement pour votre abonnement'
+    : 'Confirmez vos adresses et procedez au paiement securise'
+})
+
+// Route de retour
+const backRoute = computed(() => {
+  return isSubscription ? '/academie' : '/panier'
+})
+
+// Premier item OneClick pour le resume
+const oneClickItem = computed<OneClickBasketItem | null>(() => {
+  const firstItem = items.value[0]
+  if (isSubscription && firstItem && isOneClickItem(firstItem)) {
+    return firstItem
+  }
+  return null
+})
+
 // ============================================
 // Formatage
 // ============================================
@@ -111,14 +160,14 @@ function formatAddress(addr: any): string {
 // Lifecycle
 // ============================================
 onMounted(async () => {
-  // Vérifier que le panier n'est pas vide
-  if (cartStore.isEmpty || !cartStore.basketCode) {
-    toast.error('Votre panier est vide')
-    router.push('/panier')
+  // Verifier que le panier n'est pas vide
+  if (isEmpty.value || !basketCode.value) {
+    toast.error(isSubscription ? 'Aucun abonnement selectionne' : 'Votre panier est vide')
+    router.push(backRoute.value)
     return
   }
 
-  // Pré-sélectionner les adresses par défaut
+  // Pre-selectionner les adresses par defaut
   const defaultShipping = addresses.value.find(a => a.isDefaultShipping)
   const defaultBilling = addresses.value.find(a => a.isDefaultBilling)
 
@@ -140,11 +189,10 @@ onMounted(async () => {
 // ============================================
 
 /**
- * Passe à l'étape de paiement
- * Appelle le backend pour obtenir le client_secret et la clé publique Stripe
+ * Passe a l'etape de paiement
  */
 async function proceedToPayment() {
-  if (!canProceedToPayment.value || !cartStore.basketCode) {
+  if (!canProceedToPayment.value || !basketCode.value) {
     return
   }
 
@@ -152,16 +200,13 @@ async function proceedToPayment() {
   error.value = null
 
   try {
-    // Appeler le backend pour initialiser le paiement
-    // L'API retourne client_secret + stripePublicKey
-    const { clientSecret: secret, publicKey } = await paymentService.initPayment(
-      cartStore.basketCode,
+    // Initialiser le paiement via le composable
+    const { clientSecret: secret, publicKey } = await initPayment(
       selectedShippingId.value!,
-      effectiveBillingId.value!,
-      'eur'
+      effectiveBillingId.value!
     )
 
-    // Charger Stripe avec la clé publique reçue de l'API
+    // Charger Stripe
     stripe.value = await loadStripe(publicKey)
     if (!stripe.value) {
       throw new Error('Impossible de charger Stripe')
@@ -170,7 +215,7 @@ async function proceedToPayment() {
     clientSecret.value = secret
     currentStep.value = 'payment'
 
-    // Créer le Payment Element après le changement d'étape
+    // Creer le Card Element
     await nextTick()
 
     elements.value = stripe.value.elements({
@@ -184,7 +229,6 @@ async function proceedToPayment() {
       },
     })
 
-    // Créer le Card Element (CB uniquement, pas de SEPA/PayPal)
     cardElement.value = elements.value.create('card', {
       style: {
         base: {
@@ -199,7 +243,7 @@ async function proceedToPayment() {
           color: '#ef4444',
         },
       },
-      hidePostalCode: true, // On a déjà l'adresse de facturation
+      hidePostalCode: true,
     })
 
     cardElement.value.mount('#card-element')
@@ -217,7 +261,7 @@ async function proceedToPayment() {
 }
 
 /**
- * Revient à l'étape de sélection des adresses
+ * Revient a l'etape des adresses
  */
 function backToAddresses() {
   currentStep.value = 'addresses'
@@ -230,67 +274,51 @@ function backToAddresses() {
 }
 
 /**
- * Confirme le paiement avec Stripe (CB uniquement)
+ * Confirme le paiement
  */
-async function confirmPayment() {
+async function handleConfirmPayment() {
   if (!stripe.value || !cardElement.value || !clientSecret.value) {
     return
   }
 
   isLoading.value = true
   error.value = null
-  // Note: On ne change PAS l'étape ici pour garder le Card Element monté
 
   try {
-    // Utiliser confirmCardPayment pour les paiements CB uniquement
-    const { error: stripeError, paymentIntent } = await stripe.value.confirmCardPayment(
+    const result = await confirmPayment(
+      stripe.value,
+      cardElement.value,
       clientSecret.value,
       {
-        payment_method: {
-          card: cardElement.value,
-          billing_details: {
-            name: `${selectedBillingAddress.value?.firstName} ${selectedBillingAddress.value?.lastName}`,
-            address: {
-              line1: selectedBillingAddress.value?.line1,
-              line2: selectedBillingAddress.value?.line2 || undefined,
-              postal_code: selectedBillingAddress.value?.zipcode,
-              city: selectedBillingAddress.value?.city,
-              country: 'FR',
-            },
-          },
+        name: `${selectedBillingAddress.value?.firstName} ${selectedBillingAddress.value?.lastName}`,
+        address: {
+          line1: selectedBillingAddress.value?.line1,
+          line2: selectedBillingAddress.value?.line2 || undefined,
+          postal_code: selectedBillingAddress.value?.zipcode,
+          city: selectedBillingAddress.value?.city,
+          country: 'FR',
         },
       }
     )
 
-    if (stripeError) {
-      throw new Error(stripeError.message || 'Erreur lors du paiement')
+    if (!result.success) {
+      throw new Error(result.error || 'Erreur lors du paiement')
     }
 
-    if (paymentIntent?.status === 'succeeded') {
-      currentStep.value = 'success'
-      toast.success('Paiement réussi !')
+    currentStep.value = 'success'
+    toast.success(isSubscription ? 'Abonnement active !' : 'Paiement reussi !')
 
-      // Vider le panier après paiement réussi
-      cartStore.resetCart()
+    // Reinitialiser le panier
+    resetBasket()
 
-      // Rediriger vers la page de confirmation après un délai
-      setTimeout(() => {
-        router.push('/mon-compte')
-      }, 3000)
-    } else if (paymentIntent?.status === 'requires_action') {
-      // 3D Secure ou autre action requise - Stripe gère ça automatiquement
-      console.log('Action supplémentaire requise (3D Secure)')
-    } else if (paymentIntent?.status === 'processing') {
-      // Paiement en cours de traitement (rare pour CB)
-      toast.info('Paiement en cours de traitement...')
-    } else {
-      throw new Error('Statut de paiement inattendu: ' + paymentIntent?.status)
-    }
+    // Rediriger apres un delai
+    setTimeout(() => {
+      router.push('/mon-compte')
+    }, 3000)
   } catch (err: any) {
     console.error('Erreur confirmation paiement:', err)
     const errorMessage = err.message || 'Erreur lors du paiement'
     error.value = errorMessage
-    // Rester sur l'étape payment pour permettre de réessayer
     toast.error(errorMessage)
   } finally {
     isLoading.value = false
@@ -298,10 +326,10 @@ async function confirmPayment() {
 }
 
 /**
- * Retourne au panier
+ * Retourne au panier / academie
  */
-function goToCart() {
-  router.push('/panier')
+function goBack() {
+  router.push(backRoute.value)
 }
 </script>
 
@@ -318,11 +346,11 @@ function goToCart() {
               class="h-10 w-10 text-secondary"
             />
             <h1 class="text-4xl md:text-5xl font-bold text-neutral-800" style="font-family: Roboto, sans-serif;">
-              Finaliser ma commande
+              {{ pageTitle }}
             </h1>
           </div>
           <p class="text-lg text-neutral-600">
-            Confirmez vos adresses et procédez au paiement sécurisé
+            {{ pageSubtitle }}
           </p>
         </div>
       </section>
@@ -340,13 +368,13 @@ function goToCart() {
               <AlertDescription>{{ error }}</AlertDescription>
             </Alert>
 
-            <!-- Étape 1: Sélection des adresses -->
+            <!-- Etape 1: Selection des adresses -->
             <template v-if="currentStep === 'addresses'">
               <!-- Pas d'adresses -->
               <Card v-if="!hasAddresses">
                 <CardContent class="py-8 text-center">
                   <p class="text-neutral-600 mb-4">
-                    Vous n'avez pas encore d'adresse enregistrée.
+                    Vous n'avez pas encore d'adresse enregistree.
                   </p>
                   <Button @click="() => router.push('/mon-compte')">
                     Ajouter une adresse
@@ -354,15 +382,18 @@ function goToCart() {
                 </CardContent>
               </Card>
 
-              <!-- Sélection adresse de livraison -->
+              <!-- Selection adresse de livraison -->
               <Card v-else>
                 <CardHeader>
                   <CardTitle class="flex items-center gap-2">
                     <FontAwesomeIcon v-if="icons.shippingFast" :icon="icons.shippingFast" class="h-5 w-5" />
-                    Adresse de livraison
+                    {{ isSubscription ? 'Adresse de facturation' : 'Adresse de livraison' }}
                   </CardTitle>
                   <CardDescription>
-                    Sélectionnez l'adresse où vous souhaitez recevoir votre commande
+                    {{ isSubscription
+                      ? 'Selectionnez l\'adresse pour la facturation de votre abonnement'
+                      : 'Selectionnez l\'adresse ou vous souhaitez recevoir votre commande'
+                    }}
                   </CardDescription>
                 </CardHeader>
                 <CardContent class="space-y-3">
@@ -391,8 +422,8 @@ function goToCart() {
                 </CardContent>
               </Card>
 
-              <!-- Même adresse de facturation -->
-              <Card v-if="hasAddresses">
+              <!-- Meme adresse de facturation (seulement pour boutique) -->
+              <Card v-if="hasAddresses && !isSubscription">
                 <CardContent class="py-4">
                   <div class="flex items-center gap-3">
                     <Checkbox
@@ -401,21 +432,21 @@ function goToCart() {
                       @update:checked="(val: boolean | 'indeterminate') => useSameAddress = val === true"
                     />
                     <Label for="same-address" class="cursor-pointer">
-                      Utiliser la même adresse pour la facturation
+                      Utiliser la meme adresse pour la facturation
                     </Label>
                   </div>
                 </CardContent>
               </Card>
 
-              <!-- Sélection adresse de facturation (si différente) -->
-              <Card v-if="hasAddresses && !useSameAddress">
+              <!-- Selection adresse de facturation (si differente) -->
+              <Card v-if="hasAddresses && !useSameAddress && !isSubscription">
                 <CardHeader>
                   <CardTitle class="flex items-center gap-2">
                     <FontAwesomeIcon v-if="icons.fileInvoice" :icon="icons.fileInvoice" class="h-5 w-5" />
                     Adresse de facturation
                   </CardTitle>
                   <CardDescription>
-                    Sélectionnez l'adresse pour la facturation
+                    Selectionnez l'adresse pour la facturation
                   </CardDescription>
                 </CardHeader>
                 <CardContent class="space-y-3">
@@ -446,9 +477,9 @@ function goToCart() {
 
               <!-- Bouton continuer -->
               <div class="flex gap-4">
-                <Button variant="outline" color="secondary" rounded="lg" class="hover:bg-secondary hover:border-secondary" @click="goToCart">
+                <Button variant="outline" color="secondary" rounded="lg" class="hover:bg-secondary hover:border-secondary" @click="goBack">
                   <FontAwesomeIcon v-if="icons.arrowLeft" :icon="icons.arrowLeft" class="h-4 w-4 mr-2" />
-                  Retour au panier
+                  {{ isSubscription ? 'Retour' : 'Retour au panier' }}
                 </Button>
                 <Button
                   variant="secondary"
@@ -468,42 +499,46 @@ function goToCart() {
               </div>
             </template>
 
-            <!-- Étape 2: Paiement Stripe -->
+            <!-- Etape 2: Paiement Stripe -->
             <template v-if="currentStep === 'payment'">
-              <!-- Résumé des adresses sélectionnées -->
+              <!-- Resume des adresses selectionnees -->
               <Card>
                 <CardHeader>
-                  <CardTitle>Adresses sélectionnées</CardTitle>
+                  <CardTitle>{{ isSubscription ? 'Adresse selectionnee' : 'Adresses selectionnees' }}</CardTitle>
                 </CardHeader>
                 <CardContent class="space-y-4">
                   <div>
-                    <p class="text-sm font-medium text-neutral-500 mb-1">Livraison</p>
+                    <p class="text-sm font-medium text-neutral-500 mb-1">
+                      {{ isSubscription ? 'Facturation' : 'Livraison' }}
+                    </p>
                     <p class="text-sm">{{ formatAddress(selectedShippingAddress) }}</p>
                   </div>
-                  <Separator />
-                  <div>
-                    <p class="text-sm font-medium text-neutral-500 mb-1">Facturation</p>
-                    <p class="text-sm">{{ formatAddress(selectedBillingAddress) }}</p>
-                  </div>
+                  <template v-if="!isSubscription">
+                    <Separator />
+                    <div>
+                      <p class="text-sm font-medium text-neutral-500 mb-1">Facturation</p>
+                      <p class="text-sm">{{ formatAddress(selectedBillingAddress) }}</p>
+                    </div>
+                  </template>
                   <Button variant="link" color="secondary" size="sm" class="px-0 underline" @click="backToAddresses">
-                    Modifier les adresses
+                    Modifier {{ isSubscription ? 'l\'adresse' : 'les adresses' }}
                   </Button>
                 </CardContent>
               </Card>
 
-              <!-- Stripe Payment Element -->
+              <!-- Stripe Card Element -->
               <Card>
                 <CardHeader>
                   <CardTitle class="flex items-center gap-2">
                     <FontAwesomeIcon v-if="icons.lock" :icon="icons.lock" class="h-5 w-5" />
-                    Paiement sécurisé
+                    Paiement securise
                   </CardTitle>
                   <CardDescription>
-                    Vos informations de paiement sont protégées par Stripe
+                    Vos informations de paiement sont protegees par Stripe
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <!-- Logos cartes acceptées -->
+                  <!-- Logos cartes acceptees -->
                   <div class="flex items-center gap-4 mb-4">
                     <div class="flex items-center justify-center w-full gap-4">
                       <FontAwesomeIcon v-if="icons.ccVisa" :icon="icons.ccVisa" class="h-16 w-16 text-[#1A1F71] fa-2x" />
@@ -512,7 +547,7 @@ function goToCart() {
                     </div>
                   </div>
                   <div id="card-element" class="p-4 border border-gray-200 rounded-lg min-h-[50px]">
-                    <!-- Stripe Card Element sera monté ici -->
+                    <!-- Stripe Card Element sera monte ici -->
                   </div>
                   <Skeleton v-if="!cardElementReady" class="h-12 w-full mt-2" />
                 </CardContent>
@@ -525,7 +560,7 @@ function goToCart() {
                   Retour
                 </Button>
                 <Button
-                  @click="confirmPayment"
+                  @click="handleConfirmPayment"
                   variant="secondary"
                   rounded="lg"
                   :disabled="!cardElementReady || isLoading"
@@ -537,12 +572,12 @@ function goToCart() {
                     class="h-4 w-4 mr-2 animate-spin"
                   />
                   <span v-if="isLoading">Traitement en cours...</span>
-                  <span v-else>Payer {{ formatPrice(cartStore.subtotal) }}</span>
+                  <span v-else>{{ buttonLabel(formatPrice(totalPrice)) }}</span>
                 </Button>
               </div>
             </template>
 
-            <!-- Étape 3: Traitement -->
+            <!-- Etape 3: Traitement -->
             <template v-if="currentStep === 'processing'">
               <Card>
                 <CardContent class="py-16 text-center">
@@ -557,7 +592,7 @@ function goToCart() {
               </Card>
             </template>
 
-            <!-- Étape 4: Succès -->
+            <!-- Etape 4: Succes -->
             <template v-if="currentStep === 'success'">
               <Card>
                 <CardContent class="py-16 text-center">
@@ -566,9 +601,11 @@ function goToCart() {
                     :icon="icons.checkCircle"
                     class="h-16 w-16 text-green-500 mx-auto mb-4"
                   />
-                  <h2 class="text-2xl font-bold mb-2">Paiement réussi !</h2>
+                  <h2 class="text-2xl font-bold mb-2">
+                    {{ isSubscription ? 'Abonnement active !' : 'Paiement reussi !' }}
+                  </h2>
                   <p class="text-neutral-600 mb-4">
-                    Merci pour votre commande. Vous allez recevoir un email de confirmation.
+                    {{ successMessage }}
                   </p>
                   <p class="text-sm text-neutral-500">
                     Redirection vers votre compte dans quelques secondes...
@@ -577,7 +614,7 @@ function goToCart() {
               </Card>
             </template>
 
-            <!-- Étape 5: Erreur -->
+            <!-- Etape 5: Erreur -->
             <template v-if="currentStep === 'error'">
               <Card>
                 <CardContent class="py-16 text-center">
@@ -591,11 +628,11 @@ function goToCart() {
                     {{ error || 'Une erreur est survenue lors du paiement.' }}
                   </p>
                   <div class="flex gap-4 justify-center">
-                    <Button variant="outline" @click="goToCart">
-                      Retour au panier
+                    <Button variant="outline" @click="goBack">
+                      Retour
                     </Button>
                     <Button @click="backToAddresses">
-                      Réessayer
+                      Reessayer
                     </Button>
                   </div>
                 </CardContent>
@@ -604,19 +641,27 @@ function goToCart() {
 
           </div>
 
-          <!-- Colonne droite: Résumé commande -->
+          <!-- Colonne droite: Resume -->
           <div class="lg:col-span-1">
-            <Card class="sticky top-24">
+            <!-- Resume abonnement (OneClick) -->
+            <CheckoutSubscriptionSummary
+              v-if="isSubscription && oneClickItem"
+              :item="oneClickItem"
+              :total-price="totalPrice"
+            />
+
+            <!-- Resume commande (Boutique) -->
+            <Card v-else class="sticky top-24">
               <CardHeader>
-                <CardTitle>Résumé de la commande</CardTitle>
+                <CardTitle>{{ checkoutTitle }}</CardTitle>
               </CardHeader>
               <CardContent class="space-y-4">
                 <!-- Liste des articles -->
                 <div class="space-y-3">
-                  <div v-for="item in cartStore.items" :key="item.itemId" class="flex gap-3">
+                  <div v-for="item in items" :key="'itemId' in item ? item.itemId : item.planId" class="flex gap-3">
                     <div class="w-12 h-12 shrink-0 bg-neutral-100 rounded-lg overflow-hidden">
                       <img
-                        v-if="item.images?.[0]"
+                        v-if="'images' in item && item.images?.[0]"
                         :src="item.images[0]"
                         :alt="item.name"
                         class="w-full h-full object-cover"
@@ -624,9 +669,11 @@ function goToCart() {
                     </div>
                     <div class="flex-1 min-w-0">
                       <p class="text-sm font-medium truncate">{{ item.name }}</p>
-                      <p class="text-sm text-neutral-500">Qté: {{ item.quantity }}</p>
+                      <p v-if="'quantity' in item" class="text-sm text-neutral-500">Qte: {{ item.quantity }}</p>
                     </div>
-                    <p class="text-sm font-medium">{{ formatPrice(item.price * item.quantity) }}</p>
+                    <p class="text-sm font-medium">
+                      {{ formatPrice('quantity' in item ? item.price * item.quantity : item.price) }}
+                    </p>
                   </div>
                 </div>
 
@@ -636,16 +683,16 @@ function goToCart() {
                 <div class="space-y-2">
                   <div class="flex justify-between text-sm">
                     <span>Sous-total HT</span>
-                    <span>{{ formatPrice(cartStore.subtotalExclVAT) }}</span>
+                    <span>{{ formatPrice(subtotalExclVAT) }}</span>
                   </div>
                   <div class="flex justify-between text-sm">
                     <span>TVA</span>
-                    <span>{{ formatPrice(cartStore.vatAmount) }}</span>
+                    <span>{{ formatPrice(vatAmount) }}</span>
                   </div>
                   <Separator />
                   <div class="flex justify-between font-bold text-lg">
                     <span>Total TTC</span>
-                    <span class="text-secondary">{{ formatPrice(cartStore.subtotal) }}</span>
+                    <span class="text-secondary">{{ formatPrice(totalPrice) }}</span>
                   </div>
                 </div>
               </CardContent>

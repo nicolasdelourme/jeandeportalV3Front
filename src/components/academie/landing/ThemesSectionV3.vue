@@ -120,7 +120,7 @@ const goToFormation = (formationId: string) => {
         </p>
 
         <p class="text-foreground font-medium mb-6">
-          À partir de <span class="text-primary font-bold">9,90€/mois</span> par formation
+          À partir de <span href="#pricing-section" class="text-secondary underline font-bold">9,90€/mois</span> par formation
         </p>
 
         <Button
@@ -145,7 +145,7 @@ const goToFormation = (formationId: string) => {
         >
           <!-- Card avec couleur de fond -->
           <div
-            class="relative h-[320px] sm:h-[380px] flex flex-col transition-all duration-500 rounded-lg"
+            class="relative h-80 sm:h-[380px] flex flex-col transition-all duration-500 rounded-lg"
             :style="{ backgroundColor: formation.color }"
           >
             <!-- Numéro en grand (semi-transparent) -->
@@ -167,7 +167,7 @@ const goToFormation = (formationId: string) => {
             </div>
 
             <!-- Spacer pour pousser le contenu en bas -->
-            <div class="flex-1" />
+            <div class="flex-1"></div>
 
             <!-- Contenu en bas -->
             <div class="p-4 sm:p-5">
@@ -232,7 +232,7 @@ const goToFormation = (formationId: string) => {
         <!-- Timeline 4 semaines -->
         <div class="relative">
           <!-- Ligne de connexion (desktop) -->
-          <div class="hidden lg:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-border" />
+          <div class="hidden lg:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-border"></div>
 
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div
@@ -283,7 +283,7 @@ const goToFormation = (formationId: string) => {
             :key="`dot-${formation.id}`"
             class="w-3 h-3 rounded-full"
             :style="{ backgroundColor: formation.color }"
-          />
+          ></div>
           <FontAwesomeIcon
             v-if="icons.arrowRight"
             :icon="icons.arrowRight"

@@ -2,8 +2,10 @@
 /**
  * SubscriptionModal - Modal de choix de formule d'abonnement
  * Contextualisé à la formation sélectionnée
+ * Données dynamiques depuis l'API /fetchOneClickCatalog
  */
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import type { Formation } from '@/data/formations.data'
 import {
   Dialog,
@@ -15,6 +17,8 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@/lib/icons'
+import { useSubscriptionCatalogStore, type UIPricingPlan } from '@/stores/subscription-catalog.store'
+import { useOneClickBasketStore } from '@/stores/oneclick-basket.store'
 
 const props = defineProps<{
   open: boolean
@@ -34,45 +38,62 @@ const icons = computed(() => ({
   circleCheck: byPrefixAndName.fas?.['circle-check'],
 }))
 
+// Stores et Router
+const router = useRouter()
+const subscriptionStore = useSubscriptionCatalogStore()
+const oneClickBasketStore = useOneClickBasketStore()
+
+// Charger le catalogue au montage
+onMounted(() => {
+  subscriptionStore.fetchCatalog()
+})
+
+// Etat de chargement du bouton
+const isSubmitting = ref(false)
+
 // État
 const isAnnual = ref(false)
 const selectedPlan = ref<string | null>(null)
 const annualDiscount = 2
 
-// Plans
-interface PricingPlan {
-  id: string
-  name: string
-  priceMonthly: number
-  recommended?: boolean
-  isPremium?: boolean
-  stars: number
-}
-
-const plans: PricingPlan[] = [
-  { id: 'essentiel', name: 'Essentiel', priceMonthly: 9.90, stars: 1 },
-  { id: 'standard', name: 'Standard', priceMonthly: 14.90, recommended: true, stars: 5 },
-  { id: 'premium', name: 'Premium', priceMonthly: 19.90, isPremium: true, stars: 10 },
+// Plans de fallback (si l'API ne répond pas)
+const fallbackPlans: UIPricingPlan[] = [
+  { id: 'essentiel', planId: 0, name: 'Essentiel', priceMonthly: 9.90, stars: 1 },
+  { id: 'standard', planId: 0, name: 'Standard', priceMonthly: 14.90, recommended: true, stars: 5 },
+  { id: 'premium', planId: 0, name: 'Premium', priceMonthly: 19.90, isPremium: true, stars: 10 },
 ]
 
-// Features condensées
+// Plans dynamiques depuis le store avec fallback
+const plans = computed<UIPricingPlan[]>(() => {
+  const storePlans = subscriptionStore.getPlansForTheme(props.formation.id)
+  return storePlans.length > 0 ? storePlans : fallbackPlans
+})
+
+// Features condensées (alignées avec PricingSectionV3)
 interface Feature {
   label: string
-  essentiel: boolean
-  standard: boolean
-  premium: boolean
+  icon?: 'star'
+  essentiel: boolean | string
+  standard: boolean | string
+  premium: boolean | string
 }
 
 const features: Feature[] = [
   { label: 'Tuto mensuel', essentiel: true, standard: true, premium: true },
   { label: 'Consultations privées', essentiel: false, standard: true, premium: true },
   { label: 'Lettre mensuelle', essentiel: false, standard: false, premium: true },
-  { label: 'Dossiers bonus', essentiel: false, standard: true, premium: true },
+  { label: '3 dossiers bonus', essentiel: false, standard: true, premium: true },
+  { label: 'Etoiles', icon: 'star', essentiel: '1/mois', standard: '5/mois', premium: '10/mois' },
+  { label: 'Carton d\'invitation', essentiel: 'Occasionnel', standard: '2/ans', premium: '4/ans' },
 ]
 
 // Helpers
-const getPrice = (plan: PricingPlan) => {
+const getPrice = (plan: UIPricingPlan) => {
   if (isAnnual.value) {
+    // Utiliser le prix annuel si disponible, sinon calculer
+    if (plan.priceYearly) {
+      return plan.priceYearly
+    }
     return plan.priceMonthly * (12 - annualDiscount)
   }
   return plan.priceMonthly
@@ -80,18 +101,44 @@ const getPrice = (plan: PricingPlan) => {
 
 const formatPrice = (price: number) => price.toFixed(2).replace('.', ',') + '€'
 
-const getFeatureValue = (feature: Feature, planId: string): boolean => {
-  return feature[planId as keyof Feature] as boolean
+const getFeatureValue = (feature: Feature, planId: string): boolean | string => {
+  return feature[planId as keyof Feature] as boolean | string
 }
 
 const selectPlan = (planId: string) => {
   selectedPlan.value = planId
 }
 
-const confirmSelection = () => {
-  if (selectedPlan.value) {
+const confirmSelection = async () => {
+  if (!selectedPlan.value) return
+
+  const plan = plans.value.find(p => p.id === selectedPlan.value)
+  if (!plan || !plan.planId) {
+    console.error('Plan non trouve ou planId manquant')
+    return
+  }
+
+  isSubmitting.value = true
+
+  try {
+    // Vider le panier existant avant d'ajouter le nouveau plan
+    // Cela garantit qu'on cree toujours un nouveau panier frais
+    oneClickBasketStore.clearBasket()
+
+    // Ajouter au panier OneClick avec le planId (creera un nouveau panier)
+    await oneClickBasketStore.addPlan(plan.planId, isAnnual.value)
+
+    // Emettre l'event pour les composants parents
     emit('select', selectedPlan.value, isAnnual.value)
     emit('update:open', false)
+
+    // Rediriger vers le checkout abonnement
+    router.push('/abonnement/checkout')
+  } catch (error) {
+    console.error('Erreur lors de l\'ajout au panier:', error)
+    // L'erreur est deja geree par le store avec un toast
+  } finally {
+    isSubmitting.value = false
   }
 }
 
@@ -124,10 +171,10 @@ const handleOpenChange = (value: boolean) => {
       <div class="p-6">
         <!-- Toggle Mensuel / Annuel -->
         <div class="flex justify-center mb-6">
-          <div class="inline-flex items-center gap-2 bg-neutral-100 rounded-full p-1">
+          <div class="inline-flex items-center gap-2 bg-neutral-100 rounded-lg p-1">
             <button
               :class="[
-                'px-4 py-2 rounded-full text-sm font-medium transition-all',
+                'px-4 py-2 rounded-lg text-sm font-medium transition-all',
                 !isAnnual ? 'bg-secondary text-white' : 'text-muted-foreground hover:text-foreground',
               ]"
               @click="isAnnual = false"
@@ -136,14 +183,14 @@ const handleOpenChange = (value: boolean) => {
             </button>
             <button
               :class="[
-                'px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2',
+                'px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2',
                 isAnnual ? 'bg-secondary text-white' : 'text-muted-foreground hover:text-foreground',
               ]"
               @click="isAnnual = true"
             >
               Annuel
               <span class="text-xs bg-primary text-secondary px-1.5 py-0.5 rounded-sm font-semibold">
-                -2 mois
+                2 mois offerts
               </span>
             </button>
           </div>
@@ -157,11 +204,10 @@ const handleOpenChange = (value: boolean) => {
             :class="[
               'relative rounded-sm p-4 cursor-pointer transition-all duration-300 border-2',
               selectedPlan === plan.id
-                ? 'border-accent-yellow shadow-lg ring-2 ring-accent-yellow/20'
+                ? 'border-primary bg-primary/10 shadow-lg ring-2 ring-primary/20'
                 : plan.recommended
-                  ? 'border-accent-yellow/50 hover:border-accent-yellow'
-                  : 'border-border hover:border-accent-yellow/50',
-              'bg-white',
+                  ? 'border-accent-yellow/50 hover:border-accent-yellow bg-white'
+                  : 'border-border hover:border-accent-yellow/50 bg-white',
             ]"
             @click="selectPlan(plan.id)"
           >
@@ -170,7 +216,7 @@ const handleOpenChange = (value: boolean) => {
               v-if="plan.recommended"
               variant="default"
               rounded="sm"
-              class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-accent-yellow text-primary text-[10px] font-semibold"
+              class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-primary text-secondary text-[10px] font-semibold"
             >
               <FontAwesomeIcon v-if="icons.crown" :icon="icons.crown" class="size-2.5 mr-1" />
               Recommandé
@@ -199,39 +245,50 @@ const handleOpenChange = (value: boolean) => {
               </span>
             </div>
 
-            <!-- Indicateur de sélection (circle-check différent du check simple des features) -->
-            <div
-              v-if="selectedPlan === plan.id"
-              class="absolute top-2 right-2"
-            >
-              <FontAwesomeIcon v-if="icons.circleCheck" :icon="icons.circleCheck" class="size-5 text-accent-yellow" />
-            </div>
           </div>
         </div>
 
         <!-- Features condensées (style aligné avec PricingSection) -->
-        <div class="space-y-2 mb-6 border-t border-border pt-4">
+        <div class="mb-6 border-t border-border pt-4">
           <div
             v-for="feature in features"
             :key="feature.label"
             class="grid grid-cols-4 gap-2 text-sm py-1"
           >
-            <span class="text-muted-foreground">{{ feature.label }}</span>
+            <span class="text-muted-foreground flex items-center gap-1">
+              {{ feature.label }}
+              <FontAwesomeIcon v-if="feature.icon === 'star' && icons.star" :icon="icons.star" class="size-3 text-accent-yellow" />
+            </span>
             <div
               v-for="plan in plans"
               :key="plan.id"
-              class="flex justify-center"
+              :class="[
+                'flex justify-center items-center py-1 -my-1 rounded-sm transition-colors',
+                selectedPlan === plan.id ? 'bg-primary/15' : '',
+              ]"
             >
-              <FontAwesomeIcon
-                v-if="getFeatureValue(feature, plan.id) && icons.check"
-                :icon="icons.check"
-                class="size-4 text-success"
-              />
-              <FontAwesomeIcon
-                v-else-if="icons.times"
-                :icon="icons.times"
-                class="size-4 text-muted-foreground/50"
-              />
+              <!-- Checkmark (cercle jaune avec coche noire) -->
+              <template v-if="getFeatureValue(feature, plan.id) === true">
+                <div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                  <FontAwesomeIcon
+                    v-if="icons.check"
+                    :icon="icons.check"
+                    class="size-3 text-secondary"
+                  />
+                </div>
+              </template>
+              <!-- X pour false -->
+              <template v-else-if="getFeatureValue(feature, plan.id) === false">
+                <FontAwesomeIcon
+                  v-if="icons.times"
+                  :icon="icons.times"
+                  class="size-4 text-muted-foreground/50"
+                />
+              </template>
+              <!-- Texte pour valeurs spécifiques -->
+              <template v-else>
+                <span class="text-xs text-muted-foreground">{{ getFeatureValue(feature, plan.id) }}</span>
+              </template>
             </div>
           </div>
         </div>
@@ -241,15 +298,19 @@ const handleOpenChange = (value: boolean) => {
           variant="default"
           size="lg"
           rounded="sm"
-          class="w-full bg-accent-yellow hover:bg-accent-yellow/90 text-primary font-semibold"
-          :disabled="!selectedPlan"
+          class="w-full text-secondary"
+          :disabled="!selectedPlan || isSubmitting"
           @click="confirmSelection"
         >
-          <template v-if="selectedPlan">
+          <template v-if="isSubmitting">
+            <FontAwesomeIcon v-if="icons.star" :icon="icons.star" class="size-4 mr-2 animate-spin" />
+            Chargement...
+          </template>
+          <template v-else-if="selectedPlan">
             Choisir {{ plans.find(p => p.id === selectedPlan)?.name }}
           </template>
           <template v-else>
-            Sélectionnez une formule
+            Selectionnez une formule
           </template>
         </Button>
 

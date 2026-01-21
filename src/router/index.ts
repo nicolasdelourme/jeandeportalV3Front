@@ -5,11 +5,12 @@ import {
 } from "vue-router";
 import { authGuard, guestGuard } from "./guards/auth.guard";
 
-// Étendre les types de meta pour inclure requiresAuth et guestOnly
+// Étendre les types de meta pour inclure requiresAuth, guestOnly et checkoutType
 declare module "vue-router" {
     interface RouteMeta {
         requiresAuth?: boolean;
         guestOnly?: boolean;
+        checkoutType?: 'shop' | 'oneclick';
     }
 }
 
@@ -113,6 +114,16 @@ const routes: RouteRecordRaw[] = [
         component: () => import("@/views/checkout/CheckoutPage.vue"),
         meta: {
             requiresAuth: true,
+            checkoutType: 'shop',
+        },
+    },
+    {
+        path: "/abonnement/checkout",
+        name: "oneclick-checkout",
+        component: () => import("@/views/checkout/CheckoutPage.vue"),
+        meta: {
+            requiresAuth: true,
+            checkoutType: 'oneclick',
         },
     },
     // Pages légales

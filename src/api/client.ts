@@ -59,6 +59,11 @@ class ApiClient {
                     '/addReference', '/fetchBasket', '/basketChangeQuantityReference', '/deleteReference',
                     // Shop endpoints
                     '/fetchStore',
+                    // Subscription catalog endpoints
+                    '/fetchOneClickCatalog',
+                    // OneClick basket endpoints (accessibles sans auth pour création de panier)
+                    '/fetchOneClickBasket', '/addOneClick', '/deleteOneClick',
+                    // Note: /oneClickCheckout et /oneClickInitPayment nécessitent auth
                 ]
                 const isPublicEndpoint = publicEndpoints.some(endpoint => requestUrl.includes(endpoint))
 
