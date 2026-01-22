@@ -34,6 +34,16 @@ const routes: RouteRecordRaw[] = [
         component: () => import("@/views/UIPage.vue"),
     },
     {
+        path: "/articleDesign",
+        name: "article-design",
+        component: () => import("@/views/ArticleDesignPage.vue"),
+    },
+    {
+        path: "/articleTest",
+        name: "article-test",
+        component: () => import("@/views/ArticleTestPage.vue"),
+    },
+    {
         path: "/academie",
         name: "academie",
         component: () => import("@/views/academie/AcademiePage.vue"),
@@ -42,6 +52,11 @@ const routes: RouteRecordRaw[] = [
         path: "/academie/formation/:id",
         name: "formation-detail",
         component: () => import("@/views/academie/FormationDetailPage.vue"),
+    },
+    {
+        path: "/academie/catalogue",
+        name: "catalogue",
+        component: () => import("@/views/CataloguePage.vue"),
     },
     {
         path: "/auth",

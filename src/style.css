@@ -322,3 +322,165 @@
 .prose-product-label {
     @apply font-bold text-neutral-800;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   PROSE TIPTAP - Styles pour le contenu des articles
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Container prose */
+.prose-tiptap {
+    @apply text-neutral-700 leading-relaxed;
+}
+
+/* Headings - Bernina Sans */
+.prose-tiptap h1 {
+    @apply font-heading font-bold text-3xl md:text-4xl text-neutral-800 mt-8 mb-4;
+}
+
+.prose-tiptap h2 {
+    @apply font-heading font-bold text-2xl md:text-3xl text-neutral-800 mt-8 mb-4;
+}
+
+.prose-tiptap h3 {
+    @apply font-heading font-bold text-xl md:text-2xl text-neutral-800 mt-6 mb-3;
+}
+
+.prose-tiptap h4 {
+    @apply font-heading font-bold text-lg md:text-xl text-neutral-800 mt-6 mb-3;
+}
+
+.prose-tiptap h5 {
+    @apply font-heading font-semibold text-base md:text-lg text-neutral-800 mt-4 mb-2;
+}
+
+.prose-tiptap h6 {
+    @apply font-heading font-semibold text-sm md:text-base text-neutral-700 mt-4 mb-2;
+}
+
+/* First heading should not have top margin */
+.prose-tiptap > h1:first-child,
+.prose-tiptap > h2:first-child,
+.prose-tiptap > h3:first-child,
+.prose-tiptap > h4:first-child,
+.prose-tiptap > h5:first-child,
+.prose-tiptap > h6:first-child {
+    @apply mt-0;
+}
+
+/* Paragraphes */
+.prose-tiptap p {
+    @apply mb-4;
+}
+
+/* Formatage texte */
+.prose-tiptap strong {
+    @apply font-bold text-neutral-800;
+}
+
+.prose-tiptap em {
+    @apply italic;
+}
+
+.prose-tiptap u {
+    @apply underline decoration-2 underline-offset-2;
+}
+
+.prose-tiptap s {
+    @apply line-through text-neutral-500;
+}
+
+.prose-tiptap mark {
+    background: var(--theme-color-light, #fef3c7);
+    @apply px-1 rounded;
+}
+
+/* Listes */
+.prose-tiptap ul {
+    @apply list-disc ml-6 mb-4 space-y-2;
+}
+
+.prose-tiptap ol {
+    @apply list-decimal ml-6 mb-4 space-y-2;
+}
+
+.prose-tiptap li {
+    @apply pl-1;
+}
+
+.prose-tiptap li > ul,
+.prose-tiptap li > ol {
+    @apply mt-2 mb-0;
+}
+
+/* Blockquote - couleur thematique */
+.prose-tiptap blockquote {
+    @apply border-l-4 pl-4 py-2 my-4 italic text-neutral-600 rounded-r-sm;
+    border-color: var(--theme-color, #d1d5db);
+    background: color-mix(in srgb, var(--theme-color-light, #f5f5f5) 50%, transparent);
+}
+
+.prose-tiptap blockquote p {
+    @apply mb-0;
+}
+
+/* Code inline */
+.prose-tiptap code:not(pre code) {
+    @apply bg-neutral-100 text-neutral-800 px-1.5 py-0.5 rounded text-sm font-mono;
+}
+
+/* Code block */
+.prose-tiptap pre {
+    @apply bg-neutral-900 text-neutral-100 p-4 rounded-lg overflow-x-auto my-4;
+}
+
+.prose-tiptap pre code {
+    @apply bg-transparent p-0 text-sm font-mono leading-relaxed;
+}
+
+/* Liens - couleur thematique */
+.prose-tiptap a {
+    color: var(--theme-color, #3b82f6);
+    @apply underline underline-offset-2 hover:opacity-80 transition-opacity;
+}
+
+/* Images */
+.prose-tiptap img {
+    @apply rounded-lg my-6 max-w-full h-auto;
+}
+
+.prose-tiptap figure {
+    @apply my-6;
+}
+
+.prose-tiptap figcaption {
+    @apply text-sm text-neutral-500 text-center mt-2;
+}
+
+/* Tables - exclure les tables shadcn (data-slot) */
+.prose-tiptap table:not([data-slot]) {
+    @apply w-full border-collapse my-6;
+}
+
+.prose-tiptap th:not([data-slot]),
+.prose-tiptap td:not([data-slot]) {
+    @apply border border-neutral-200 px-4 py-2 text-left;
+}
+
+.prose-tiptap th:not([data-slot]) {
+    @apply bg-neutral-50 font-semibold;
+    border-color: var(--theme-color, #e5e7eb);
+}
+
+.prose-tiptap tr:not([data-slot]):nth-child(even) {
+    @apply bg-neutral-50/50;
+}
+
+/* Container shadcn Table dans prose-tiptap */
+.prose-tiptap [data-slot="table-container"] {
+    @apply my-6;
+}
+
+/* Separateur - style simple (utiliser Separator shadcn de preference) */
+.prose-tiptap hr {
+    @apply my-8 border-0 h-px bg-border;
+}

@@ -102,6 +102,7 @@ import {
   faTruck,
   faUmbrellaBeach,
   faUndo,
+  faLink,
   faUser,
   faUserCircle,
   faUserPlus,
@@ -134,6 +135,9 @@ import {
   faCcMastercard,
   faCcAmex,
   faYoutube,
+  faFacebookF,
+  faXTwitter,
+  faLinkedinIn,
 } from '@awesome.me/kit-0aac173ed2/icons/classic/brands'
 
 // ============================================================================
@@ -273,6 +277,7 @@ export const fas = {
   'star': faStar,
   'truck': faTruck,
   'umbrella-beach': faUmbrellaBeach,
+  'link': faLink,
 } as const
 
 /**
@@ -300,6 +305,9 @@ export const fab = {
   'cc-mastercard': faCcMastercard,
   'cc-amex': faCcAmex,
   'youtube': faYoutube,
+  'facebook-f': faFacebookF,
+  'x-twitter': faXTwitter,
+  'linkedin-in': faLinkedinIn,
 } as const
 
 /**

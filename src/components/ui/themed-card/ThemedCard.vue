@@ -36,6 +36,10 @@ const icons = {
   newspaper: byPrefixAndName.far['newspaper'],
   plus: byPrefixAndName.far['plus'],
   download: byPrefixAndName.far['download'],
+  // These icons are only available in solid (fas)
+  comments: byPrefixAndName.fas['comments'],
+  book: byPrefixAndName.fas['book'],
+  circlePlay: byPrefixAndName.fas['circle-play'],
 }
 
 export interface Participant {
@@ -44,7 +48,7 @@ export interface Participant {
   role?: string
 }
 
-export type ContentType = 'tuto' | 'dossier' | 'newsletter'
+export type ContentType = 'tuto' | 'dossier' | 'newsletter' | 'consultation' | 'article' | 'video'
 
 interface Props {
   theme: ThemeType
@@ -92,20 +96,26 @@ const formattedDate = computed(() => {
 
 // Icône du type de contenu
 const contentTypeIcon = computed(() => {
-  const typeIcons = {
+  const typeIcons: Record<ContentType, unknown> = {
     tuto: icons.graduationCap,
     dossier: icons.fileLines,
     newsletter: icons.newspaper,
+    consultation: icons.comments,
+    article: icons.book,
+    video: icons.circlePlay,
   }
   return typeIcons[props.contentType]
 })
 
 // Label du type de contenu
 const contentTypeLabel = computed(() => {
-  const labels = {
+  const labels: Record<ContentType, string> = {
     tuto: 'Tuto',
     dossier: 'Dossier',
     newsletter: 'Newsletter',
+    consultation: 'Consultation',
+    article: 'Article',
+    video: 'Tuto Vidéo',
   }
   return labels[props.contentType]
 })
@@ -119,9 +129,9 @@ const getInitials = (name: string) => {
 <template>
   <div
     :class="cn(
-      'group relative bg-white rounded-sm shadow-md overflow-hidden transition-all duration-300',
+      'group relative bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300',
       'hover:shadow-lg hover:scale-[1.02]',
-      'border-2',
+      'border-2 flex flex-col h-full',
       themeClasses.border,
       props.class
     )"
@@ -142,7 +152,7 @@ const getInitials = (name: string) => {
     </div>
 
     <!-- Contenu -->
-    <div class="p-4 space-y-3">
+    <div class="p-4 space-y-3 flex-1 flex flex-col">
       <!-- Badges -->
       <div class="flex flex-wrap gap-2">
         <!-- Badge thématique -->
@@ -221,7 +231,7 @@ const getInitials = (name: string) => {
       </div>
 
       <!-- Actions -->
-      <div v-if="showActions" class="flex items-center gap-3 pt-2">
+      <div v-if="showActions" class="flex items-center gap-3 pt-2 mt-auto">
         <!-- CTA principal -->
         <Button
           :color="theme"

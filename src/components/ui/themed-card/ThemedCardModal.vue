@@ -3,8 +3,8 @@
  * ThemedCardModal - Modal pour afficher le détail d'un contenu thématisé
  *
  * Basé sur les designs Figma:
- * - Desktop: node 56-1350 (layout 2 colonnes)
- * - Mobile: node 56-1615 (layout 1 colonne)
+ * - Desktop: node 56-1428 (image top, 2 colonnes below)
+ * - Mobile: node 56-1615 (image top, CTA, content, participants)
  *
  * @example
  * <ThemedCardModal
@@ -19,11 +19,10 @@
  *   @view="handleView"
  *   @add="handleAdd"
  *   @download="handleDownload"
- *   @share="handleShare"
  * />
  */
 import type { HTMLAttributes } from "vue"
-import { computed, ref } from "vue"
+import { computed } from "vue"
 import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -49,7 +48,10 @@ const icons = {
   newspaper: byPrefixAndName.far['newspaper'],
   plus: byPrefixAndName.far['plus'],
   download: byPrefixAndName.far['download'],
-  share: byPrefixAndName.far['share'],
+  // These icons are only available in solid (fas)
+  comments: byPrefixAndName.fas['comments'],
+  book: byPrefixAndName.fas['book'],
+  circlePlay: byPrefixAndName.fas['circle-play'],
 }
 
 interface Props {
@@ -78,7 +80,6 @@ const emit = defineEmits<{
   (e: 'view'): void
   (e: 'add'): void
   (e: 'download'): void
-  (e: 'share'): void
 }>()
 
 // Récupérer les classes du thème
@@ -99,20 +100,26 @@ const formattedDate = computed(() => {
 
 // Icône du type de contenu
 const contentTypeIcon = computed(() => {
-  const typeIcons = {
+  const typeIcons: Record<ContentType, unknown> = {
     tuto: icons.graduationCap,
     dossier: icons.fileLines,
     newsletter: icons.newspaper,
+    consultation: icons.comments,
+    article: icons.book,
+    video: icons.circlePlay,
   }
   return typeIcons[props.contentType]
 })
 
 // Label du type de contenu
 const contentTypeLabel = computed(() => {
-  const labels = {
+  const labels: Record<ContentType, string> = {
     tuto: 'Tuto',
     dossier: 'Dossier',
     newsletter: 'Newsletter',
+    consultation: 'Consultation',
+    article: 'Article',
+    video: 'Tuto Vidéo',
   }
   return labels[props.contentType]
 })
@@ -120,10 +127,13 @@ const contentTypeLabel = computed(() => {
 // CTA label dynamique selon le type
 const dynamicCtaLabel = computed(() => {
   if (props.ctaLabel !== 'VOIR LE TUTO') return props.ctaLabel
-  const labels = {
+  const labels: Record<ContentType, string> = {
     tuto: 'VOIR LE TUTO',
     dossier: 'LIRE LE DOSSIER',
     newsletter: 'LIRE LA NEWSLETTER',
+    consultation: 'RESERVER',
+    article: 'LIRE L\'ARTICLE',
+    video: 'VOIR LA VIDEO',
   }
   return labels[props.contentType]
 })
@@ -142,8 +152,8 @@ const handleOpenChange = (value: boolean) => {
   <Dialog :open="open" @update:open="handleOpenChange">
     <DialogContent
       :class="cn(
-        'max-w-[900px] p-0 gap-0 overflow-hidden',
-        'border-2',
+        'sm:max-w-3xl p-0 gap-0 overflow-hidden',
+        'border rounded-lg',
         themeClasses.border,
         props.class
       )"
@@ -152,109 +162,100 @@ const handleOpenChange = (value: boolean) => {
       <DialogTitle class="sr-only">{{ title }}</DialogTitle>
       <DialogDescription class="sr-only">{{ description }}</DialogDescription>
 
+      <!-- Image en haut (full width) -->
+      <div
+        class="relative aspect-video w-full overflow-hidden rounded-t-lg"
+        :class="[`bg-gradient-to-br`, themeClasses.gradient]"
+      >
+        <img
+          v-if="thumbnail"
+          :src="thumbnail"
+          :alt="title"
+          class="absolute inset-0 w-full h-full object-cover"
+        />
+      </div>
+
+      <!-- Mobile: CTA + Actions juste après l'image -->
+      <div class="flex md:hidden items-center gap-3 p-3 border-b border-border">
+        <Button
+          :color="theme"
+          size="default"
+          rounded="lg"
+          class="flex-1"
+          @click="emit('view')"
+        >
+          Consulter
+        </Button>
+        <Button variant="outline" size="icon" rounded="lg" @click="emit('add')" aria-label="Ajouter à ma liste">
+          <FontAwesomeIcon v-if="icons.plus" :icon="icons.plus" class="size-4" />
+        </Button>
+        <Button variant="outline" size="icon" rounded="lg" @click="emit('download')" aria-label="Télécharger">
+          <FontAwesomeIcon v-if="icons.download" :icon="icons.download" class="size-4" />
+        </Button>
+      </div>
+
+      <!-- Contenu principal : 2 colonnes sur desktop, 1 colonne sur mobile -->
       <div class="flex flex-col md:flex-row">
-        <!-- Colonne gauche / Top mobile: Image + Contenu -->
-        <div class="flex-1">
-          <!-- Header avec gradient et thumbnail -->
-          <div
-            class="relative aspect-video overflow-hidden rounded-tl-sm rounded-tr-sm md:rounded-tr-none"
-            :class="[`bg-gradient-to-br`, themeClasses.gradient]"
-          >
-            <img
-              v-if="thumbnail"
-              :src="thumbnail"
-              :alt="title"
-              class="absolute inset-0 w-full h-full object-cover"
-            />
+        <!-- Colonne gauche: Badges, Titre, Date, Description -->
+        <div class="flex-1 p-4 space-y-2">
+          <!-- Badges -->
+          <div class="flex flex-wrap gap-2">
+            <Badge :variant="`theme-${theme}-outline`">
+              {{ themeLabels[theme] }}
+            </Badge>
+            <Badge :variant="`theme-${theme}-outline`" class="gap-1.5">
+              <FontAwesomeIcon v-if="contentTypeIcon" :icon="contentTypeIcon" class="size-3" />
+              {{ contentTypeLabel }}
+            </Badge>
+            <Badge v-if="isSubscriberOnly" variant="access-subscriber">
+              Accès Abonnés
+            </Badge>
           </div>
 
-          <!-- Contenu texte -->
-          <div class="p-4 space-y-3">
-            <!-- Mobile: Actions en haut -->
-            <div class="flex md:hidden items-center gap-3">
-              <Button
-                :color="theme"
-                size="default"
-                rounded="lg"
-                class="flex-1"
-                @click="emit('view')"
+          <!-- Titre -->
+          <h3 class="font-heading font-bold text-xl leading-tight text-foreground">
+            {{ title }}
+          </h3>
+
+          <!-- Date -->
+          <div v-if="formattedDate" class="flex items-center gap-2 text-muted-foreground text-sm">
+            <FontAwesomeIcon v-if="icons.clock" :icon="icons.clock" class="size-4" />
+            <span class="capitalize">{{ formattedDate }}</span>
+          </div>
+
+          <!-- Description -->
+          <p v-if="description" class="text-muted-foreground text-sm leading-relaxed pt-2">
+            {{ description }}
+          </p>
+
+          <!-- Mobile: Participants en bas -->
+          <div v-if="participants.length > 0" class="md:hidden flex items-center gap-2 pt-3">
+            <span class="text-muted-foreground text-sm">Participants :</span>
+            <div class="flex -space-x-2">
+              <div
+                v-for="(participant, index) in participants.slice(0, 3)"
+                :key="index"
+                class="relative"
+                :title="participant.name"
               >
-                Consulter
-              </Button>
-              <div class="flex gap-2">
-                <Button variant="outline" size="icon" rounded="lg" color="neutral-400" @click="emit('add')" aria-label="Ajouter à ma liste">
-                  <FontAwesomeIcon v-if="icons.plus" :icon="icons.plus" class="size-4" />
-                </Button>
-                <Button variant="outline" size="icon" rounded="lg" color="neutral-400" @click="emit('download')" aria-label="Télécharger">
-                  <FontAwesomeIcon v-if="icons.download" :icon="icons.download" class="size-4" />
-                </Button>
-                <Button variant="outline" size="icon" rounded="lg" color="neutral-400" @click="emit('share')" aria-label="Partager">
-                  <FontAwesomeIcon v-if="icons.share" :icon="icons.share" class="size-4" />
-                </Button>
-              </div>
-            </div>
-
-            <!-- Badges -->
-            <div class="flex flex-wrap gap-2">
-              <Badge :variant="`theme-${theme}-outline`">
-                {{ themeLabels[theme] }}
-              </Badge>
-              <Badge :variant="`theme-${theme}-outline`" class="gap-1.5">
-                <FontAwesomeIcon v-if="contentTypeIcon" :icon="contentTypeIcon" class="size-3" />
-                {{ contentTypeLabel }}
-              </Badge>
-              <Badge v-if="isSubscriberOnly" variant="access-subscriber">
-                Accès Abonnés
-              </Badge>
-            </div>
-
-            <!-- Titre -->
-            <h3 class="font-heading font-bold text-xl leading-tight text-foreground">
-              {{ title }}
-            </h3>
-
-            <!-- Date -->
-            <div v-if="formattedDate" class="flex items-center gap-2 text-muted-foreground text-sm">
-              <FontAwesomeIcon v-if="icons.clock" :icon="icons.clock" class="size-4" />
-              <span class="capitalize">{{ formattedDate }}</span>
-            </div>
-
-            <!-- Description -->
-            <div v-if="description" class="pt-2">
-              <p class="text-muted-foreground text-sm leading-relaxed">
-                {{ description }}
-              </p>
-            </div>
-
-            <!-- Mobile: Participants en bas -->
-            <div v-if="participants.length > 0" class="md:hidden flex items-center gap-2 pt-2">
-              <span class="text-muted-foreground text-sm">Participants :</span>
-              <div class="flex -space-x-2">
                 <div
-                  v-for="(participant, index) in participants.slice(0, 3)"
-                  :key="index"
-                  class="relative"
-                  :title="participant.name"
+                  :class="cn(
+                    'size-10 rounded-full border-2 border-white overflow-hidden',
+                    themeClasses.bg
+                  )"
                 >
-                  <div
-                    :class="cn(
-                      'size-10 rounded-full border-2 border-white overflow-hidden',
-                      themeClasses.bg
-                    )"
+                  <img
+                    v-if="participant.avatar"
+                    :src="participant.avatar"
+                    :alt="participant.name"
+                    class="w-full h-full object-cover"
+                  />
+                  <span
+                    v-else
+                    :class="cn('flex items-center justify-center w-full h-full text-xs font-bold', themeClasses.text)"
                   >
-                    <img
-                      v-if="participant.avatar"
-                      :src="participant.avatar"
-                      :alt="participant.name"
-                      class="w-full h-full object-cover"
-                    />
-                    <span
-                      v-else
-                      :class="cn('flex items-center justify-center w-full h-full text-xs font-bold', themeClasses.text)"
-                    >
-                      {{ getInitials(participant.name) }}
-                    </span>
-                  </div>
+                    {{ getInitials(participant.name) }}
+                  </span>
                 </div>
               </div>
             </div>
@@ -262,9 +263,9 @@ const handleOpenChange = (value: boolean) => {
         </div>
 
         <!-- Colonne droite (desktop uniquement): Participants + Actions -->
-        <div class="hidden md:flex flex-col justify-between w-[280px] p-4 border-l border-border">
+        <div class="hidden md:flex flex-col justify-between w-[280px] p-4">
           <!-- Participants avec tooltips -->
-          <div class="space-y-3">
+          <div class="space-y-2">
             <p class="text-muted-foreground text-sm">Participants :</p>
             <TooltipProvider>
               <div class="flex -space-x-2">
@@ -272,7 +273,7 @@ const handleOpenChange = (value: boolean) => {
                   <TooltipTrigger as-child>
                     <div
                       :class="cn(
-                        'size-12 rounded-full border-4 border-white overflow-hidden cursor-pointer',
+                        'size-10 rounded-full border-4 border-white overflow-hidden cursor-pointer',
                         themeClasses.bg
                       )"
                     >
@@ -284,15 +285,15 @@ const handleOpenChange = (value: boolean) => {
                       />
                       <span
                         v-else
-                        :class="cn('flex items-center justify-center w-full h-full text-sm font-bold', themeClasses.text)"
+                        :class="cn('flex items-center justify-center w-full h-full text-xs font-bold', themeClasses.text)"
                       >
                         {{ getInitials(participant.name) }}
                       </span>
                     </div>
                   </TooltipTrigger>
-                  <TooltipContent>
+                  <TooltipContent :class="[themeClasses.bg, themeClasses.text === 'text-white' ? 'text-white' : 'text-foreground']">
                     <p class="font-medium">{{ participant.name }}</p>
-                    <p v-if="participant.role" class="text-xs text-muted-foreground">{{ participant.role }}</p>
+                    <p v-if="participant.role" class="text-xs opacity-80">{{ participant.role }}</p>
                   </TooltipContent>
                 </Tooltip>
               </div>
@@ -300,7 +301,7 @@ const handleOpenChange = (value: boolean) => {
           </div>
 
           <!-- Actions desktop -->
-          <div class="space-y-3">
+          <div class="space-y-3 pt-4">
             <Button
               :color="theme"
               size="default"
@@ -316,7 +317,6 @@ const handleOpenChange = (value: boolean) => {
                 variant="outline"
                 size="default"
                 rounded="lg"
-                color="neutral-400"
                 class="flex-1"
                 @click="emit('add')"
                 aria-label="Ajouter à ma liste"
@@ -327,7 +327,6 @@ const handleOpenChange = (value: boolean) => {
                 variant="outline"
                 size="default"
                 rounded="lg"
-                color="neutral-400"
                 class="flex-1"
                 @click="emit('download')"
                 aria-label="Télécharger"

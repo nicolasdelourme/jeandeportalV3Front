@@ -114,7 +114,6 @@ const confirmSelection = async () => {
 
   const plan = plans.value.find(p => p.id === selectedPlan.value)
   if (!plan || !plan.planId) {
-    console.error('Plan non trouve ou planId manquant')
     return
   }
 
@@ -135,7 +134,6 @@ const confirmSelection = async () => {
     // Rediriger vers le checkout abonnement
     router.push('/abonnement/checkout')
   } catch (error) {
-    console.error('Erreur lors de l\'ajout au panier:', error)
     // L'erreur est deja geree par le store avec un toast
   } finally {
     isSubmitting.value = false
