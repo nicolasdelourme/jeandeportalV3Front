@@ -9,12 +9,13 @@
        INFOCASH ACADÉMIE - Design System
        ═══════════════════════════════════════════════════════════════════════ */
                     /* Noir signature - CTA & textes principaux */
-    --color-accent-yellow: #FFDD00;          /* Jaune signature */
-    --color-bg-yellow-soft: #FFF9D3;         /* Fond jaune descendu */
+    --color-accent-yellow: #ffde00;          /* Jaune signature */
+    --color-bg-yellow-soft: #FFF9D3;
+    --color-xag: #7999A3;         /* Fond jaune descendu */
 
     /* ─── Thématiques Infocash Académie ─── */
     /* Métaux précieux - Or */
-    --color-theme-metaux: #F2CC00;
+    --color-theme-metaux: #ffde00;
     --color-theme-metaux-light: #FFF9D3;
     --color-theme-metaux-dark: #D4B200;
     --color-theme-metaux-gradient-start: rgba(242, 204, 0, 1);
@@ -78,9 +79,9 @@
     --foreground: #1d1d1d;
     --card: #ffffff;
     --card-foreground: #1d1d1d;
-    --popover: #ffdd00;
+    --popover: #ffde00;
     --popover-foreground: #1d1d1d;
-    --primary: #ffdd00;
+    --primary: #ffde00;
     --primary-foreground: #1d1d1d;
     --secondary: #1d1d1d;
     --secondary-foreground: #ffffff;

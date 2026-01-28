@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * ArticleTestPage - Article test : Or 2024
+ * ArticleShortPage - Article court : VeraCash
  */
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -43,129 +43,27 @@ const icons = computed(() => ({
   envelope: byPrefixAndName.fas?.['envelope'],
 }))
 
-// Mock article data
+// Article court - VeraCash
 const mockArticle = ref({
-  type: 'newsletter' as ContentType,
-  title: "Pourquoi l'or atteint des sommets en 2024 : Analyse complète des facteurs économiques",
-  chapeau: "En ce début d'année 2024, le cours de l'or a franchi des seuils historiques. Décryptage des facteurs fondamentaux qui expliquent cette hausse.",
-  date: '2024-01-15',
-  readTime: '8 min',
-  author: 'Jean de Portal',
-  image: 'https://placehold.co/1200x675/F2CC00/1D1D1D?text=Or+2024',
+  type: 'article' as ContentType,
+  title: "Toujours pas de droit de garde chez VeraCash",
+  date: '2026-01-26',
+  readTime: '2 min',
+  author: 'Nicolas Delourme',
+  image: 'https://www.shutterstock.com/shutterstock/photos/2209788541/display_1500/stock-photo-strong-room-gate-door-golden-color-for-safety-protect-valuable-in-bank-background-2209788541.jpg',
   content: `
-<h2>Introduction : L'or, valeur refuge par excellence</h2>
 <p>
-  En ce début d'année 2024, le cours de l'or a franchi des seuils historiques, dépassant les
-  <strong>2 100 dollars l'once</strong>. Cette performance exceptionnelle soulève de nombreuses
-  questions chez les investisseurs, qu'ils soient novices ou expérimentés.
+  Au début de l'année 2025, VeraCash annonçait une future révision de ses tarifs et, notamment, l'ajout de <strong>frais de garde des métaux précieux</strong>. Il faut dire que le négociant ne facture rien pour le stockage sécurisé, audité et assuré de votre or et de votre argent dans ces chambres fortes des Ports francs de Genève. Et, en GoldPremium (jetons et pièces à cours légal), il n'y a pas de frais à la revente, ni de prime négative.
 </p>
 <p>
-  Dans cette analyse approfondie, nous allons décrypter les <em>facteurs fondamentaux</em>
-  qui expliquent cette hausse et vous donner les clés pour comprendre si cette tendance
-  est amenée à se poursuivre. Voici un <a href="#">lien vers notre dossier complet</a> sur le sujet.
+  En clair, une fois les frais d'entrée payés (3 %), vous pouvez conserver votre métal jaune pendant des années, sans rien payer de plus (ce qui est très bénéfique en période de hausse du cours) !
 </p>
-
-<h2>Les facteurs macro-économiques</h2>
-<h3>1. L'inflation persistante</h3>
 <p>
-  Malgré les efforts des banques centrales, l'inflation reste au-dessus des objectifs dans
-  la plupart des économies développées. L'or, traditionnellement considéré comme une
-  protection contre l'érosion monétaire, bénéficie directement de ce contexte.
+  A ce stade, le négociant français semble avoir abandonné l'idée et continue d'appliquer les tarifs de 2023, vous invitant même <em>« ne pas vous soucier du stockage, il est offert »</em> !
 </p>
-<ul>
-  <li>Inflation zone euro : 2.9% en décembre 2023</li>
-  <li>Inflation USA : 3.4% en décembre 2023</li>
-  <li>Prévisions 2024 : maintien au-dessus de 2%</li>
-</ul>
-
-<h3>2. Les tensions géopolitiques</h3>
-<p>
-  Les conflits en cours et les tensions commerciales sino-américaines renforcent l'attrait
-  des actifs refuges. Les banques centrales des pays émergents, notamment la Chine,
-  continuent d'accumuler des réserves d'or à un rythme soutenu.
-</p>
-
 <blockquote>
-  <p>"L'or est la seule monnaie que les gouvernements ne peuvent pas dévaluer par simple décision politique."</p>
+  <p>Pourvu que ça dure…</p>
 </blockquote>
-
-<h3>3. Les politiques monétaires</h3>
-<p>
-  La perspective d'une baisse des taux directeurs en 2024 est favorable à l'or. En effet,
-  des taux plus bas réduisent le coût d'opportunité de détenir de l'or, qui ne verse pas
-  d'intérêts.
-</p>
-
-<h2>Comparatif : Or vs autres actifs refuges</h2>
-<table>
-  <thead>
-    <tr>
-      <th>Critère</th>
-      <th>Or</th>
-      <th>Argent</th>
-      <th>Bitcoin</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Volatilité</td>
-      <td>Faible</td>
-      <td>Moyenne</td>
-      <td>Très élevée</td>
-    </tr>
-    <tr>
-      <td>Liquidité</td>
-      <td>Excellente</td>
-      <td>Bonne</td>
-      <td>Variable</td>
-    </tr>
-    <tr>
-      <td>Stockage</td>
-      <td>Physique/Papier</td>
-      <td>Encombrant</td>
-      <td>Numérique</td>
-    </tr>
-    <tr>
-      <td>Track record</td>
-      <td>5000 ans</td>
-      <td>5000 ans</td>
-      <td>15 ans</td>
-    </tr>
-  </tbody>
-</table>
-
-<h2>Nos recommandations pour 2024</h2>
-<p>
-  Sur la base de notre analyse, voici nos conseils pour intégrer l'or dans votre
-  stratégie patrimoniale :
-</p>
-<ol>
-  <li><strong>Allocation recommandée</strong> : 5 à 15% de votre patrimoine financier</li>
-  <li><strong>Diversification</strong> : Combinez or physique et or papier (ETF)</li>
-  <li><strong>Timing</strong> : Privilégiez les achats progressifs (DCA)</li>
-  <li><strong>Horizon</strong> : Investissement à long terme (5+ ans)</li>
-</ol>
-
-<h3>Formule de calcul du ratio or/argent</h3>
-<p>Pour suivre le marché, utilisez ce ratio simple :</p>
-<pre><code>// Ratio historique moyen : 60-70
-const ratio = prix_or / prix_argent;
-
-// Interprétation :
-// > 80 : Argent sous-évalué
-// < 60 : Or sous-évalué
-console.log("Ratio actuel:", ratio);</code></pre>
-
-<h2>Conclusion</h2>
-<p>
-  L'or reste un pilier incontournable de toute stratégie de diversification patrimoniale.
-  Dans le contexte actuel d'incertitudes économiques et géopolitiques, son rôle de
-  valeur refuge n'a jamais été aussi pertinent.
-</p>
-<figure>
-  <img src="https://placehold.co/800x400/F2CC00/1D1D1D?text=Evolution+Cours+Or" alt="Évolution du cours de l'or" />
-  <figcaption>Évolution du cours de l'or sur 10 ans - Source : World Gold Council</figcaption>
-</figure>
 `
 })
 
@@ -183,14 +81,6 @@ interface SuggestedItem {
 const suggestedContent = ref<SuggestedItem[]>([
   {
     id: '1',
-    type: 'article',
-    title: "Toujours pas de droit de garde chez VeraCash",
-    thumbnail: 'https://placehold.co/320x180/F2CC00/1D1D1D?text=VeraCash',
-    date: '25 jan.',
-    readTime: '2 min',
-  },
-  {
-    id: '2',
     type: 'video',
     title: "Or : faut-il acheter maintenant ou attendre ?",
     thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg',
@@ -198,12 +88,20 @@ const suggestedContent = ref<SuggestedItem[]>([
     duration: '18:32',
   },
   {
-    id: '3',
+    id: '2',
     type: 'article',
     title: "Fiscalité de l'or : ce qui change en 2026",
     thumbnail: 'https://placehold.co/320x180/F4BFA6/1D1D1D?text=Fiscalite',
     date: '22 jan.',
     readTime: '6 min',
+  },
+  {
+    id: '3',
+    type: 'article',
+    title: "Les banques centrales accumulent de l'or",
+    thumbnail: 'https://placehold.co/320x180/F2CC00/1D1D1D?text=Banques',
+    date: '18 jan.',
+    readTime: '10 min',
   },
 ])
 
@@ -212,7 +110,7 @@ const handleSuggestedClick = (item: SuggestedItem) => {
   if (item.type === 'video') {
     window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank')
   } else {
-    router.push('/articleShort')
+    router.push('/articleLong')
   }
 }
 
@@ -305,7 +203,7 @@ const shareByEmail = () => {
         </Breadcrumb>
 
         <!-- Hero 2 columns layout -->
-        <div class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 lg:gap-8 items-start">
+        <div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 lg:gap-8 items-start">
           <!-- Left: Content -->
           <div>
             <!-- Badge type contenu -->
@@ -320,11 +218,6 @@ const shareByEmail = () => {
             <h1 class="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
               {{ mockArticle.title }}
             </h1>
-
-            <!-- Chapeau -->
-            <p class="text-lg text-muted-foreground mb-4">
-              {{ mockArticle.chapeau }}
-            </p>
 
             <!-- Meta -->
             <div class="flex flex-wrap items-center gap-4 text-muted-foreground">

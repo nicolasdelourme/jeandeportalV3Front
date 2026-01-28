@@ -22,6 +22,19 @@ export default [
         parser: typescriptParser,
         ecmaVersion: 'latest',
         sourceType: 'module'
+      },
+      globals: {
+        window: 'readonly',
+        document: 'readonly',
+        navigator: 'readonly',
+        console: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        fetch: 'readonly',
+        URL: 'readonly',
+        URLSearchParams: 'readonly',
       }
     },
     plugins: {

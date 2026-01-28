@@ -306,7 +306,7 @@ const handleOpenChange = (value: boolean) => {
               :color="theme"
               size="default"
               rounded="lg"
-              class="w-full"
+              class="w-full text-secondray bg-red-600"
               @click="emit('view')"
             >
               {{ dynamicCtaLabel }}
