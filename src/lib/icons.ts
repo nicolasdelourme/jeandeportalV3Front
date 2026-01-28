@@ -118,6 +118,7 @@ import {
 import {
   faClock as faClockRegular,
   faDownload as faDownloadRegular,
+  faEnvelope as faEnvelopeRegular,
   faFileLines as faFileLinesRegular,
   faGraduationCap as faGraduationCapRegular,
   faHeart as faHeartRegular,
@@ -287,6 +288,7 @@ export const fas = {
 export const far = {
   'clock': faClockRegular,
   'download': faDownloadRegular,
+  'envelope': faEnvelopeRegular,
   'file-lines': faFileLinesRegular,
   'graduation-cap': faGraduationCapRegular,
   'heart': faHeartRegular,
