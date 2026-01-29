@@ -4,6 +4,7 @@
  */
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { logger } from '@/utils/logger'
 import DefaultLayout from '@/components/layout/DefaultLayout.vue'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -205,7 +206,7 @@ const copyLink = async () => {
       linkCopied.value = false
     }, 2000)
   } catch (err) {
-    console.error('Failed to copy link:', err)
+    logger.error('Failed to copy link:', err)
   }
 }
 

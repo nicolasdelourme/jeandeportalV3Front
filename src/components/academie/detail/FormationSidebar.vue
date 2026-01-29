@@ -5,6 +5,7 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import type { Formation } from '@/data/formations.data'
+import { logger } from '@/utils/logger'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -41,7 +42,7 @@ const openSubscriptionModal = () => {
 
 const handlePlanSelection = (planId: string, isAnnual: boolean) => {
   // TODO: Redirection vers checkout
-  console.log('Plan sélectionné:', planId, 'Annuel:', isAnnual)
+  logger.debug('Plan sélectionné:', planId, 'Annuel:', isAnnual)
 }
 
 const goToStarsInfo = () => {

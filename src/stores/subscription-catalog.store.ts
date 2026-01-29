@@ -6,6 +6,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { subscriptionCatalogService } from '@/services/subscription-catalog.service'
+import { logger } from '@/utils/logger'
 import type { ThemeType } from '@/components/ui/themed-card'
 import type {
   SubscriptionPlan,
@@ -226,7 +227,7 @@ export const useSubscriptionCatalogStore = defineStore('subscriptionCatalog', ()
       }
       localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData))
     } catch (err) {
-      console.warn('Failed to save subscription catalog to localStorage:', err)
+      logger.warn('Failed to save subscription catalog to localStorage:', err)
     }
   }
 
@@ -261,7 +262,7 @@ export const useSubscriptionCatalogStore = defineStore('subscriptionCatalog', ()
         err instanceof SubscriptionCatalogAPIError
           ? err
           : new SubscriptionCatalogAPIError('Erreur inconnue')
-      console.error('❌ Failed to fetch subscription catalog:', err)
+      logger.error('❌ Failed to fetch subscription catalog:', err)
     } finally {
       isLoading.value = false
     }

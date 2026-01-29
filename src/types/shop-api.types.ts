@@ -3,6 +3,8 @@
  * Structure du catalogue produits
  */
 
+import { logger } from '@/utils/logger'
+
 /**
  * Prix d'un produit avec ses variantes
  */
@@ -413,7 +415,7 @@ export function mapAPIResponseToShopCatalog(apiResponse: APIRawStoreResponse): S
   try {
     // Vérifier la structure de la réponse
     if (!apiResponse || !apiResponse.category_array) {
-      console.error('❌ Invalid API response structure. Expected object with category_array')
+      logger.error('❌ Invalid API response structure. Expected object with category_array')
       return { references: [] }
     }
 
@@ -429,14 +431,14 @@ export function mapAPIResponseToShopCatalog(apiResponse: APIRawStoreResponse): S
           const ref = mapAPIItemToShopReference(item, categoryId, categoryName)
           references.push(ref)
         } catch (err) {
-          console.error(`❌ Error mapping item ${item.itemId}:`, err)
+          logger.error(`❌ Error mapping item ${item.itemId}:`, err)
         }
       }
     }
 
     return { references }
   } catch (err) {
-    console.error('❌ Fatal error in mapAPIResponseToShopCatalog:', err)
+    logger.error('❌ Fatal error in mapAPIResponseToShopCatalog:', err)
     return { references: [] }
   }
 }

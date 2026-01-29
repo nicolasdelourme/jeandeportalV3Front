@@ -9,6 +9,7 @@
  */
 import { onMounted, computed, ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { logger } from '@/utils/logger'
 import DefaultLayout from '@/components/layout/DefaultLayout.vue'
 import { useShopStore } from '@/stores/shop.store'
 import { useCartStore } from '@/stores/cart.store'
@@ -184,7 +185,7 @@ const handleShare = async () => {
         url: window.location.href,
       })
     } catch (err) {
-      console.log('Partage annulé')
+      logger.debug('Partage annulé')
     }
   } else {
     navigator.clipboard.writeText(window.location.href)

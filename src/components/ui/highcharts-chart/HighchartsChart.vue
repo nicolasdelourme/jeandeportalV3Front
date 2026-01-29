@@ -12,6 +12,7 @@
 import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import { useHighchartsLoader } from '@/composables/useHighchartsLoader'
 import { imipieService } from '@/services/imipie.service'
+import { logger } from '@/utils/logger'
 import type { ArticleChartConfig, ImiPieChartResponse, HighchartsGlobal, HighchartsPayloadClientGlobal, HighchartsChartInstance } from '@/types/imipie.types'
 import { ImiPieAPIError } from '@/types/imipie.types'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -80,7 +81,7 @@ async function fetchChartData() {
     } else {
       fetchError.value = 'Erreur lors du chargement du graphique'
     }
-    console.error('[HighchartsChart] Fetch error:', error)
+    logger.error('[HighchartsChart] Fetch error:', error)
   } finally {
     isFetching.value = false
   }
@@ -94,7 +95,7 @@ function renderChart() {
 
   const container = document.getElementById(containerId.value)
   if (!container) {
-    console.error('[HighchartsChart] Container not found:', containerId.value)
+    logger.error('[HighchartsChart] Container not found:', containerId.value)
     return
   }
 
@@ -123,11 +124,11 @@ function renderChart() {
       chartInstance = Highcharts?.charts?.find(
         (c: HighchartsChartInstance | undefined) => c?.renderTo?.id === containerId.value
       ) || null
-      console.log('[HighchartsChart] Chart rendered via PayloadClient')
+      logger.debug('[HighchartsChart] Chart rendered via PayloadClient')
     } else if (Highcharts && purePayload.chart) {
       // Fallback: utiliser Highcharts directement avec les options du chart
       chartInstance = Highcharts.chart(containerId.value, purePayload.chart as Record<string, unknown>)
-      console.log('[HighchartsChart] Chart rendered via Highcharts fallback')
+      logger.debug('[HighchartsChart] Chart rendered via Highcharts fallback')
     } else {
       throw new Error('Highcharts ou HighchartsPayloadClient non disponible')
     }
@@ -141,7 +142,7 @@ function renderChart() {
       }
     }, 50)
   } catch (error) {
-    console.error('[HighchartsChart] Render error:', error)
+    logger.error('[HighchartsChart] Render error:', error)
     fetchError.value = 'Erreur lors du rendu du graphique'
   }
 }
@@ -168,7 +169,7 @@ async function initChart() {
     // Rendre le graphique
     renderChart()
   } catch (error) {
-    console.error('[HighchartsChart] Init error:', error)
+    logger.error('[HighchartsChart] Init error:', error)
   }
 }
 

@@ -5,6 +5,7 @@
  */
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { logger } from '@/utils/logger'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
@@ -101,13 +102,13 @@ const cancelProcess = () => {
 const onSubmit = handleSubmit(async (formValues) => {
   try {
     // TODO: Appel API pour annuler l'abonnement
-    console.log('Annulation abonnement:', formValues)
+    logger.debug('Annulation abonnement:', formValues)
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
     toast.success('Votre abonnement a été annulé avec succès')
     router.push('/mon-compte?tab=subscription')
   } catch (error) {
-    console.error(error)
+    logger.error(error)
     toast.error('Une erreur est survenue lors de l\'annulation')
   }
 })

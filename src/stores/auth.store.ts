@@ -143,7 +143,7 @@ export const useAuthStore = defineStore('auth', () => {
                 try {
                     await cartStore.syncWithBackend()
                 } catch (err) {
-                    console.warn('⚠️ [AUTH STORE] Erreur lors de la sync panier (non bloquant):', err)
+                    logger.warn('⚠️ [AUTH STORE] Erreur lors de la sync panier (non bloquant):', err)
                 }
             }
 

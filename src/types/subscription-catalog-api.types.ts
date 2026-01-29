@@ -4,6 +4,7 @@
  */
 
 import type { ThemeType } from '@/components/ui/themed-card'
+import { logger } from '@/utils/logger'
 
 // ============================================================================
 // Types API bruts (structure réelle renvoyée par le backend)
@@ -203,7 +204,7 @@ export function mapAPIProductToSubscriptionPlan(
   // Extraire le theme depuis technicalTag
   const theme = THEME_TAG_MAP[product.technicalTag]
   if (!theme) {
-    console.warn(`Unknown technicalTag: ${product.technicalTag}`)
+    logger.warn(`Unknown technicalTag: ${product.technicalTag}`)
     return null
   }
 
@@ -213,7 +214,7 @@ export function mapAPIProductToSubscriptionPlan(
   // Trouver le premier plan avec des pricing (généralement il n'y en a qu'un)
   const plan = product.plan_array?.[0]
   if (!plan) {
-    console.warn(`No plan found for product: ${product.name}`)
+    logger.warn(`No plan found for product: ${product.name}`)
     return null
   }
 

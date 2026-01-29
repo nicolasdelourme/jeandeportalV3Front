@@ -6,6 +6,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { shopService } from '@/services/shop.service'
+import { logger } from '@/utils/logger'
 import type {
   ShopCatalogResponse,
   ShopReference,
@@ -284,7 +285,7 @@ export const useShopStore = defineStore('shop', () => {
       }
       localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData))
     } catch (err) {
-      console.warn('Failed to save shop catalog to localStorage:', err)
+      logger.warn('Failed to save shop catalog to localStorage:', err)
     }
   }
 
@@ -316,7 +317,7 @@ export const useShopStore = defineStore('shop', () => {
 
     } catch (err) {
       error.value = err instanceof ShopAPIError ? err : new ShopAPIError('Erreur inconnue')
-      console.error('❌ Failed to fetch shop catalog:', err)
+      logger.error('❌ Failed to fetch shop catalog:', err)
     } finally {
       isLoading.value = false
     }

@@ -6,6 +6,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { userSubscriptionService } from '@/services/user-subscription.service'
+import { logger } from '@/utils/logger'
 import type {
   UserSubscription,
   UserInvoice,
@@ -114,7 +115,7 @@ export const useUserSubscriptionStore = defineStore('userSubscription', () => {
           : 'Impossible de charger vos abonnements'
 
       error.value = errorMessage
-      console.error('❌ Failed to fetch user subscriptions:', err)
+      logger.error('❌ Failed to fetch user subscriptions:', err)
     } finally {
       isLoading.value = false
     }
@@ -157,7 +158,7 @@ export const useUserSubscriptionStore = defineStore('userSubscription', () => {
           : 'Impossible de mettre à jour le moyen de paiement'
 
       error.value = errorMessage
-      console.error('❌ Failed to update payment method:', err)
+      logger.error('❌ Failed to update payment method:', err)
       return null
     } finally {
       isUpdatingPayment.value = false

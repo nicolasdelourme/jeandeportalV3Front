@@ -16,6 +16,7 @@ import { cartService } from '@/services/cart.service'
 import { decodeHtmlEntities } from '@/utils/html.utils'
 import { toast } from 'vue-sonner'
 import { getErrorMessage } from '@/lib/error-utils'
+import { logger } from '@/utils/logger'
 
 /**
  * Clé localStorage pour le basketCode
@@ -49,7 +50,7 @@ function saveBasketCode(code: string | null): void {
       localStorage.removeItem(BASKET_CODE_KEY)
     }
   } catch (error) {
-    console.error('❌ Erreur lors de la sauvegarde du basketCode:', error)
+    logger.error('❌ Erreur lors de la sauvegarde du basketCode:', error)
   }
 }
 
@@ -75,7 +76,7 @@ function clearOldLocalStorageCart(): void {
       localStorage.removeItem(CART_CONFIG.STORAGE_KEY)
     }
   } catch (error) {
-    console.error('Erreur lors du nettoyage du localStorage:', error)
+    logger.error('Erreur lors du nettoyage du localStorage:', error)
   }
 }
 
@@ -235,7 +236,7 @@ export const useCartStore = defineStore('cart', () => {
       cartState.value.isSynced = true
       cartState.value.lastSyncTimestamp = Date.now()
     } catch (error) {
-      console.error('❌ [CART STORE] Erreur lors de la synchronisation:', error)
+      logger.error('❌ [CART STORE] Erreur lors de la synchronisation:', error)
       throw error
     } finally {
       cartState.value.isLoading = false
@@ -300,10 +301,10 @@ export const useCartStore = defineStore('cart', () => {
       if (mapped.basketCode) {
         saveBasketCode(mapped.basketCode)
       } else {
-        console.error('❌ [CART STORE] ATTENTION: basketCode est null/undefined dans la réponse!')
+        logger.error('❌ [CART STORE] ATTENTION: basketCode est null/undefined dans la réponse!')
       }
     } catch (error) {
-      console.error('❌ [CART STORE] Erreur lors de l\'ajout:', error)
+      logger.error('❌ [CART STORE] Erreur lors de l\'ajout:', error)
       throw error
     } finally {
       cartState.value.isLoading = false
@@ -339,7 +340,7 @@ export const useCartStore = defineStore('cart', () => {
       }
 
     } catch (error) {
-      console.error('❌ [CART STORE] Erreur lors de la mise à jour:', error)
+      logger.error('❌ [CART STORE] Erreur lors de la mise à jour:', error)
       throw error
     } finally {
       cartState.value.isLoading = false
@@ -382,7 +383,7 @@ export const useCartStore = defineStore('cart', () => {
 
       toast.success('Article retiré du panier')
     } catch (error) {
-      console.error('❌ [CART STORE] Erreur lors de la suppression:', error)
+      logger.error('❌ [CART STORE] Erreur lors de la suppression:', error)
       throw error
     } finally {
       cartState.value.isLoading = false
@@ -410,7 +411,7 @@ export const useCartStore = defineStore('cart', () => {
 
       toast.success('Panier vidé')
     } catch (error) {
-      console.error('❌ [CART STORE] Erreur lors du vidage:', error)
+      logger.error('❌ [CART STORE] Erreur lors du vidage:', error)
       throw error
     } finally {
       cartState.value.isLoading = false

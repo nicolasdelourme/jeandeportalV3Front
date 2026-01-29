@@ -5,6 +5,7 @@
  */
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { logger } from '@/utils/logger'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@/lib/icons'
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
@@ -118,7 +119,7 @@ const getStatusBadge = (status: InvoiceStatus) => {
 // Télécharger une facture
 const downloadInvoice = (invoice: SubscriptionInvoice) => {
   // TODO: Implémenter le téléchargement réel
-  console.log('Téléchargement facture:', invoice.id)
+  logger.debug('Téléchargement facture:', invoice.id)
   window.open(invoice.pdfUrl, '_blank')
 }
 

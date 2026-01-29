@@ -6,6 +6,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { toast } from 'vue-sonner'
+import { logger } from '@/utils/logger'
 import { useAuthStore } from '@/stores/auth.store'
 import { authService } from '@/services/auth.service'
 import { getErrorMessage } from '@/lib/error-utils'
@@ -75,7 +76,7 @@ const handleLoginSubmit = async (values: { email: string; password: string; reme
         const finalUrl = redirectUrl || afterLoginUrl
         await router.push(finalUrl)
     } catch (error) {
-        console.error('❌ [AUTH PAGE] Erreur lors du login:', error)
+        logger.error('❌ [AUTH PAGE] Erreur lors du login:', error)
         errors.value.general = getErrorMessage(error)
     } finally {
         isSubmitting.value = false
@@ -117,7 +118,7 @@ const handleRegisterSubmit = async (values: {
 
         toast.success('Un email de vérification a été envoyé !')
     } catch (error) {
-        console.error('Erreur:', error)
+        logger.error('Erreur:', error)
         errors.value.general = getErrorMessage(error)
     } finally {
         isSubmitting.value = false
@@ -147,7 +148,7 @@ const handleForgotPasswordSubmit = async (values: { email: string }) => {
         toast.success(result.message)
         mode.value = 'login'
     } catch (error) {
-        console.error('Erreur:', error)
+        logger.error('Erreur:', error)
         errors.value.general = getErrorMessage(error)
     } finally {
         isSubmitting.value = false

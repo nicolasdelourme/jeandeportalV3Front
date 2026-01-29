@@ -42,7 +42,7 @@ class ApiClient {
             (response) => response,
             async (error) => {
                 // DEBUG: Log immédiat pour voir TOUTES les erreurs
-                console.log('🚨 [API CLIENT] ERREUR INTERCEPTÉE:', {
+                logger.debug('🚨 [API CLIENT] ERREUR INTERCEPTÉE:', {
                     url: error.config?.url,
                     status: error.response?.status,
                     message: error.message
@@ -69,7 +69,7 @@ class ApiClient {
 
                 // Log pour debug (sans bloquer)
                 if (error.response?.status === 401) {
-                    console.log('🔍 [API CLIENT] Intercepteur 401:', {
+                    logger.debug('🔍 [API CLIENT] Intercepteur 401:', {
                         requestUrl,
                         status: error.response?.status,
                         isPublicEndpoint,

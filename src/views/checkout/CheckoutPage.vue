@@ -10,6 +10,7 @@
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { loadStripe, type Stripe, type StripeElements, type StripeCardElement } from '@stripe/stripe-js'
+import { logger } from '@/utils/logger'
 import { useCheckoutFlow, isOneClickItem, type CheckoutType } from '@/composables/useCheckoutFlow'
 import { useAuth } from '@/composables/useAuth'
 import type { CheckoutStep } from '@/types/payment.types'
@@ -251,7 +252,7 @@ async function proceedToPayment() {
       cardElementReady.value = true
     })
   } catch (err: any) {
-    console.error('Erreur initialisation paiement:', err)
+    logger.error('Erreur initialisation paiement:', err)
     const errorMessage = err.message || 'Impossible d\'initialiser le paiement'
     error.value = errorMessage
     toast.error(errorMessage)
@@ -316,7 +317,7 @@ async function handleConfirmPayment() {
       router.push('/mon-compte')
     }, 3000)
   } catch (err: any) {
-    console.error('Erreur confirmation paiement:', err)
+    logger.error('Erreur confirmation paiement:', err)
     const errorMessage = err.message || 'Erreur lors du paiement'
     error.value = errorMessage
     toast.error(errorMessage)
