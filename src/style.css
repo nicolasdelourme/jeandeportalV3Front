@@ -261,9 +261,11 @@
     --theme-gradient-end: var(--color-theme-bonus-gradient-end);
 }
 
-/* Styles pour le contenu HTML des descriptions produits */
+/* Styles pour le contenu HTML des descriptions produits - taille 17px */
 .prose {
     @apply text-neutral-700;
+    font-size: 1.0625rem; /* 17px - entre text-base (16px) et text-lg (18px) */
+    line-height: 1.625;
 }
 
 .prose p {
@@ -328,9 +330,9 @@
    PROSE TIPTAP - Styles pour le contenu des articles
    ═══════════════════════════════════════════════════════════════════════ */
 
-/* Container prose */
+/* Container prose - taille de base 18px pour confort de lecture */
 .prose-tiptap {
-    @apply text-neutral-700 leading-relaxed;
+    @apply text-neutral-700 text-lg leading-relaxed;
 }
 
 /* Headings - Bernina Sans */
@@ -459,16 +461,16 @@
 
 /* Tables - exclure les tables shadcn (data-slot) */
 .prose-tiptap table:not([data-slot]) {
-    @apply w-full border-collapse my-6;
+    @apply w-full border-collapse my-6 text-base;
 }
 
 .prose-tiptap th:not([data-slot]),
 .prose-tiptap td:not([data-slot]) {
-    @apply border border-neutral-200 px-4 py-2 text-left;
+    @apply border border-neutral-200 px-4 py-3 text-left;
 }
 
 .prose-tiptap th:not([data-slot]) {
-    @apply bg-neutral-50 font-semibold;
+    @apply bg-neutral-50 font-semibold text-base;
     border-color: var(--theme-color, #e5e7eb);
 }
 
@@ -479,6 +481,16 @@
 /* Container shadcn Table dans prose-tiptap */
 .prose-tiptap [data-slot="table-container"] {
     @apply my-6;
+}
+
+/* Override taille texte pour tables shadcn dans prose-tiptap */
+.prose-tiptap [data-slot="table"] {
+    @apply text-base;
+}
+
+.prose-tiptap [data-slot="table-cell"],
+.prose-tiptap [data-slot="table-head"] {
+    @apply py-3 text-base;
 }
 
 /* Separateur - style simple (utiliser Separator shadcn de preference) */
