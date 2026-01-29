@@ -65,6 +65,23 @@ const mockArticle = ref({
   est amenée à se poursuivre. Voici un <a href="#">lien vers notre dossier complet</a> sur le sujet.
 </p>
 
+<h2>Evolution historique du cours de l'or</h2>
+<p>
+  Avant d'analyser les facteurs macro-économiques, observons l'évolution du cours de l'or
+  sur les dernières années. Ce graphique illustre la tendance haussière depuis 2000.
+</p>
+
+<div
+  data-imipie-chart
+  data-family="gold"
+  data-serie="lbmaSerie"
+  data-start-date="2000-01-01"
+  data-stop-date="2025-12-31"
+  data-x-tick="730"
+  data-height="400px"
+  data-title="Cours de l'or LBMA (EUR/oz)"
+></div>
+
 <h2>Les facteurs macro-économiques</h2>
 <h3>1. L'inflation persistante</h3>
 <p>

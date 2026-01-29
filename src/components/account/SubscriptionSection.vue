@@ -11,6 +11,7 @@ import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Empty } from '@/components/ui/empty'
 import {
     Collapsible,
     CollapsibleContent,
@@ -54,6 +55,7 @@ const icons = computed(() => ({
     spinner: byPrefixAndName.fas?.['spinner'],
     triangleExclamation: byPrefixAndName.fas?.['triangle-exclamation'],
     undo: byPrefixAndName.fas?.['undo'],
+    newspaper: byPrefixAndName.far?.['newspaper'],
 }))
 
 const getIcon = (iconKey: keyof typeof icons.value): IconDefinition | undefined => {
@@ -212,12 +214,20 @@ const openInvoice = (invoice: UserInvoice): void => {
                 </CardHeader>
                 <CardContent class="space-y-4">
                     <!-- Message si aucun abonnement -->
-                    <p
+                    <Empty
                         v-if="store.activeSubscriptions.length === 0 && store.cancelledSubscriptions.length === 0"
-                        class="text-neutral-500 text-sm py-4 text-center"
+                        title="Aucun abonnement"
+                        description="Vous n'avez pas encore souscrit à un abonnement."
+                        class="py-8"
                     >
-                        Vous n'avez pas encore d'abonnement.
-                    </p>
+                        <template #icon>
+                            <FontAwesomeIcon
+                                v-if="getIcon('newspaper')"
+                                :icon="getIcon('newspaper')!"
+                                class="h-10 w-10 text-neutral-400"
+                            />
+                        </template>
+                    </Empty>
 
                     <!-- Liste des abonnements actifs/suspendus -->
                     <div
@@ -477,12 +487,20 @@ const openInvoice = (invoice: UserInvoice): void => {
                 </CardHeader>
                 <CardContent>
                     <!-- Message si aucune facture -->
-                    <p
+                    <Empty
                         v-if="store.invoices.length === 0"
-                        class="text-neutral-500 text-sm py-4 text-center"
+                        title="Aucune facture"
+                        description="Vous n'avez pas encore de facture d'abonnement."
+                        class="py-8"
                     >
-                        Aucune facture disponible.
-                    </p>
+                        <template #icon>
+                            <FontAwesomeIcon
+                                v-if="getIcon('fileInvoice')"
+                                :icon="getIcon('fileInvoice')!"
+                                class="h-10 w-10 text-neutral-400"
+                            />
+                        </template>
+                    </Empty>
 
                     <!-- Tableau des factures -->
                     <div v-else class="border rounded-lg overflow-hidden">

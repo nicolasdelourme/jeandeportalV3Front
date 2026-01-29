@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
- * ProseContent - Render TipTap HTML with shadcn Table components
- * Parses HTML content, extracts tables and renders them as shadcn Tables
+ * ProseContent - Render TipTap HTML with shadcn Table components and Highcharts
+ * Parses HTML content, extracts tables and chart placeholders, renders them with components
  */
 import { computed } from 'vue'
 import {
@@ -12,6 +12,8 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table'
+import { HighchartsChart } from '@/components/ui/highcharts-chart'
+import type { ArticleChartConfig } from '@/types/imipie.types'
 
 interface Props {
     html: string
@@ -23,8 +25,8 @@ interface TableData {
 }
 
 interface ContentSegment {
-    type: 'html' | 'table'
-    content: string | TableData
+    type: 'html' | 'table' | 'chart'
+    content: string | TableData | ArticleChartConfig
 }
 
 const props = defineProps<Props>()
@@ -81,18 +83,50 @@ function parseTable(tableHtml: string): TableData {
 }
 
 /**
- * Decoupe le HTML en segments (html brut et tables)
+ * Parse un placeholder de graphique et extrait la configuration
+ * Format: <div data-imipie-chart data-family="gold" data-serie="lbmaSerie" ...></div>
+ */
+function parseChartPlaceholder(divHtml: string): ArticleChartConfig | null {
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(divHtml, 'text/html')
+    const div = doc.querySelector('div[data-imipie-chart]')
+
+    if (!div) return null
+
+    const family = div.getAttribute('data-family')
+    const serie = div.getAttribute('data-serie')
+
+    // family et serie sont requis
+    if (!family || !serie) {
+        console.warn('[ProseContent] Chart placeholder missing required data-family or data-serie')
+        return null
+    }
+
+    return {
+        family,
+        serie,
+        startDate: div.getAttribute('data-start-date') || undefined,
+        stopDate: div.getAttribute('data-stop-date') || undefined,
+        xTick: div.getAttribute('data-x-tick') ? parseInt(div.getAttribute('data-x-tick')!, 10) : undefined,
+        height: div.getAttribute('data-height') || undefined,
+        title: div.getAttribute('data-title') || undefined,
+    }
+}
+
+/**
+ * Decoupe le HTML en segments (html brut, tables et graphiques)
  */
 const segments = computed<ContentSegment[]>(() => {
     if (!props.html) return []
 
     const result: ContentSegment[] = []
-    const tableRegex = /<table[\s\S]*?<\/table>/gi
+    // Regex combinée pour tables et placeholders de graphiques
+    const combinedRegex = /(<table[\s\S]*?<\/table>)|(<div[^>]*data-imipie-chart[^>]*>(?:<\/div>)?)/gi
     let lastIndex = 0
     let match
 
-    while ((match = tableRegex.exec(props.html)) !== null) {
-        // Add HTML before the table
+    while ((match = combinedRegex.exec(props.html)) !== null) {
+        // Add HTML before the match
         if (match.index > lastIndex) {
             const htmlContent = props.html.slice(lastIndex, match.index).trim()
             if (htmlContent) {
@@ -100,16 +134,30 @@ const segments = computed<ContentSegment[]>(() => {
             }
         }
 
-        // Add the table
-        result.push({
-            type: 'table',
-            content: parseTable(match[0]),
-        })
+        // Determine if it's a table or a chart
+        const matchedContent = match[0]
+
+        if (match[1]) {
+            // It's a table
+            result.push({
+                type: 'table',
+                content: parseTable(matchedContent),
+            })
+        } else if (match[2]) {
+            // It's a chart placeholder
+            const chartConfig = parseChartPlaceholder(matchedContent)
+            if (chartConfig) {
+                result.push({
+                    type: 'chart',
+                    content: chartConfig,
+                })
+            }
+        }
 
         lastIndex = match.index + match[0].length
     }
 
-    // Add remaining HTML after last table
+    // Add remaining HTML after last match
     if (lastIndex < props.html.length) {
         const htmlContent = props.html.slice(lastIndex).trim()
         if (htmlContent) {
@@ -152,6 +200,12 @@ const segments = computed<ContentSegment[]>(() => {
                     </TableRow>
                 </TableBody>
             </Table>
+
+            <!-- Highcharts chart -->
+            <HighchartsChart
+                v-else-if="segment.type === 'chart'"
+                :config="segment.content as ArticleChartConfig"
+            />
         </template>
     </div>
 </template>
