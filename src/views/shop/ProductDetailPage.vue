@@ -512,11 +512,11 @@ const displayTags = computed((): ParsedTag[] => {
                   <div class="hidden md:flex flex-col gap-2">
                     <!-- CTA Principal : Commander (achat direct) -->
                     <Button
-                      @click="handleDirectPurchase"
-                      :disabled="!selectedPrice"
-                      size="lg"
-                      rounded="lg"
                       class="w-full justify-center bg-success hover:bg-success/90 text-success-foreground"
+                      rounded="lg"
+                      size="lg"
+                      :disabled="!selectedPrice"
+                      @click="handleDirectPurchase"
                     >
                       <FontAwesomeIcon
                         v-if="icons.creditCard"
@@ -527,13 +527,13 @@ const displayTags = computed((): ParsedTag[] => {
                     </Button>
                     <!-- CTA Secondaire : Ajouter au panier -->
                     <Button
-                      @click="handleAddToCart"
-                      :disabled="!selectedPrice"
-                      variant="outline"
-                      color="secondary"
-                      size="lg"
-                      rounded="lg"
                       class="w-full justify-center hover:bg-secondary hover:border-secondary"
+                      rounded="lg"
+                      size="lg"
+                      color="secondary"
+                      variant="outline"
+                      :disabled="!selectedPrice"
+                      @click="handleAddToCart"
                     >
                       <FontAwesomeIcon
                         v-if="isInCart && icons.check"

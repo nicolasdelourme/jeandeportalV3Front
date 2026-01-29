@@ -436,7 +436,7 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                         <DropdownMenuContent align="end" class="w-56 rounded-lg bg-secondary-foreground">
                             <DropdownMenuLabel class="text-secondary">{{ displayName }}</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem @click="handleAccount" class="cursor-pointer rounded-lg">
+                            <DropdownMenuItem class="cursor-pointer rounded-lg" @click="handleAccount">
                                 <FontAwesomeIcon v-if="icons.userCircle" :icon="icons.userCircle"
                                     class="h-4 w-4 mr-2 text-secondary" />
                                 Mon compte

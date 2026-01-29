@@ -7,8 +7,8 @@ import { useAuthStore } from "./stores/auth.store"
 import { useCartStore } from "./stores/cart.store"
 
 // ✅ Forcer HTTPS en production
-if (import.meta.env.PROD && location.protocol !== 'https:') {
-    location.replace(`https:${location.href.substring(location.protocol.length)}`)
+if (import.meta.env.PROD && globalThis.location?.protocol !== 'https:') {
+    globalThis.location?.replace(`https:${globalThis.location.href.substring(globalThis.location.protocol.length)}`)
 }
 
 const pinia = createPinia()
@@ -27,7 +27,7 @@ authStore.initialize().then(async () => {
     const cartStore = useCartStore();
     try {
         await cartStore.initialize();
-    } catch (error) {
+    } catch {
         // Erreur normale si pas de session (utilisateur non connecté)
         console.info('🛒 Panier non chargé (utilisateur non connecté ou session invalide)');
     }

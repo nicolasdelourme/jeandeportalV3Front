@@ -24,6 +24,7 @@ export default [
         sourceType: 'module'
       },
       globals: {
+        // Browser globals
         window: 'readonly',
         document: 'readonly',
         navigator: 'readonly',
@@ -35,6 +36,23 @@ export default [
         fetch: 'readonly',
         URL: 'readonly',
         URLSearchParams: 'readonly',
+        localStorage: 'readonly',
+        sessionStorage: 'readonly',
+        // DOM Event types
+        Event: 'readonly',
+        MouseEvent: 'readonly',
+        KeyboardEvent: 'readonly',
+        FocusEvent: 'readonly',
+        InputEvent: 'readonly',
+        HTMLElement: 'readonly',
+        HTMLInputElement: 'readonly',
+        HTMLButtonElement: 'readonly',
+        Element: 'readonly',
+        globalThis: 'readonly',
+        // Browser dialogs
+        alert: 'readonly',
+        confirm: 'readonly',
+        prompt: 'readonly',
       }
     },
     plugins: {
@@ -62,6 +80,31 @@ export default [
       parserOptions: {
         ecmaVersion: 'latest',
         sourceType: 'module'
+      },
+      globals: {
+        // Browser globals
+        window: 'readonly',
+        document: 'readonly',
+        navigator: 'readonly',
+        console: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        fetch: 'readonly',
+        URL: 'readonly',
+        URLSearchParams: 'readonly',
+        localStorage: 'readonly',
+        sessionStorage: 'readonly',
+        globalThis: 'readonly',
+        alert: 'readonly',
+        confirm: 'readonly',
+        prompt: 'readonly',
+        // DOM types
+        Event: 'readonly',
+        MouseEvent: 'readonly',
+        HTMLElement: 'readonly',
+        Element: 'readonly',
       }
     },
     plugins: {
