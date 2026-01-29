@@ -194,8 +194,10 @@ const navigate = (path: string) => {
                     <div class="grid grid-cols-2 gap-x-4 gap-y-2 md:flex md:gap-6 text-[#b0bec5]">
                         <a href="/cgv" @click.prevent="navigate('/cgv')" class="hover:text-white transition-colors cursor-pointer">CGV</a>
                         <a href="/mentions-legales" @click.prevent="navigate('/mentions-legales')" class="hover:text-white transition-colors cursor-pointer">Mentions légales</a>
-                        <a href="/confidentialite" @click.prevent="navigate('/confidentialite')" class="hover:text-white transition-colors cursor-pointer">RGPD</a>
+                        <a href="/confidentialite" @click.prevent="navigate('/confidentialite')" class="hover:text-white transition-colors cursor-pointer">Confidentialité</a>
                         <a href="/cookies" @click.prevent="navigate('/cookies')" class="hover:text-white transition-colors cursor-pointer">Cookies</a>
+                        <span class="hidden md:inline text-neutral-500">–</span>
+                        <a href="/rgpd" @click.prevent="navigate('/rgpd')" class="hover:text-white transition-colors cursor-pointer">RGPD (legacy)</a>
                     </div>
 
                     <!-- Copyright -->
