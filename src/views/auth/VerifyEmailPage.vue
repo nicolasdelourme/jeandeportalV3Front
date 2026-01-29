@@ -31,6 +31,14 @@ onMounted(async () => {
     // Token depuis le path param (ex: /register/verif/abc123)
     const token = route.params.token as string
 
+    // Mode démo pour prévisualisation UI
+    if (token === 'demo') {
+        isLoading.value = false
+        isSuccess.value = true
+        message.value = 'Votre compte a été activé avec succès. Vous pouvez maintenant vous connecter.'
+        return
+    }
+
     if (!token) {
         isLoading.value = false
         isSuccess.value = false
