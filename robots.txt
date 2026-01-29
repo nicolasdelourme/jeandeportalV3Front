@@ -1,0 +1,31 @@
+# Robots.txt pour Infocash Academie
+# https://jeandeportal.fr
+
+User-agent: *
+Allow: /
+
+# Pages autorisees
+Allow: /
+Allow: /academie
+Allow: /academie/catalogue
+Allow: /boutique
+Allow: /boutique/*
+
+# Pages a ne pas indexer (auth, compte utilisateur, panier)
+Disallow: /auth
+Disallow: /mon-compte
+Disallow: /mon-compte/*
+Disallow: /panier
+Disallow: /commander
+Disallow: /register/verif/*
+
+# Fichiers techniques
+Disallow: /assets/
+Disallow: /*.js$
+Disallow: /*.css$
+
+# Sitemap
+Sitemap: https://jeandeportal.fr/sitemap.xml
+
+# Delai entre les requetes (en secondes)
+Crawl-delay: 1
