@@ -206,8 +206,8 @@ const goToForgotPassword = () => {
             <div v-if="isVerifying" class="space-y-6 text-center py-8">
                 <div class="mx-auto w-16 h-16 flex items-center justify-center">
                     <svg class="animate-spin w-10 h-10 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
                     </svg>
                 </div>
                 <p class="text-neutral-600">Vérification du lien de réinitialisation...</p>
@@ -229,8 +229,9 @@ const goToForgotPassword = () => {
                     <Button
                         type="button"
                         color="primary"
+                        rounded="lg"
                         size="lg"
-                        class="w-full"
+                        class="w-full text-secondary hover:text-secondary"
                         @click="goToForgotPassword"
                     >
                         <span class="font-bold">Demander un nouveau lien</span>
@@ -255,7 +256,7 @@ const goToForgotPassword = () => {
                     <p class="text-sm text-red-600">{{ errorMessage }}</p>
                 </div>
 
-                <form @submit="onSubmit" class="space-y-4">
+                <form class="space-y-4" @submit="onSubmit">
                     <!-- Nouveau mot de passe -->
                     <FormField v-slot="{ componentField }" name="password">
                         <FormItem class="gap-1">
@@ -276,9 +277,9 @@ const goToForgotPassword = () => {
                                     />
                                     <button
                                         type="button"
-                                        @click="showPassword = !showPassword"
                                         class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
                                         :aria-label="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+                                        @click="showPassword = !showPassword"
                                     >
                                         <FontAwesomeIcon v-if="showPassword && getIcon('eyeSlash')" :icon="getIcon('eyeSlash')" class="w-4 h-4" />
                                         <FontAwesomeIcon v-else-if="getIcon('eye')" :icon="getIcon('eye')" class="w-4 h-4" />
@@ -302,7 +303,7 @@ const goToForgotPassword = () => {
                                         :style="{
                                             width: `${passwordStrength.score}%`,
                                             backgroundColor: passwordStrength.barColor
-                                        }" />
+                                        }" ></div>
                                 </div>
                             </div>
                             <FormDescription v-if="!values.password" class="text-xs text-neutral-500">
@@ -333,9 +334,9 @@ const goToForgotPassword = () => {
                                     />
                                     <button
                                         type="button"
-                                        @click="showConfirmPassword = !showConfirmPassword"
                                         class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
                                         :aria-label="showConfirmPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+                                        @click="showConfirmPassword = !showConfirmPassword"
                                     >
                                         <FontAwesomeIcon v-if="showConfirmPassword && getIcon('eyeSlash')" :icon="getIcon('eyeSlash')" class="w-4 h-4" />
                                         <FontAwesomeIcon v-else-if="getIcon('eye')" :icon="getIcon('eye')" class="w-4 h-4" />
@@ -350,7 +351,8 @@ const goToForgotPassword = () => {
                     <Button
                         type="submit"
                         color="primary"
-                        class="w-full"
+                        rounded="lg"
+                        class="w-full text-secondary hover:text-secondary"
                         size="lg"
                         :disabled="isSubmitting"
                     >
@@ -379,8 +381,9 @@ const goToForgotPassword = () => {
                 <Button
                     type="button"
                     color="primary"
+                    rounded="lg"
                     size="lg"
-                    class="w-full"
+                    class="w-full text-secondary hover:text-secondary"
                     @click="goToLogin"
                 >
                     <span class="font-bold">Se connecter</span>

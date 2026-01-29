@@ -154,20 +154,22 @@ function handleClose() {
           </p>
         </div>
 
-        <DialogFooter class="gap-2 sm:gap-0">
+        <DialogFooter class="flex gap-0 md:gap-2">
           <Button
             variant="outline"
             type="button"
+            rounded="lg"
             color="secondary"
-            @click="handleClose"
             class="hover:bg-secondary hover:border-secondary"
             :disabled="isSubmitting"
+            @click="handleClose"
           >
             Annuler
           </Button>
           <Button
           variant="secondary"
             type="submit"
+            rounded="lg"
             :disabled="isSubmitting || !values.newEmail"
           >
             <span style="font-family: Roboto, sans-serif">

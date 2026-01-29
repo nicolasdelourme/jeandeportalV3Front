@@ -284,8 +284,8 @@ onMounted(() => {
                     type="button"
                     variant="secondary"
                     rounded="lg"
-                    @click="goToLoginFromSuccess"
                     class="w-full transition-colors"
+                    @click="goToLoginFromSuccess"
                 >
                     Aller à la connexion
                 </Button>

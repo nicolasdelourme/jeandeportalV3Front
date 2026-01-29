@@ -214,7 +214,7 @@ const onSubmit = handleSubmit(async (values) => {
             <CardContent class="space-y-6">
             
                 <!-- Avatar Section -->
-                <div class="hidden flex items-center gap-6">
+                <div v-if="false" class="flex items-center gap-6">
                     <Avatar class="h-24 w-24">
                         <AvatarImage v-if="avatarUrl" :src="avatarUrl" alt="Photo de profil" />
                         <AvatarFallback class="text-2xl bg-secondary text-white">{{ avatarInitials }}</AvatarFallback>
@@ -238,7 +238,7 @@ const onSubmit = handleSubmit(async (values) => {
                 <Separator class="hidden" />
 
                 <!-- Form -->
-                <form @submit="onSubmit" class="space-y-4">
+                <form class="space-y-4" @submit="onSubmit">
                     <!-- Prénom et Nom -->
                     <div class="grid grid-cols-2 gap-4">
                         <FormField v-slot="{ componentField }" name="firstName">

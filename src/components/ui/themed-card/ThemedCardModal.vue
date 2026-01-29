@@ -165,7 +165,7 @@ const handleOpenChange = (value: boolean) => {
       <!-- Image en haut (full width) -->
       <div
         class="relative aspect-video w-full overflow-hidden rounded-t-lg"
-        :class="[`bg-gradient-to-br`, themeClasses.gradient]"
+        :class="[`bg-linear-to-br`, themeClasses.gradient]"
       >
         <img
           v-if="thumbnail"
@@ -186,10 +186,10 @@ const handleOpenChange = (value: boolean) => {
         >
           Consulter
         </Button>
-        <Button variant="outline" size="icon" rounded="lg" @click="emit('add')" aria-label="Ajouter à ma liste">
+        <Button variant="outline" size="icon" rounded="lg" aria-label="Ajouter à ma liste" @click="emit('add')">
           <FontAwesomeIcon v-if="icons.plus" :icon="icons.plus" class="size-4" />
         </Button>
-        <Button variant="outline" size="icon" rounded="lg" @click="emit('download')" aria-label="Télécharger">
+        <Button variant="outline" size="icon" rounded="lg" aria-label="Télécharger" @click="emit('download')">
           <FontAwesomeIcon v-if="icons.download" :icon="icons.download" class="size-4" />
         </Button>
       </div>
@@ -306,7 +306,7 @@ const handleOpenChange = (value: boolean) => {
               :color="theme"
               size="default"
               rounded="lg"
-              class="w-full text-secondray bg-red-600"
+              class="w-full"
               @click="emit('view')"
             >
               {{ dynamicCtaLabel }}
@@ -318,8 +318,8 @@ const handleOpenChange = (value: boolean) => {
                 size="default"
                 rounded="lg"
                 class="flex-1"
-                @click="emit('add')"
                 aria-label="Ajouter à ma liste"
+                @click="emit('add')"
               >
                 <FontAwesomeIcon v-if="icons.plus" :icon="icons.plus" class="size-4" />
               </Button>
@@ -328,8 +328,8 @@ const handleOpenChange = (value: boolean) => {
                 size="default"
                 rounded="lg"
                 class="flex-1"
-                @click="emit('download')"
                 aria-label="Télécharger"
+                @click="emit('download')"
               >
                 <FontAwesomeIcon v-if="icons.download" :icon="icons.download" class="size-4" />
               </Button>

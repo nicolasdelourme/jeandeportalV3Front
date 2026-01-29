@@ -80,20 +80,22 @@ function handleClose() {
         </p>
       </div>
 
-      <DialogFooter class="gap-2 sm:gap-0">
+      <DialogFooter class="flex gap-0 md:gap-2">
         <Button
           variant="outline"
           color="secondary"
+          rounded="lg"
           class="hover:bg-secondary hover:border-secondary"
-          @click="handleClose"
           :disabled="isSubmitting"
+          @click="handleClose"
         >
           Annuler
         </Button>
         <Button
-          @click="handleConfirm"
-          :disabled="isSubmitting || !userEmail"
-          variant="secondary"
+        :disabled="isSubmitting || !userEmail"
+        variant="secondary"
+        rounded="lg"
+        @click="handleConfirm"
         >
           <span style="font-family: Roboto, sans-serif">
             {{ isSubmitting ? 'Envoi en cours...' : "Envoyer l'email" }}

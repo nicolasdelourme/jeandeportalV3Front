@@ -478,7 +478,7 @@ const resetFilters = () => {
                     class="flex gap-3 cursor-pointer group"
                     @click="handleItemClick(item)"
                   >
-                    <Badge class="size-6 flex-shrink-0 flex items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">
+                    <Badge class="size-6 shrink-0 flex items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">
                       {{ index + 1 }}
                     </Badge>
                     <p class="text-sm font-medium text-foreground line-clamp-2 group-hover:text-primary transition-colors">

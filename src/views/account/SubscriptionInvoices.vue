@@ -133,7 +133,7 @@ const goBack = () => {
     <div class="container max-w-6xl mx-auto py-8 px-4">
     <!-- En-tête -->
     <div class="mb-6">
-      <Button variant="ghost" @click="goBack" class="mb-4">
+      <Button variant="ghost" class="mb-4" @click="goBack">
         <FontAwesomeIcon v-if="getIcon('arrowLeft')" :icon="getIcon('arrowLeft')" class="mr-2" />
         Retour à Mon Compte
       </Button>
@@ -268,8 +268,8 @@ const goBack = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    @click="downloadInvoice(invoice)"
                     :disabled="!invoice.pdfUrl"
+                    @click="downloadInvoice(invoice)"
                   >
                     <FontAwesomeIcon v-if="getIcon('download')" :icon="getIcon('download')" class="mr-2" />
                     Télécharger
@@ -331,9 +331,9 @@ const goBack = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  @click="downloadInvoice(invoice)"
                   :disabled="!invoice.pdfUrl"
                   class="w-full"
+                  @click="downloadInvoice(invoice)"
                 >
                   <FontAwesomeIcon v-if="getIcon('download')" :icon="getIcon('download')" class="mr-2" />
                   Télécharger la facture

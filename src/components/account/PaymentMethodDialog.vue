@@ -123,7 +123,7 @@ function handleClose() {
       <div class="py-4">
         <div
           id="stripe-card-element"
-          class="border rounded-md p-3 bg-white min-h-[40px]"
+          class="border rounded-md p-3 bg-white min-h-10"
         ></div>
         <p v-if="errorMessage" class="text-destructive text-sm mt-2">
           {{ errorMessage }}

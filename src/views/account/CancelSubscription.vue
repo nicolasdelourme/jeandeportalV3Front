@@ -123,7 +123,7 @@ const goBack = () => {
     <div class="container max-w-3xl mx-auto py-8 px-4">
     <!-- Breadcrumb -->
     <div class="mb-6">
-      <Button variant="ghost" @click="goBack" class="mb-4">
+      <Button variant="ghost" class="mb-4" @click="goBack">
         <FontAwesomeIcon v-if="getIcon('arrowLeft')" :icon="getIcon('arrowLeft')" class="mr-2" />
         Retour
       </Button>
@@ -224,10 +224,10 @@ const goBack = () => {
 
           <!-- Actions -->
           <div class="flex gap-3 pt-4">
-            <Button type="button" variant="outline" @click="cancelProcess" class="flex-1">
+            <Button type="button" variant="outline" class="flex-1" @click="cancelProcess">
               Garder mon abonnement
             </Button>
-            <Button type="button" color="red" @click="nextStep" class="flex-1">
+            <Button type="button" color="red" class="flex-1" @click="nextStep">
               Continuer l'annulation
             </Button>
           </div>
@@ -257,8 +257,8 @@ const goBack = () => {
                     class="flex items-center space-x-3 border rounded-lg p-3 hover:bg-accent cursor-pointer"
                   >
                     <input
-                      type="radio"
                       :id="`reason-${key}`"
+                      type="radio"
                       :value="key"
                       v-bind="componentField"
                       class="w-4 h-4 text-primary focus:ring-2 focus:ring-primary"
@@ -284,7 +284,7 @@ const goBack = () => {
                   v-bind="componentField"
                   placeholder="Dites-nous en plus sur votre décision..."
                   class="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                />
+                ></textarea>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -298,9 +298,9 @@ const goBack = () => {
             </Button>
             <Button
               type="button"
-              @click="nextStep"
-              :disabled="!values.reason"
               class="flex-1"
+              :disabled="!values.reason"
+              @click="nextStep"
             >
               Continuer
               <FontAwesomeIcon v-if="getIcon('arrowRight')" :icon="getIcon('arrowRight')" class="ml-2" />

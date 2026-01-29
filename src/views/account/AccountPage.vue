@@ -36,7 +36,7 @@ const activeTab = ref('profile')
                     <div class="flex items-center gap-4 mb-4">
                         <Avatar class="h-16 w-16">
                             <AvatarImage v-if="avatarUrl" :src="avatarUrl" alt="Photo de profil" />
-                            <AvatarFallback class="text-xl bg-primary text-white">{{ avatarInitials }}</AvatarFallback>
+                            <AvatarFallback class="text-2xl font-bold bg-secondary text-primary">{{ avatarInitials }}</AvatarFallback>
                         </Avatar>
                         <div>
                             <h1 class="font-bold text-3xl text-neutral-800" style="font-family: Roboto, sans-serif;">
