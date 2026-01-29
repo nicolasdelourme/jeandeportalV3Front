@@ -17,16 +17,16 @@ import DefaultLayout from '@/components/layout/DefaultLayout.vue'
 
                 <!-- Dernière mise à jour -->
                 <p class="text-sm text-neutral-500 mb-8">
-                    Dernière mise à jour : [À COMPLÉTER - Date]
+                    Dernière mise à jour : Janvier 2026
                 </p>
 
                 <div class="prose prose-neutral max-w-none">
                     <!-- Introduction -->
                     <section class="mb-10">
                         <p class="text-neutral-600 leading-relaxed mb-4">
-                            <strong>[À COMPLÉTER - Nom de la société]</strong> (ci-après « nous », « notre »,
-                            « Infocash Académie ») s'engage à protéger la vie privée des utilisateurs de son
-                            site <strong>infocash-academie.fr</strong> (ci-après « le Site »).
+                            <strong>Editions Jean de Portal</strong> (ci-après « nous », « notre »,
+                            « Infocash ») s'engage à protéger la vie privée des utilisateurs de son
+                            site <strong>infocash.fr</strong> (ci-après « le Site »).
                         </p>
                         <p class="text-neutral-600 leading-relaxed">
                             Cette politique de confidentialité décrit comment nous collectons, utilisons et
@@ -44,9 +44,9 @@ import DefaultLayout from '@/components/layout/DefaultLayout.vue'
                             Le responsable du traitement des données personnelles est :
                         </p>
                         <ul class="list-none space-y-2 text-neutral-600 bg-neutral-50 p-4 rounded-lg">
-                            <li><strong>Société :</strong> [À COMPLÉTER - Nom de la société]</li>
-                            <li><strong>Adresse :</strong> [À COMPLÉTER]</li>
-                            <li><strong>Email DPO/Contact :</strong> [À COMPLÉTER - privacy@infocash-academie.fr]</li>
+                            <li><strong>Société :</strong> Editions Jean de Portal</li>
+                            <li><strong>Adresse :</strong> 1 rue de Stockholm, 75008 Paris</li>
+                            <li><strong>Email :</strong> privacy@infocash.fr</li>
                         </ul>
                     </section>
 
@@ -162,7 +162,7 @@ import DefaultLayout from '@/components/layout/DefaultLayout.vue'
                                     class="text-primary hover:underline">politique de confidentialité Stripe</a>)
                             </li>
                             <li>
-                                <strong>Hébergeur</strong> : [À COMPLÉTER - Nom de l'hébergeur] pour le stockage des données
+                                <strong>Hébergeur</strong> : Alteo pour le stockage des données
                             </li>
                             <li>
                                 <strong>Prestataires techniques</strong> : maintenance, envoi d'emails transactionnels
@@ -214,8 +214,8 @@ import DefaultLayout from '@/components/layout/DefaultLayout.vue'
                                 <strong>Pour exercer vos droits :</strong>
                             </p>
                             <ul class="list-disc pl-6 space-y-1 text-neutral-600">
-                                <li>Email : [À COMPLÉTER - privacy@infocash-academie.fr]</li>
-                                <li>Courrier : [À COMPLÉTER - Adresse]</li>
+                                <li>Email : privacy@infocash.fr</li>
+                                <li>Courrier : Editions Jean de Portal - 1 rue de Stockholm, 75008 Paris</li>
                             </ul>
                             <p class="text-neutral-600 text-sm mt-2 italic">
                                 Nous répondrons dans un délai d'un mois. Une pièce d'identité peut être demandée.
@@ -292,8 +292,8 @@ import DefaultLayout from '@/components/layout/DefaultLayout.vue'
                             Pour toute question relative à cette politique ou à vos données personnelles :
                         </p>
                         <ul class="list-none space-y-2 text-neutral-600 bg-neutral-50 p-4 rounded-lg">
-                            <li><strong>Email :</strong> [À COMPLÉTER - privacy@infocash-academie.fr]</li>
-                            <li><strong>Adresse :</strong> [À COMPLÉTER]</li>
+                            <li><strong>Email :</strong> privacy@infocash.fr</li>
+                            <li><strong>Adresse :</strong> Editions Jean de Portal - 1 rue de Stockholm, 75008 Paris</li>
                         </ul>
                     </section>
                 </div>

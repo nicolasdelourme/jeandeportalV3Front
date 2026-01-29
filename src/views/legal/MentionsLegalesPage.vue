@@ -17,7 +17,7 @@ import DefaultLayout from '@/components/layout/DefaultLayout.vue'
 
                 <!-- Dernière mise à jour -->
                 <p class="text-sm text-neutral-500 mb-8">
-                    Dernière mise à jour : [À COMPLÉTER - Date]
+                    Dernière mise à jour : Janvier 2026
                 </p>
 
                 <div class="prose prose-neutral max-w-none">
@@ -27,13 +27,13 @@ import DefaultLayout from '@/components/layout/DefaultLayout.vue'
                             1. Éditeur du site
                         </h2>
                         <p class="text-neutral-600 leading-relaxed mb-4">
-                            Le site <strong>Infocash Académie</strong> (ci-après « le Site ») est édité par :
+                            Le site <strong>Infocash</strong> (ci-après « le Site ») est édité par :
                         </p>
                         <ul class="list-none space-y-2 text-neutral-600 bg-neutral-50 p-4 rounded-lg">
-                            <li><strong>Raison sociale :</strong> [À COMPLÉTER - Nom de la société]</li>
+                            <li><strong>Raison sociale :</strong> Editions Jean de Portal</li>
                             <li><strong>Forme juridique :</strong> [À COMPLÉTER - SAS, SARL, etc.]</li>
                             <li><strong>Capital social :</strong> [À COMPLÉTER] euros</li>
-                            <li><strong>Siège social :</strong> [À COMPLÉTER - Adresse complète]</li>
+                            <li><strong>Siège social :</strong> 1 rue de Stockholm, 75008 Paris</li>
                             <li><strong>RCS :</strong> [À COMPLÉTER - Ville et numéro]</li>
                             <li><strong>SIRET :</strong> [À COMPLÉTER]</li>
                             <li><strong>Numéro TVA intracommunautaire :</strong> [À COMPLÉTER]</li>
@@ -57,9 +57,8 @@ import DefaultLayout from '@/components/layout/DefaultLayout.vue'
                             3. Contact
                         </h2>
                         <ul class="list-none space-y-2 text-neutral-600 bg-neutral-50 p-4 rounded-lg">
-                            <li><strong>Email :</strong> [À COMPLÉTER - contact@infocash-academie.fr]</li>
-                            <li><strong>Téléphone :</strong> [À COMPLÉTER - Optionnel]</li>
-                            <li><strong>Formulaire de contact :</strong> [À COMPLÉTER - URL si disponible]</li>
+                            <li><strong>Email :</strong> contact@infocash.fr</li>
+                            <li><strong>Adresse :</strong> 1 rue de Stockholm, 75008 Paris</li>
                         </ul>
                     </section>
 
@@ -72,9 +71,8 @@ import DefaultLayout from '@/components/layout/DefaultLayout.vue'
                             Le Site est hébergé par :
                         </p>
                         <ul class="list-none space-y-2 text-neutral-600 bg-neutral-50 p-4 rounded-lg">
-                            <li><strong>Raison sociale :</strong> [À COMPLÉTER - Nom de l'hébergeur]</li>
-                            <li><strong>Adresse :</strong> [À COMPLÉTER]</li>
-                            <li><strong>Téléphone :</strong> [À COMPLÉTER]</li>
+                            <li><strong>Raison sociale :</strong> Alteo</li>
+                            <li><strong>Site web :</strong> <a href="https://www.alteo.io" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">www.alteo.io</a></li>
                         </ul>
                     </section>
 
@@ -92,7 +90,7 @@ import DefaultLayout from '@/components/layout/DefaultLayout.vue'
                             Toute reproduction, représentation, modification, publication, transmission ou
                             dénaturation, totale ou partielle, du Site ou de son contenu, par quelque procédé
                             que ce soit et sur quelque support que ce soit, est interdite sans l'autorisation
-                            écrite préalable de [À COMPLÉTER - Nom de la société].
+                            écrite préalable des Editions Jean de Portal.
                         </p>
                         <p class="text-neutral-600 leading-relaxed">
                             Toute exploitation non autorisée du Site ou de son contenu sera considérée comme
@@ -107,9 +105,8 @@ import DefaultLayout from '@/components/layout/DefaultLayout.vue'
                             6. Crédits
                         </h2>
                         <ul class="list-none space-y-2 text-neutral-600 bg-neutral-50 p-4 rounded-lg">
-                            <li><strong>Conception et développement :</strong> [À COMPLÉTER]</li>
-                            <li><strong>Design :</strong> [À COMPLÉTER]</li>
-                            <li><strong>Crédits photos/vidéos :</strong> [À COMPLÉTER si applicable]</li>
+                            <li><strong>Conception et développement :</strong> Imi Productions & Creative - 21 place de la République, 75003 Paris - RCS Paris 810 029 553</li>
+                            <li><strong>Certificat SSL :</strong> GlobalSign</li>
                         </ul>
                     </section>
 

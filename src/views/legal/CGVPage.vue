@@ -17,7 +17,7 @@ import DefaultLayout from '@/components/layout/DefaultLayout.vue'
 
                 <!-- Dernière mise à jour -->
                 <p class="text-sm text-neutral-500 mb-8">
-                    Dernière mise à jour : [À COMPLÉTER - Date]
+                    Dernière mise à jour : Janvier 2026
                 </p>
 
                 <div class="prose prose-neutral max-w-none">
@@ -32,14 +32,14 @@ import DefaultLayout from '@/components/layout/DefaultLayout.vue'
                         </p>
                         <ul class="list-disc pl-6 space-y-2 text-neutral-600 mb-4">
                             <li>
-                                <strong>[À COMPLÉTER - Nom de la société]</strong>, société [À COMPLÉTER - forme juridique],
-                                au capital de [À COMPLÉTER] euros, immatriculée au RCS de [À COMPLÉTER] sous le
-                                numéro [À COMPLÉTER], dont le siège social est situé [À COMPLÉTER - Adresse]
-                                (ci-après « le Vendeur » ou « Infocash Académie »)
+                                <strong>Editions Jean de Portal</strong>, société [À COMPLÉTER - forme juridique],
+                                au capital de [À COMPLÉTER] euros, immatriculée au RCS de Paris sous le
+                                numéro [À COMPLÉTER], dont le siège social est situé 1 rue de Stockholm, 75008 Paris
+                                (ci-après « le Vendeur » ou « Infocash »)
                             </li>
                             <li>
                                 Et toute personne physique ou morale effectuant un achat sur le site
-                                infocash-academie.fr (ci-après « le Client »)
+                                infocash.fr (ci-après « le Client »)
                             </li>
                         </ul>
                         <p class="text-neutral-600 leading-relaxed">
@@ -204,7 +204,7 @@ import DefaultLayout from '@/components/layout/DefaultLayout.vue'
                         </h2>
                         <p class="text-neutral-600 leading-relaxed mb-4">
                             Tous les contenus proposés à la vente (textes, vidéos, PDF, etc.) restent la
-                            propriété exclusive de [À COMPLÉTER - Nom de la société] ou de leurs auteurs respectifs.
+                            propriété exclusive des Editions Jean de Portal ou de leurs auteurs respectifs.
                         </p>
                         <p class="text-neutral-600 leading-relaxed mb-4">
                             L'achat confère au Client un droit d'usage personnel et non cessible. Il est
@@ -262,8 +262,8 @@ import DefaultLayout from '@/components/layout/DefaultLayout.vue'
                             contacter le service client :
                         </p>
                         <ul class="list-none space-y-2 text-neutral-600 bg-neutral-50 p-4 rounded-lg">
-                            <li><strong>Email :</strong> [À COMPLÉTER - support@infocash-academie.fr]</li>
-                            <li><strong>Délai de réponse :</strong> [À COMPLÉTER - ex: sous 48h ouvrées]</li>
+                            <li><strong>Email :</strong> support@infocash.fr</li>
+                            <li><strong>Délai de réponse :</strong> sous 48h ouvrées</li>
                         </ul>
                     </section>
 

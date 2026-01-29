@@ -17,7 +17,7 @@ import DefaultLayout from '@/components/layout/DefaultLayout.vue'
 
                 <!-- Dernière mise à jour -->
                 <p class="text-sm text-neutral-500 mb-8">
-                    Dernière mise à jour : [À COMPLÉTER - Date]
+                    Dernière mise à jour : Janvier 2026
                 </p>
 
                 <div class="prose prose-neutral max-w-none">
@@ -25,8 +25,8 @@ import DefaultLayout from '@/components/layout/DefaultLayout.vue'
                     <section class="mb-10">
                         <p class="text-neutral-600 leading-relaxed mb-4">
                             Cette politique de cookies explique ce que sont les cookies, comment
-                            <strong>Infocash Académie</strong> les utilise sur le site
-                            <strong>infocash-academie.fr</strong> (ci-après « le Site ») et comment
+                            <strong>Infocash</strong> les utilise sur le site
+                            <strong>infocash.fr</strong> (ci-après « le Site ») et comment
                             vous pouvez les gérer.
                         </p>
                     </section>
@@ -306,7 +306,7 @@ import DefaultLayout from '@/components/layout/DefaultLayout.vue'
                             Pour toute question concernant cette politique de cookies :
                         </p>
                         <ul class="list-none space-y-2 text-neutral-600 bg-neutral-50 p-4 rounded-lg">
-                            <li><strong>Email :</strong> [À COMPLÉTER - privacy@infocash-academie.fr]</li>
+                            <li><strong>Email :</strong> privacy@infocash.fr</li>
                         </ul>
                         <p class="text-neutral-600 leading-relaxed mt-4">
                             Pour plus d'informations sur la gestion de vos données personnelles,
