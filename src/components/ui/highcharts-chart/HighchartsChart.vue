@@ -124,11 +124,9 @@ function renderChart() {
       chartInstance = Highcharts?.charts?.find(
         (c: HighchartsChartInstance | undefined) => c?.renderTo?.id === containerId.value
       ) || null
-      logger.debug('[HighchartsChart] Chart rendered via PayloadClient')
     } else if (Highcharts && purePayload.chart) {
       // Fallback: utiliser Highcharts directement avec les options du chart
       chartInstance = Highcharts.chart(containerId.value, purePayload.chart as Record<string, unknown>)
-      logger.debug('[HighchartsChart] Chart rendered via Highcharts fallback')
     } else {
       throw new Error('Highcharts ou HighchartsPayloadClient non disponible')
     }

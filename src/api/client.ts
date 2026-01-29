@@ -41,13 +41,6 @@ class ApiClient {
         this.axiosInstance.interceptors.response.use(
             (response) => response,
             async (error) => {
-                // DEBUG: Log immédiat pour voir TOUTES les erreurs
-                logger.debug('🚨 [API CLIENT] ERREUR INTERCEPTÉE:', {
-                    url: error.config?.url,
-                    status: error.response?.status,
-                    message: error.message
-                })
-
                 const requestUrl = error.config?.url || ''
 
                 // Ne pas rediriger pour les endpoints d'auth et les endpoints publics (panier)
@@ -66,16 +59,6 @@ class ApiClient {
                     // Note: /oneClickCheckout et /oneClickInitPayment nécessitent auth
                 ]
                 const isPublicEndpoint = publicEndpoints.some(endpoint => requestUrl.includes(endpoint))
-
-                // Log pour debug (sans bloquer)
-                if (error.response?.status === 401) {
-                    logger.debug('🔍 [API CLIENT] Intercepteur 401:', {
-                        requestUrl,
-                        status: error.response?.status,
-                        isPublicEndpoint,
-                        willRedirect: !isPublicEndpoint
-                    })
-                }
 
                 if (error.response?.status === 401 && !isPublicEndpoint) {
                     // Session expirée ou invalide - nettoyage des données utilisateur

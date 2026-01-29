@@ -55,7 +55,6 @@ class OneClickBasketService {
   async fetchBasket(
     basketCode: string
   ): Promise<{ basketCode: string; items: OneClickBasketItem[] }> {
-    logger.info('🛒 [ONECLICK SERVICE] Fetching basket:', basketCode.substring(0, 8) + '...')
 
     // Mode mock
     if (USE_MOCK) {
@@ -83,7 +82,6 @@ class OneClickBasketService {
         )
       }
 
-      logger.info('✅ [ONECLICK SERVICE] Basket fetched successfully')
       return mapAPIOneClickBasketResponse(response)
     } catch (error) {
       if (error instanceof OneClickBasketError) {
@@ -118,7 +116,6 @@ class OneClickBasketService {
     storeId: number = ONECLICK_STORE_ID,
     basketCode: string | null = null
   ): Promise<{ basketCode: string; items: OneClickBasketItem[] }> {
-    logger.info('🛒 [ONECLICK SERVICE] Adding plan:', { planId, storeId, basketCode })
 
     // Mode mock
     if (USE_MOCK) {
@@ -154,7 +151,6 @@ class OneClickBasketService {
         )
       }
 
-      logger.info('✅ [ONECLICK SERVICE] Plan added successfully')
       return mapAPIOneClickBasketResponse(response)
     } catch (error) {
       if (error instanceof OneClickBasketError) {
@@ -180,7 +176,6 @@ class OneClickBasketService {
     planId: number,
     basketCode: string
   ): Promise<{ basketCode: string; items: OneClickBasketItem[] }> {
-    logger.info('🛒 [ONECLICK SERVICE] Removing plan:', { planId, basketCode })
 
     // Mode mock
     if (USE_MOCK) {
@@ -208,7 +203,6 @@ class OneClickBasketService {
         )
       }
 
-      logger.info('✅ [ONECLICK SERVICE] Plan removed successfully')
       return mapAPIOneClickBasketResponse(response)
     } catch (error) {
       if (error instanceof OneClickBasketError) {
@@ -232,7 +226,6 @@ class OneClickBasketService {
    * Retourne la cle publique Stripe
    */
   async checkout(basketCode: string): Promise<{ publicKey: string }> {
-    logger.info('🛒 [ONECLICK SERVICE] Checkout:', basketCode.substring(0, 8) + '...')
 
     // Mode mock
     if (USE_MOCK) {
@@ -260,7 +253,6 @@ class OneClickBasketService {
         )
       }
 
-      logger.info('✅ [ONECLICK SERVICE] Checkout validated')
       return { publicKey: response.stripePublicKey }
     } catch (error) {
       if (error instanceof OneClickBasketError) {
@@ -292,12 +284,6 @@ class OneClickBasketService {
     addressId: number,
     billAddressId: number
   ): Promise<OneClickInitPaymentResult> {
-    logger.info('💳 [ONECLICK SERVICE] Init payment:', {
-      basketCode: basketCode.substring(0, 8) + '...',
-      addressId,
-      billAddressId,
-    })
-
     // Mode mock
     if (USE_MOCK) {
       const response = await mockOneClickInitPayment(basketCode, addressId, billAddressId)
@@ -331,7 +317,6 @@ class OneClickBasketService {
         )
       }
 
-      logger.info('✅ [ONECLICK SERVICE] SetupIntent created successfully')
       return {
         clientSecret: response.client_secret,
         publicKey: response.stripePublicKey,

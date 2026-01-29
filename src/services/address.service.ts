@@ -42,7 +42,6 @@ class AddressService {
      */
     async fetchAddresses(): Promise<AddressAPIResponse> {
         try {
-            logger.info('📍 Récupération des adresses...')
 
             const response = await apiClient.get<AddressAPIResponse>('/fetchUserAdress')
 
@@ -53,7 +52,6 @@ class AddressService {
                 )
             }
 
-            logger.info(`✅ ${response.adress_array?.length || 0} adresse(s) récupérée(s)`)
             return response
         } catch (error) {
             if (error instanceof AddressError) {
@@ -78,7 +76,6 @@ class AddressService {
      */
     async createAddress(data: CreateAddressDto): Promise<AddressAPIResponse> {
         try {
-            logger.info('📍 Création d\'une nouvelle adresse...')
 
             // Mapper les données frontend vers le format API (payload plat pour création)
             const payload: CreateAddressAPIRequest = {
@@ -103,7 +100,6 @@ class AddressService {
                 )
             }
 
-            logger.info('✅ Adresse créée avec succès')
             return response
         } catch (error) {
             if (error instanceof AddressError) {
@@ -128,7 +124,6 @@ class AddressService {
      */
     async updateAddress(addressId: number, data: Partial<CreateAddressDto>): Promise<AddressAPIResponse> {
         try {
-            logger.info(`📍 Mise à jour de l'adresse #${addressId}...`)
 
             // Mapper les données frontend vers le format API
             // Ne pas inclure les champs undefined
@@ -159,7 +154,6 @@ class AddressService {
                 )
             }
 
-            logger.info('✅ Adresse mise à jour avec succès')
             return response
         } catch (error) {
             if (error instanceof AddressError) {
@@ -184,7 +178,6 @@ class AddressService {
      */
     async deleteAddress(addressId: number): Promise<AddressAPIResponse> {
         try {
-            logger.info(`📍 Suppression de l'adresse #${addressId}...`)
 
             const response = await apiClient.post<AddressAPIResponse>('/deleteAdress', {
                 adressId: addressId
@@ -197,7 +190,6 @@ class AddressService {
                 )
             }
 
-            logger.info('✅ Adresse supprimée avec succès')
             return response
         } catch (error) {
             if (error instanceof AddressError) {

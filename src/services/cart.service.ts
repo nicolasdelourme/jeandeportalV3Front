@@ -52,7 +52,6 @@ class CartService {
         basketCode: string | null = null
     ): Promise<CartAPIResponse> {
         try {
-            logger.info(`🛒 [CART SERVICE] Ajout au panier: referenceId=${referenceId}, quantity=${quantity}, storeId=${storeId}, basketCode=${basketCode ? '***' : 'null'}`)
 
             // Construire la requête (ne pas envoyer basketCode si null)
             const request: AddToCartRequest = {
@@ -76,7 +75,6 @@ class CartService {
                 )
             }
 
-            logger.info('✅ [CART SERVICE] Article ajouté avec succès')
             return response
         } catch (error) {
             logger.error('❌ [CART SERVICE] Erreur lors de l\'ajout au panier:', error)
@@ -96,7 +94,6 @@ class CartService {
      */
     async fetchCart(basketCode: string): Promise<CartAPIResponse> {
         try {
-            logger.info(`🛒 [CART SERVICE] Récupération du panier: basketCode=${basketCode ? basketCode.substring(0, 8) + '...' : 'null'}`)
 
             const request: FetchCartRequest = { basketCode, storeId: CART_CONFIG.STORE_ID }
             const response = await apiClient.post<CartAPIResponse>('/fetchBasket', request)
@@ -116,7 +113,6 @@ class CartService {
                 throw new CartError('Réponse du serveur invalide', 'API_ERROR')
             }
 
-            logger.info(`✅ [CART SERVICE] Panier récupéré: ${response.basket.count || 0} items`)
             return response
         } catch (error) {
             // Si c'est déjà un CartError (ex: BASKET_NOT_FOUND), le re-throw tel quel
@@ -151,10 +147,6 @@ class CartService {
                 throw new CartError('La quantité ne peut pas être négative', 'INVALID_QUANTITY')
             }
 
-            logger.info(
-                `🛒 [CART SERVICE] Mise à jour quantité: priceId=${priceId}, quantity=${quantity}`
-            )
-
             const request: UpdateQuantityRequest = {
                 priceId,
                 quantity,
@@ -165,12 +157,6 @@ class CartService {
                 '/basketChangeQuantityReference',
                 request
             )
-
-            if (quantity === 0) {
-                logger.info('✅ [CART SERVICE] Article supprimé du panier')
-            } else {
-                logger.info('✅ [CART SERVICE] Quantité mise à jour')
-            }
 
             return response
         } catch (error) {
@@ -202,7 +188,6 @@ class CartService {
         basketCode: string
     ): Promise<CartAPIResponse> {
         try {
-            logger.info(`🛒 [CART SERVICE] Suppression du panier: referenceId=${referenceId}, quantity=${quantity}`)
 
             const request: DeleteReferenceRequest = {
                 referenceId,
@@ -221,7 +206,6 @@ class CartService {
                 throw new CartError(response.message || 'Erreur lors de la suppression', 'API_ERROR')
             }
 
-            logger.info('✅ [CART SERVICE] Article supprimé du panier')
             return response
         } catch (error) {
             if (error instanceof CartError) {
@@ -241,7 +225,6 @@ class CartService {
      * @deprecated Utiliser deleteReference à la place
      */
     async removeFromCart(priceId: number, basketCode: string): Promise<CartAPIResponse> {
-        logger.info(`🛒 [CART SERVICE] Suppression du panier (legacy): priceId=${priceId}`)
         return this.updateQuantity(priceId, 0, basketCode)
     }
 
@@ -255,7 +238,6 @@ class CartService {
      */
     async clearCart(currentItems: CartItem[], basketCode: string): Promise<CartAPIResponse> {
         try {
-            logger.info('🛒 [CART SERVICE] Vidage du panier')
 
             // Supprimer tous les items un par un via deleteReference
             let response: CartAPIResponse | null = null
@@ -268,7 +250,6 @@ class CartService {
                 throw new CartError('Panier déjà vide', 'API_ERROR')
             }
 
-            logger.info('✅ [CART SERVICE] Panier vidé')
             return response
         } catch (error) {
             if (error instanceof CartError) {
@@ -370,7 +351,6 @@ class CartService {
         // Si referenceList est undefined ou null, utiliser un tableau vide
         const referenceList = basket.referenceList || []
 
-        logger.info(`🛒 [CART SERVICE] Mapping réponse: ${referenceList.length} items`)
 
         return {
             items: referenceList.map(item => this.mapAPIItemToCartItem(item)),

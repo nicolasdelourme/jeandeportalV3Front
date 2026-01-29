@@ -30,10 +30,6 @@ class PaymentService {
     currency: string = 'eur'
   ): Promise<InitPaymentResult> {
     try {
-      logger.info('💳 [PAYMENT SERVICE] Initialisation du paiement...')
-      logger.info(`   basketCode: ${basketCode.substring(0, 8)}...`)
-      logger.info(`   adressId: ${shippingAddressId}, billAdressId: ${billingAddressId}`)
-
       const request: InitPaymentRequest = {
         basketCode,
         adressId: shippingAddressId,
@@ -50,7 +46,6 @@ class PaymentService {
         )
       }
 
-      logger.info('✅ [PAYMENT SERVICE] PaymentIntent créé avec succès')
       return {
         clientSecret: response.client_secret,
         publicKey: response.stripePublicKey

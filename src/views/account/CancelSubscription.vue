@@ -99,10 +99,9 @@ const cancelProcess = () => {
 }
 
 // Soumission finale
-const onSubmit = handleSubmit(async (formValues) => {
+const onSubmit = handleSubmit(async (_formValues) => {
   try {
     // TODO: Appel API pour annuler l'abonnement
-    logger.debug('Annulation abonnement:', formValues)
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
     toast.success('Votre abonnement a été annulé avec succès')

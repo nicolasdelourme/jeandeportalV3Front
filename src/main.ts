@@ -29,7 +29,6 @@ authStore.initialize().then(async () => {
         await cartStore.initialize();
     } catch {
         // Erreur normale si pas de session (utilisateur non connecté)
-        console.info('🛒 Panier non chargé (utilisateur non connecté ou session invalide)');
     }
 
     app.mount("#app");
