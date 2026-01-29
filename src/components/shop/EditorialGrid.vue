@@ -81,7 +81,7 @@ const retry = () => {
       <div class="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
         <p class="text-red-800 font-semibold mb-2">Erreur de chargement</p>
         <p class="text-red-600 text-sm mb-4">{{ error.message }}</p>
-        <Button @click="retry" variant="outline" size="sm" color="red-600">
+        <Button variant="outline" size="sm" color="red-600" @click="retry">
           Réessayer
         </Button>
       </div>

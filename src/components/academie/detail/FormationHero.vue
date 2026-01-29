@@ -20,7 +20,7 @@ const icons = computed(() => ({
 
 <template>
   <div
-    class="relative aspect-[3/4] rounded-lg overflow-hidden"
+    class="relative aspect-3/4 rounded-lg overflow-hidden"
     :style="{ backgroundColor: formation.color }"
   >
     <!-- Numéro en grand -->

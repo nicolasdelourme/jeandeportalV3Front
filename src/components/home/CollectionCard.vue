@@ -94,7 +94,7 @@ const handleExplore = () => {
         </div>
 
         <!-- Bouton CTA -->
-        <Button @click="handleExplore" :color="color" class="w-full mt-auto" size="default">
+        <Button size="default" class="w-full mt-auto" :color="color" @click="handleExplore">
             <p class="font-bold text-sm" style="font-family: Roboto, sans-serif;">
                 Explorer la collection
             </p>

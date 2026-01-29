@@ -17,7 +17,7 @@ const colors = [
 
 <template>
     <DefaultLayout>
-        <div class="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-8">
+        <div class="flex min-h-screen items-center justify-center bg-linear-to-br from-slate-50 to-slate-100 p-8">
         <div class="max-w-6xl w-full">
             <!-- Header -->
             <div class="text-center mb-12">

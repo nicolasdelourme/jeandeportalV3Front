@@ -180,8 +180,8 @@ import DefaultLayout from '@/components/layout/DefaultLayout.vue'
                             9. Développement et hébergement
                         </h2>
                         <p class="text-neutral-600 leading-relaxed">
-                            <strong>Imi Productions & Creative</strong><br>
-                            21, place de la République – 75003 Paris<br>
+                            <strong>Imi Productions & Creative</strong><br/>
+                            21, place de la République – 75003 Paris<br/>
                             <span class="text-neutral-500">RCS Paris 810 029 553</span>
                         </p>
                     </section>

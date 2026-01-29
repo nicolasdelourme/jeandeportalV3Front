@@ -274,7 +274,7 @@ const displayTags = computed((): ParsedTag[] => {
         <div class="grid grid-cols-1 lg:grid-cols-[280px_1fr_340px] gap-6 lg:gap-10">
           <!-- Skeleton image -->
           <div>
-            <Skeleton class="w-full aspect-[2/3] rounded-lg" />
+            <Skeleton class="w-full aspect-2/3 rounded-lg" />
             <div class="hidden lg:flex gap-2 mt-3">
               <Skeleton v-for="i in 4" :key="i" class="w-14 h-14 rounded-lg" />
             </div>
@@ -306,7 +306,7 @@ const displayTags = computed((): ParsedTag[] => {
             <AlertDescription class="mt-2">
               Ce produit n'existe pas ou a été supprimé.
               <div class="mt-4">
-                <Button @click="handleBack" variant="outline" size="sm">
+                {# <Button size="sm" variant="outline" @click="handleBack"> #}
                   Retour à la boutique
                 </Button>
               </div>
@@ -395,7 +395,7 @@ const displayTags = computed((): ParsedTag[] => {
                 v-if="reference.subname"
                 class="prose prose-sm max-w-none bg-muted/50 border-l-4 border-primary p-4 rounded-r-sm"
                 v-html="sanitizedSubname"
-              />
+              ></div>
 
               <!-- Description détaillée -->
               <div class="space-y-3">
@@ -405,7 +405,7 @@ const displayTags = computed((): ParsedTag[] => {
                 <div
                   class="prose prose-sm max-w-none text-muted-foreground leading-relaxed"
                   v-html="sanitizedDescription"
-                />
+                ></div>
               </div>
 
               <!-- Tags thématiques (tab_, etc.) -->
@@ -431,7 +431,7 @@ const displayTags = computed((): ParsedTag[] => {
 
               <!-- Actions secondaires (Favoris + Partage) -->
               <div class="flex gap-3 pt-4">
-                <Button @click="toggleFavorite" variant="outline" color="secondary" size="sm" class="gap-2 rounded-lg hover:bg-secondary hover:border-secondary">
+                <Button class="gap-2 rounded-lg hover:bg-secondary hover:border-secondary" size="sm" color="secondary" variant="outline" @click="toggleFavorite">
                   <FontAwesomeIcon
                     v-if="isFavorite && icons.heartSolid"
                     :icon="icons.heartSolid"
@@ -447,7 +447,7 @@ const displayTags = computed((): ParsedTag[] => {
                 <TooltipProvider>
                   <Tooltip :open="showShareMenu">
                     <TooltipTrigger as-child>
-                      <Button @click="handleShare" variant="outline" color="secondary" size="sm" class="gap-2 rounded-lg hover:bg-secondary hover:border-secondary">
+                      <Button class="gap-2 rounded-lg hover:bg-secondary hover:border-secondary" size="sm" color="secondary" variant="outline" @click="handleShare">
                         <FontAwesomeIcon v-if="icons.share" :icon="icons.share" class="w-4 h-4" />
                         Partager
                       </Button>
@@ -614,7 +614,7 @@ const displayTags = computed((): ParsedTag[] => {
         />
 
         <!-- Spacer pour le sticky cart mobile -->
-        <div class="h-20 md:hidden" />
+        <div class="h-20 md:hidden" ></div>
       </template>
     </div>
   </DefaultLayout>

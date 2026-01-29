@@ -59,7 +59,7 @@ const getIcon = (iconKey: 'circleExclamation'): IconDefinition => {
                 </Alert>
 
                 <!-- Contenu du formulaire (slot) -->
-                <slot />
+                <slot ></slot>
             </div>
         </div>
     </section>

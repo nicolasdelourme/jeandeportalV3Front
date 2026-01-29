@@ -171,7 +171,7 @@ onUnmounted(() => {
     >
         <div class="flex items-center justify-center h-full">
             <div class="text-center">
-                <div class="inline-block animate-spin rounded-full h-8 w-8 border-2 border-neutral-300 border-t-neutral-600 mb-4" />
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-2 border-neutral-300 border-t-neutral-600 mb-4" ></div>
                 <p class="text-neutral-500 text-sm">Chargement...</p>
             </div>
         </div>
@@ -180,14 +180,14 @@ onUnmounted(() => {
     <!-- Carrousel avec produits -->
     <section
         v-else
-        class="hero-carousel bg-gradient-to-br from-secondary via-secondary/90 to-secondary/80"
+        class="hero-carousel bg-linear-to-br from-secondary via-secondary/90 to-secondary/80"
     >
         <Carousel
             class="w-full h-full"
             :opts="{ align: 'start', loop: true }"
             @init-api="setApi"
         >
-            <CarouselContent class="h-full -ml-0">
+            <CarouselContent class="h-full ml-0">
                 <CarouselItem
                     v-for="reference in featuredProducts"
                     :key="reference.id"
@@ -222,14 +222,14 @@ onUnmounted(() => {
                                     <h2
                                         class="font-heading font-bold text-2xl md:text-3xl lg:text-4xl text-white leading-tight mb-3"
                                         v-html="reference.name"
-                                    />
+                                    ></h2>
 
                                     <!-- Description courte -->
                                     <p
                                         v-if="reference.subname"
                                         class="text-white/80 text-sm md:text-base leading-relaxed mb-4 line-clamp-3 max-w-xl"
                                         v-html="reference.subname"
-                                    />
+                                    ></p>
 
                                     <!-- Badges sous la description -->
                                     <div class="flex flex-wrap justify-center md:justify-start gap-2 mb-6">
@@ -296,14 +296,14 @@ onUnmounted(() => {
             <button
                 v-for="index in count"
                 :key="index"
-                @click="goToSlide(index - 1)"
-                class="transition-all duration-300 rounded-sm"
+                :aria-label="`Aller à la slide ${index}`"
                 :class="current === index - 1
                     ? 'bg-white w-8 h-2'
                     : 'bg-white/40 hover:bg-white/60 w-2 h-2'
                 "
-                :aria-label="`Aller à la slide ${index}`"
-            />
+                class="transition-all duration-300 rounded-sm"
+                @click="goToSlide(index - 1)"
+            ></button>
         </div>
     </section>
 </template>

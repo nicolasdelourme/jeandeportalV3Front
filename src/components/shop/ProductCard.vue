@@ -197,8 +197,8 @@ const handleAddToCart = (e: Event) => {
           color="primary"
           class="w-full text-primary-foreground group-hover:text-primary-foreground group-hover:bg-white hover:bg-primary hover:border-primary hover:text-primary-foreground transition-colors duration-300"
           :class='isInCart && icons.check ? "bg-primary":""'
-          @click="handleAddToCart"
           :disabled="isInCart && icons.check"
+          @click="handleAddToCart"
         >
           <FontAwesomeIcon
             v-if="isInCart && icons.check"

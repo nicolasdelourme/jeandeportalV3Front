@@ -192,7 +192,7 @@ const openInvoice = (invoice: UserInvoice): void => {
                 class="w-8 h-8 text-destructive mb-4"
             />
             <p class="text-destructive mb-4">{{ store.error }}</p>
-            <Button @click="store.refresh()" variant="outline">
+            <Button variant="outline" @click="store.refresh()">
                 <FontAwesomeIcon
                     v-if="getIcon('undo')"
                     :icon="getIcon('undo')!"

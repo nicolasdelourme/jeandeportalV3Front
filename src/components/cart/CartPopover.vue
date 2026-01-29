@@ -154,10 +154,10 @@ function formatPrice(price: number): string {
 
             <!-- Bouton supprimer -->
             <button
-              @click="handleRemoveItem(item.itemId)"
-              class="shrink-0 text-neutral-400 hover:text-red-600 transition-colors p-1"
-              aria-label="Retirer du panier"
               :disabled="cartStore.isLoading"
+              aria-label="Retirer du panier"
+              class="shrink-0 text-neutral-400 hover:text-red-600 transition-colors p-1"
+              @click="handleRemoveItem(item.itemId)"
             >
               <FontAwesomeIcon v-if="icons.xmark" :icon="icons.xmark" class="h-4 w-4" />
             </button>
@@ -181,10 +181,10 @@ function formatPrice(price: number): string {
         <div class="flex flex-col gap-2">
           <!-- CTA Principal : Commander -->
           <Button
-            @click="goToCheckout"
-            size="lg"
-            rounded="lg"
             class="w-full bg-success hover:bg-success/90 text-success-foreground"
+            rounded="lg"
+            size="lg"
+            @click="goToCheckout"
           >
             <FontAwesomeIcon
               v-if="icons.creditCard"
@@ -195,12 +195,12 @@ function formatPrice(price: number): string {
           </Button>
           <!-- CTA Secondaire : Voir le panier -->
           <Button
-            @click="goToCart"
-            variant="outline"
-            color="secondary"
-            size="lg"
-            rounded="lg"
             class="w-full hover:bg-secondary hover:border-secondary"
+            rounded="lg"
+            size="lg"
+            color="secondary"
+            variant="outline"
+            @click="goToCart"
           >
             <FontAwesomeIcon
               v-if="icons.eye"

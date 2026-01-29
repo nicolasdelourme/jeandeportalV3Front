@@ -104,7 +104,7 @@ const handleScrollDown = () => {
 
                     <!-- Prochain live responsive -->
                     <div class="flex gap-2 items-center justify-center w-full">
-                        <div class="bg-primary opacity-[0.891] rounded-full w-2.5 h-2.5 md:w-3 md:h-3" />
+                        <div class="bg-primary opacity-[0.891] rounded-full w-2.5 h-2.5 md:w-3 md:h-3" ></div>
                         <p class="font-semibold text-sm md:text-base text-center text-white leading-6"
                             style="font-family: Roboto, sans-serif;">
                             {{ nextLive }}
@@ -114,15 +114,15 @@ const handleScrollDown = () => {
                     <!-- Boutons CTA responsive -->
                     <div class="flex flex-col md:flex-row gap-3 md:gap-6 items-center justify-center w-full">
                         <!-- Bouton Découvrir les formules -->
-                        <Button @click="handleDiscoverFormulas" class="w-full md:w-auto">
+                        <Button class="w-full md:w-auto" @click="handleDiscoverFormulas">
                             <p style="font-family: Roboto, sans-serif;">
                                 Découvrir les formules
                             </p>
                         </Button>
 
                         <!-- Bouton Découvrir l'Académie -->
-                        <Button @click="handleViewCalendar" variant="outline" color="neutral-900"
-                                class="text-white w-full md:w-auto">
+                        <Button color="neutral-900" variant="outline" class="text-white w-full md:w-auto"
+                                @click="handleViewCalendar">
                             <p style="font-family: Roboto, sans-serif;">
                                 <!-- Texte court sur mobile, complet sur desktop -->
                                 <span class="md:hidden">L'Académie</span>
@@ -134,7 +134,7 @@ const handleScrollDown = () => {
             </div>
 
             <!-- Colonne droite : Image avec bouton play (masquée sur mobile) -->
-            <div class="hidden md:flex flex-col items-start opacity-30 shrink-0" v-if="image">
+            <div v-if="image" class="hidden md:flex flex-col items-start opacity-30 shrink-0">
                 <div class="relative w-[384px] h-[509.328px]">
                     <!-- Image -->
                     <div class="absolute inset-0 border-4 border-black rounded-[20px] overflow-hidden">

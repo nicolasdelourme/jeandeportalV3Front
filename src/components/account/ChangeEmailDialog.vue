@@ -120,7 +120,7 @@ function handleClose() {
       </DialogHeader>
 
       <!-- État initial : formulaire -->
-      <form v-if="!emailSent" @submit.prevent="onSubmit" class="space-y-4">
+      <form v-if="!emailSent" class="space-y-4" @submit.prevent="onSubmit">
         <div class="py-4 space-y-4">
           <!-- Email actuel (lecture seule) -->
           <div class="space-y-2">
@@ -204,7 +204,7 @@ function handleClose() {
         </div>
 
         <DialogFooter>
-          <Button @click="handleClose" class="w-full">
+          <Button class="w-full" @click="handleClose">
             Fermer
           </Button>
         </DialogFooter>

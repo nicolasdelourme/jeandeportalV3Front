@@ -35,7 +35,7 @@ withDefaults(defineProps<Props>(), {
 
         <!-- Contenu de la page -->
         <main class="flex flex-col flex-1">
-            <slot />
+            <slot ></slot>
         </main>
 
         <!-- Footer (conditionnel) -->

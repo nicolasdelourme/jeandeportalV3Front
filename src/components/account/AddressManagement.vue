@@ -243,9 +243,9 @@ const formatFullAddress = (address: Address) => {
           color="secondary"
           size="sm"
           rounded="lg"
-          @click="openCreateForm"
-          class="flex items-center gap-1.5 hover:bg-secondary hover:border-secondary"
           :disabled="isLoading"
+          class="flex items-center gap-1.5 hover:bg-secondary hover:border-secondary"
+          @click="openCreateForm"
         >
           <FontAwesomeIcon v-if="getIcon('plus')" :icon="getIcon('plus')" class="w-3 h-3" />
           <span class="font-semibold tracking-wide">AJOUTER</span>
@@ -277,18 +277,18 @@ const formatFullAddress = (address: Address) => {
               variant="ghost"
               color="secondary"
               size="sm"
-              @click="openEditForm(address)"
-              class="h-8 w-8 p-0"
               :disabled="isLoading"
+              class="h-8 w-8 p-0"
+              @click="openEditForm(address)"
             >
               <FontAwesomeIcon v-if="getIcon('pen')" :icon="getIcon('pen')" class="w-3.5 h-3.5" />
             </Button>
             <Button
               variant="ghost"
               size="sm"
-              @click="confirmDelete(address.id)"
-              class="h-8 w-8 p-0 text-destructive hover:text-destructive"
               :disabled="isLoading"
+              class="h-8 w-8 p-0 text-destructive hover:text-destructive"
+              @click="confirmDelete(address.id)"
             >
               <FontAwesomeIcon v-if="getIcon('trash')" :icon="getIcon('trash')" class="w-3.5 h-3.5" />
             </Button>
@@ -382,16 +382,16 @@ const formatFullAddress = (address: Address) => {
         <div class="flex gap-3 pt-4">
           <Button
             variant="outline"
-            @click="isDeleteDialogOpen = false"
-            class="flex-1"
             :disabled="isDeleting"
+            class="flex-1"
+            @click="isDeleteDialogOpen = false"
           >
             Annuler
           </Button>
           <Button
-            @click="deleteAddress"
-            class="flex-1 bg-destructive hover:bg-destructive/90 text-white"
             :disabled="isDeleting"
+            class="flex-1 bg-destructive hover:bg-destructive/90 text-white"
+            @click="deleteAddress"
           >
             <FontAwesomeIcon
               v-if="isDeleting && getIcon('spinner')"

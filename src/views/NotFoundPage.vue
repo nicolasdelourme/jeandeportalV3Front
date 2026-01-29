@@ -46,7 +46,7 @@ const goToShop = () => {
 
 <template>
     <DefaultLayout>
-        <section class="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 py-16 bg-gradient-to-b from-white to-neutral-50">
+        <section class="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 py-16 bg-linear-to-b from-white to-neutral-50">
             <div class="max-w-2xl mx-auto flex flex-col items-center gap-8 text-center">
                 <!-- Icône 404 avec design primary -->
                 <div class="relative">
@@ -54,11 +54,11 @@ const goToShop = () => {
                     <div class="absolute inset-0 bg-primary/10 rounded-full animate-pulse"></div>
 
                     <!-- Icône principale -->
-                    <div class="relative bg-gradient-to-br from-primary to-[#aa0000] p-8 md:p-12 rounded-full shadow-2xl shadow-primary/20">
+                    <div class="relative bg-primary p-8 md:py-8 md:px-7 rounded-full shadow-2xl shadow-primary/20">
                         <FontAwesomeIcon
                             v-if="icons.compass"
                             :icon="icons.compass"
-                            class="w-16 h-16 md:w-24 md:h-24 text-white animate-spin"
+                            class="w-16 h-16 md:w-20 md:h-20 text-secondary fa-2x animate-spin"
                             style="animation-duration: 8s;"
                         />
                     </div>
@@ -66,11 +66,11 @@ const goToShop = () => {
 
                 <!-- Code 404 -->
                 <div class="flex flex-col gap-2">
-                    <h1 class="font-black text-6xl md:text-8xl text-primary leading-none tracking-tight"
+                    <h1 class="font-black text-6xl md:text-8xl text-secondary leading-none tracking-tight"
                         style="font-family: Roboto, sans-serif;">
                         404
                     </h1>
-                    <div class="h-1 w-24 mx-auto bg-gradient-to-r from-primary to-[#aa0000] rounded-full"></div>
+                    <div class="h-1 w-24 mx-auto bg-primary rounded-full"></div>
                 </div>
 
                 <!-- Message principal -->
@@ -110,26 +110,28 @@ const goToShop = () => {
                 <div class="flex flex-col sm:flex-row gap-3 w-full max-w-md">
                     <!-- Bouton principal : Retour accueil -->
                     <Button
-                        @click="goHome"
                         variant="default"
+                        rounded="lg"
                         color="primary"
                         size="lg"
-                        class="flex-1"
+                        class="flex-1 text-secondary hover:text-secondary"
+                        @click="goHome"
                     >
-                        <FontAwesomeIcon v-if="icons.home" :icon="icons.home" class="w-4 h-4 mr-2" />
-                        <span style="font-family: Roboto, sans-serif;">Retour à l'accueil</span>
+                        <FontAwesomeIcon v-if="icons.home" :icon="icons.home" class="w-4 h-4 mr-2 text-secondary" />
+                        Retour à l'accueil
                     </Button>
 
                     <!-- Bouton secondaire : Retour arrière -->
                     <Button
-                        @click="goBack"
                         variant="outline"
-                        color="neutral-800"
+                        color="secondary"
+                        rounded="lg"
                         size="lg"
                         class="flex-1"
+                        @click="goBack"
                     >
                         <FontAwesomeIcon v-if="icons.arrowLeft" :icon="icons.arrowLeft" class="w-4 h-4 mr-2" />
-                        <span style="font-family: Roboto, sans-serif;">Page précédente</span>
+                        Page précédente
                     </Button>
                 </div>
 
@@ -140,10 +142,10 @@ const goToShop = () => {
                         Ou découvrez nos publications
                     </p>
                     <Button
-                        @click="goToShop"
                         variant="ghost"
-                        color="primary"
+                        color="secondary"
                         class="mx-auto"
+                        @click="goToShop"
                     >
                         <span class="font-semibold" style="font-family: Roboto, sans-serif;">
                             Visiter la boutique →

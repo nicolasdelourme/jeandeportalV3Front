@@ -381,7 +381,7 @@ const shareByEmail = () => {
           </div>
 
           <!-- Right: Image thumbnail -->
-          <div class="order-first lg:order-none">
+          <div class="order-first lg:order-0">
             <AspectRatio :ratio="4/3" class="overflow-hidden rounded-lg bg-neutral-100">
               <img
                 :src="mockArticle.image"
@@ -421,14 +421,14 @@ const shareByEmail = () => {
           </div>
 
           <!-- Center Column - Article Content -->
-          <div class="order-2 lg:order-none">
+          <div class="order-2 lg:order-0">
             <div class="bg-white rounded-lg shadow-sm p-6 lg:p-8">
               <ProseContent :html="mockArticle.content" />
             </div>
           </div>
 
           <!-- Right Column - Suggested Content -->
-          <div class="order-1 lg:order-none">
+          <div class="order-1 lg:order-0">
             <div class="sticky top-24 space-y-4">
               <h4 class="font-heading font-bold text-sm text-muted-foreground uppercase tracking-wide">
                 À lire aussi

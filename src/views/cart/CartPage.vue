@@ -121,7 +121,7 @@ function goToCheckout() {
             />
           </template>
           <template #action>
-            <Button @click="goToShop" variant="secondary" size="lg">
+            <Button variant="secondary" size="lg" @click="goToShop">
               Découvrir la boutique
             </Button>
           </template>
@@ -135,11 +135,11 @@ function goToCheckout() {
           <!-- Bouton vider le panier -->
           <div class="flex justify-end">
             <Button
-              @click="clearCart"
-              variant="ghost"
-              color="neutral-800"
-              size="sm"
               class="text-red-600 hover:text-red-700"
+              size="sm"
+              color="neutral-800"
+              variant="ghost"
+              @click="clearCart"
             >
               <FontAwesomeIcon v-if="icons.trash" :icon="icons.trash" class="h-4 w-4 mr-2" />
               Vider le panier
@@ -155,7 +155,7 @@ function goToCheckout() {
             >
               <div class="flex gap-4">
                 <!-- Image -->
-                <div class="w-24 h-24 flex-shrink-0 bg-neutral-100 rounded-lg overflow-hidden">
+                <div class="w-24 h-24 shrink-0 bg-neutral-100 rounded-lg overflow-hidden">
                   <img
                     v-if="item.images && item.images[0]"
                     :src="item.images[0]"
@@ -181,11 +181,11 @@ function goToCheckout() {
                   <!-- Bouton suppression -->
                   <div class="flex items-center justify-end mt-3">
                     <Button
-                      @click="removeItem(item.itemId, item.name)"
-                      variant="ghost"
-                      size="sm"
-                      class="text-red-600 hover:text-red-700"
                       :disabled="cartStore.isLoading"
+                      class="text-red-600 hover:text-red-700"
+                      size="sm"
+                      variant="ghost"
+                      @click="removeItem(item.itemId, item.name)"
                     >
                       <FontAwesomeIcon v-if="icons.trash" :icon="icons.trash" class="h-4 w-4 mr-2" />
                       Retirer
@@ -236,10 +236,10 @@ function goToCheckout() {
 
             <!-- CTA Principal : Commander -->
             <Button
-              @click="goToCheckout"
               size="lg"
-              rounded="lg"
               class="w-full bg-success hover:bg-success/90 text-success-foreground"
+              rounded="lg"
+              @click="goToCheckout"
             >
               <FontAwesomeIcon
                 v-if="icons.creditCard"
@@ -251,11 +251,11 @@ function goToCheckout() {
 
             <!-- CTA Secondaire : Continuer les achats -->
             <Button
-              @click="goToShop"
-              variant="outline"
-              color="secondary"
-              rounded="lg"
               class="w-full mt-3 hover:bg-secondary hover:border-secondary"
+              rounded="lg"
+              color="secondary"
+              variant="outline"
+              @click="goToShop"
             >
               <FontAwesomeIcon
                 v-if="icons.arrowLeft"

@@ -65,10 +65,10 @@ const handleAddToCart = async (reference: ShopReference) => {
 
 <template>
   <DefaultLayout>
-    <div class="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-red-50/30 relative overflow-x-hidden">
+    <div class="min-h-screen bg-linear-to-br from-neutral-50 via-white to-red-50/30 relative overflow-x-hidden">
       <!-- Éléments décoratifs de fond -->
-      <div class="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-      <div class="absolute bottom-0 left-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+      <div class="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" ></div>
+      <div class="absolute bottom-0 left-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" ></div>
 
       <!-- Hero Carrousel immersif -->
       <ShopHeroCarousel />

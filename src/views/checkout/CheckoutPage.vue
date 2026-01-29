@@ -484,9 +484,9 @@ function goBack() {
                 <Button
                   variant="secondary"
                   rounded="lg"
-                  @click="proceedToPayment"
-                  :disabled="!canProceedToPayment || isLoading"
                   class="flex-1"
+                  :disabled="!canProceedToPayment || isLoading"
+                  @click="proceedToPayment"
                 >
                   <FontAwesomeIcon
                     v-if="isLoading && icons.spinner"
@@ -560,11 +560,11 @@ function goBack() {
                   Retour
                 </Button>
                 <Button
-                  @click="handleConfirmPayment"
-                  variant="secondary"
-                  rounded="lg"
-                  :disabled="!cardElementReady || isLoading"
                   class="flex-1"
+                  :disabled="!cardElementReady || isLoading"
+                  rounded="lg"
+                  variant="secondary"
+                  @click="handleConfirmPayment"
                 >
                   <FontAwesomeIcon
                     v-if="isLoading && icons.spinner"

@@ -73,13 +73,13 @@ const isInCart = computed(() => false)
 
 <template>
   <Button
-    @click="addToCart"
-    :variant="variant"
-    color="primary"
-    :size="size"
-    :disabled="disabled || isAdding"
-    :class="{ 'w-full': fullWidth }"
     class="relative"
+    :class="{ 'w-full': fullWidth }"
+    :disabled="disabled || isAdding"
+    :size="size"
+    color="primary"
+    :variant="variant"
+    @click="addToCart"
   >
     <!-- Icône et texte selon l'état -->
     <template v-if="!isAdding">
@@ -108,6 +108,6 @@ const isInCart = computed(() => false)
       v-if="isInCart && !isAdding"
       class="absolute -top-1 -right-1 h-3 w-3 bg-green-500 rounded-full border-2 border-white"
       title="Déjà dans le panier"
-    />
+    ></span>
   </Button>
 </template>

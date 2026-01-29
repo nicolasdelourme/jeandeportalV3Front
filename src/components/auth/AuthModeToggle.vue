@@ -25,7 +25,7 @@ const emit = defineEmits<{
     <div class="mt-6 text-center">
         <p class="text-sm text-neutral-600" style="font-family: Roboto, sans-serif;">
             {{ text }}
-            <button type="button" @click="emit('toggle')" class="text-secondary font-medium hover:underline ml-1">
+            <button type="button" class="text-secondary font-medium hover:underline ml-1" @click="emit('toggle')">
                 {{ linkText }}
             </button>
         </p>

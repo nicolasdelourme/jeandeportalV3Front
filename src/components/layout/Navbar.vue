@@ -188,7 +188,6 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                             <!-- Lien simple -->
                             <button
                                 v-if="item.type === 'link'"
-                                @click="handleNavClick(item.href)"
                                 :class="[
                                     'w-full px-3 py-2.5 text-left text-sm font-medium rounded-xl transition-colors',
                                     'text-primary hover:bg-primary/5',
@@ -196,6 +195,7 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                                         ? 'bg-primary/10 font-semibold'
                                         : ''
                                 ]"
+                                @click="handleNavClick(item.href)"
                             >
                                 {{ item.label }}
                             </button>
@@ -225,7 +225,6 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                                             <button
                                                 v-for="subItem in item.items"
                                                 :key="subItem.label"
-                                                @click="handleNavClick(subItem.href)"
                                                 :class="[
                                                     'w-full pl-7 pr-3 py-2 text-left text-xs font-normal rounded-xl transition-colors',
                                                     'text-neutral-600 hover:bg-secondary/5 hover:text-secondary',
@@ -233,6 +232,7 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                                                         ? 'bg-secondary/10 text-secondary font-semibold'
                                                         : ''
                                                 ]"
+                                                @click="handleNavClick(subItem.href)"
                                             >
                                                 {{ subItem.label }}
                                             </button>
@@ -264,16 +264,16 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
 
                             <!-- Liens compte -->
                             <button
-                                @click="handleAccount"
                                 class="w-full px-3 py-2 text-left flex items-center text-sm font-normal rounded-xl text-neutral-600 hover:bg-secondary/5 hover:text-secondary transition-colors"
+                                @click="handleAccount"
                             >
                                 <FontAwesomeIcon v-if="icons.userCircle" :icon="icons.userCircle" class="h-4 w-4 mr-3 shrink-0" />
                                 <span>Mon compte</span>
                             </button>
 
                             <button
-                                @click="handleOrders"
                                 class="w-full px-3 py-2 text-left flex items-center text-sm font-normal rounded-xl text-neutral-600 hover:bg-secondary/5 hover:text-secondary transition-colors"
+                                @click="handleOrders"
                             >
                                 <FontAwesomeIcon v-if="icons.box" :icon="icons.box" class="h-4 w-4 mr-3 shrink-0" />
                                 <span>Mes commandes</span>
@@ -282,8 +282,8 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                             <div class="h-px bg-neutral-200 my-2"></div>
 
                             <button
-                                @click="handleLogout"
                                 class="w-full px-3 py-2 text-left flex items-center text-sm font-normal rounded-xl text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors"
+                                @click="handleLogout"
                             >
                                 <FontAwesomeIcon v-if="icons.signOut" :icon="icons.signOut" class="h-4 w-4 mr-3 shrink-0" />
                                 <span>Déconnexion</span>
@@ -293,15 +293,15 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                         <!-- Mode non connecté -->
                         <template v-else>
                             <button
-                                @click="handleLogin"
                                 class="w-full px-3 py-3 flex items-center justify-center text-sm font-medium rounded-2xl bg-secondary text-white hover:bg-[#2D2D2D] transition-colors"
+                                @click="handleLogin"
                             >
                                 Se connecter
                             </button>
 
                             <button
-                                @click="handleRegister"
                                 class="w-full px-3 py-2.5 text-left flex items-center justify-center text-sm font-medium rounded-xl text-secondary hover:bg-secondary/5 transition-colors mt-2"
+                                @click="handleRegister"
                             >
                                 Créer un compte
                             </button>
@@ -441,12 +441,12 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                                     class="h-4 w-4 mr-2 text-secondary" />
                                 Mon compte
                             </DropdownMenuItem>
-                            <DropdownMenuItem @click="handleOrders" class="cursor-pointer rounded-lg">
+                            <DropdownMenuItem class="cursor-pointer rounded-lg" @click="handleOrders">
                                 <FontAwesomeIcon v-if="icons.box" :icon="icons.box" class="h-4 w-4 mr-2 text-secondary" />
                                 Mes formations
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem @click="handleLogout" class="cursor-pointer text-red-600 rounded-lg">
+                            <DropdownMenuItem class="cursor-pointer text-red-600 rounded-lg" @click="handleLogout">
                                 <FontAwesomeIcon v-if="icons.signOut" :icon="icons.signOut" class="h-4 w-4 mr-2" />
                                 Déconnexion
                             </DropdownMenuItem>

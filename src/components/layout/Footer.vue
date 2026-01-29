@@ -67,20 +67,20 @@ const navigate = (path: string) => {
                         Navigation
                     </h4>
                     <div class="flex flex-col gap-2 text-[14px] leading-5" style="font-family: Roboto, sans-serif;">
-                        <a href="/" @click.prevent="navigate('/')"
-                            class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer">
+                        <a href="/" class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer"
+                            @click.prevent="navigate('/')">
                             Accueil
                         </a>
-                        <a href="/academie" @click.prevent="navigate('/academie')"
-                            class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer">
+                        <a href="/academie" class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer"
+                            @click.prevent="navigate('/academie')">
                             Académie
                         </a>
-                        <a href="/boutique" @click.prevent="navigate('/boutique')"
-                            class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer">
+                        <a href="/boutique" class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer"
+                            @click.prevent="navigate('/boutique')">
                             Boutique
                         </a>
-                        <a href="/notre-maison" @click.prevent="navigate('/notre-maison')"
-                            class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer">
+                        <a href="/notre-maison" class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer"
+                            @click.prevent="navigate('/notre-maison')">
                             Notre Maison
                         </a>
                     </div>
@@ -142,20 +142,20 @@ const navigate = (path: string) => {
                     </AccordionTrigger>
                     <AccordionContent class="pb-4">
                         <div class="flex flex-col gap-3 text-sm leading-5" style="font-family: Roboto, sans-serif;">
-                            <a href="/" @click.prevent="navigate('/')"
-                                class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer py-1">
+                            <a href="/" class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer py-1"
+                                @click.prevent="navigate('/')">
                                 Accueil
                             </a>
-                            <a href="/academie" @click.prevent="navigate('/academie')"
-                                class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer py-1">
+                            <a href="/academie" class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer py-1"
+                                @click.prevent="navigate('/academie')">
                                 Académie
                             </a>
-                            <a href="/boutique" @click.prevent="navigate('/boutique')"
-                                class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer py-1">
+                            <a href="/boutique" class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer py-1"
+                                @click.prevent="navigate('/boutique')">
                                 Boutique
                             </a>
-                            <a href="/notre-maison" @click.prevent="navigate('/notre-maison')"
-                                class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer py-1">
+                            <a href="/notre-maison" class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer py-1"
+                                @click.prevent="navigate('/notre-maison')">
                                 Notre Maison
                             </a>
                         </div>
@@ -192,12 +192,12 @@ const navigate = (path: string) => {
                     style="font-family: Roboto, sans-serif;">
                     <!-- Liens légaux - Grid 2x2 sur mobile, horizontal sur desktop -->
                     <div class="grid grid-cols-2 gap-x-4 gap-y-2 md:flex md:gap-6 text-[#b0bec5]">
-                        <a href="/cgv" @click.prevent="navigate('/cgv')" class="hover:text-white transition-colors cursor-pointer">CGV</a>
-                        <a href="/mentions-legales" @click.prevent="navigate('/mentions-legales')" class="hover:text-white transition-colors cursor-pointer">Mentions légales</a>
-                        <a href="/confidentialite" @click.prevent="navigate('/confidentialite')" class="hover:text-white transition-colors cursor-pointer">Confidentialité</a>
-                        <a href="/cookies" @click.prevent="navigate('/cookies')" class="hover:text-white transition-colors cursor-pointer">Cookies</a>
+                        <a href="/cgv" class="hover:text-white transition-colors cursor-pointer" @click.prevent="navigate('/cgv')">CGV</a>
+                        <a href="/mentions-legales" class="hover:text-white transition-colors cursor-pointer" @click.prevent="navigate('/mentions-legales')">Mentions légales</a>
+                        <a href="/confidentialite" class="hover:text-white transition-colors cursor-pointer" @click.prevent="navigate('/confidentialite')">Confidentialité</a>
+                        <a href="/cookies" class="hover:text-white transition-colors cursor-pointer" @click.prevent="navigate('/cookies')">Cookies</a>
                         <span class="hidden md:inline text-neutral-500">–</span>
-                        <a href="/rgpd" @click.prevent="navigate('/rgpd')" class="hover:text-white transition-colors cursor-pointer">RGPD (legacy)</a>
+                        <a href="/rgpd" class="hover:text-white transition-colors cursor-pointer" @click.prevent="navigate('/rgpd')">RGPD (legacy)</a>
                     </div>
 
                     <!-- Copyright -->

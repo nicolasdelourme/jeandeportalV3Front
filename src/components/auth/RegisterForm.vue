@@ -201,7 +201,7 @@ const onSubmit = handleSubmit((values) => {
 </script>
 
 <template>
-    <form @submit="onSubmit" class="space-y-1">
+    <form class="space-y-1" @submit="onSubmit">
         <!-- Prénom et Nom -->
         <div class="grid grid-cols-2 gap-4">
             <!-- Prénom -->
@@ -292,9 +292,9 @@ const onSubmit = handleSubmit((values) => {
                         </div>
                         <Input :type="showPassword ? 'text' : 'password'" placeholder="••••••••" class="pl-10 pr-10"
                             autocomplete="new-password" v-bind="componentField" />
-                        <button type="button" @click="showPassword = !showPassword"
+                        <button type="button" :aria-label="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
                             class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
-                            :aria-label="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'">
+                            @click="showPassword = !showPassword">
                             <FontAwesomeIcon v-if="showPassword && getIcon('eyeSlash')" :icon="getIcon('eyeSlash')"
                                 class="w-4 h-4" />
                             <FontAwesomeIcon v-else-if="getIcon('eye')" :icon="getIcon('eye')" class="w-4 h-4" />
@@ -319,7 +319,7 @@ const onSubmit = handleSubmit((values) => {
                             :style="{
                                 width: `${passwordStrength.score}%`,
                                 backgroundColor: passwordStrength.barColor
-                            }" />
+                            }" ></div>
                     </div>
                 </div>
                 <FormDescription v-if="!values.password" class="text-xs text-neutral-500">
@@ -343,9 +343,9 @@ const onSubmit = handleSubmit((values) => {
                         </div>
                         <Input :type="showConfirmPassword ? 'text' : 'password'" placeholder="••••••••"
                             class="pl-10 pr-10" autocomplete="new-password" v-bind="componentField" />
-                        <button type="button" @click="showConfirmPassword = !showConfirmPassword"
+                        <button type="button" :aria-label="showConfirmPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
                             class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
-                            :aria-label="showConfirmPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'">
+                            @click="showConfirmPassword = !showConfirmPassword">
                             <FontAwesomeIcon v-if="showConfirmPassword && getIcon('eyeSlash')"
                                 :icon="getIcon('eyeSlash')" class="w-4 h-4" />
                             <FontAwesomeIcon v-else-if="getIcon('eye')" :icon="getIcon('eye')" class="w-4 h-4" />

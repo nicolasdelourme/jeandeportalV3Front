@@ -430,25 +430,25 @@ const handleViewAllPublications = () => {
                 <!-- Contrôles du carousel -->
                 <div class="flex items-center justify-center gap-4 mt-8">
                     <!-- Bouton précédent -->
-                    <Button @click="handlePrevious" variant="outline"
-                        class="rounded-full border border-neutral-300 flex items-center justify-center p-1 transition-colors">
+                    <Button class="rounded-full border border-neutral-300 flex items-center justify-center p-1 transition-colors" variant="outline"
+                        @click="handlePrevious">
                         <CarouselPrevious class="static translate-y-0" />
                     </Button>
 
                     <!-- Indicateurs de pagination dynamiques -->
                     <div class="flex gap-2">
-                        <button v-for="pageIndex in Math.ceil(publications.length / getSlidesToScroll())" :key="pageIndex" @click="() => {
+                        <button v-for="pageIndex in Math.ceil(publications.length / getSlidesToScroll())" :key="pageIndex" :class="Math.floor((current - 1) / getSlidesToScroll()) === (pageIndex - 1) ? 'bg-primary w-8' : 'bg-neutral-300'" class="w-2 h-2 rounded-full transition-all"
+                            @click="() => {
                             stopAutoplay()
                             emblaApi?.scrollTo((pageIndex - 1) * getSlidesToScroll())
                             startAutoplay()
-                        }" class="w-2 h-2 rounded-full transition-all"
-                            :class="Math.floor((current - 1) / getSlidesToScroll()) === (pageIndex - 1) ? 'bg-primary w-8' : 'bg-neutral-300'">
+                        }">
                         </button>
                     </div>
 
                     <!-- Bouton suivant -->
-                    <Button @click="handleNext" variant="outline"
-                        class="rounded-full border border-neutral-300 flex items-center justify-center p-1 transition-colors">
+                    <Button class="rounded-full border border-neutral-300 flex items-center justify-center p-1 transition-colors" variant="outline"
+                        @click="handleNext">
                         <CarouselNext class="static translate-y-0" />
                     </Button>
                 </div>
@@ -456,7 +456,7 @@ const handleViewAllPublications = () => {
 
             <!-- CTA pour voir toutes les publications -->
             <div class="flex justify-center">
-                <Button @click="handleViewAllPublications" variant="outline" color="primary" size="lg">
+                <Button size="lg" color="primary" variant="outline" @click="handleViewAllPublications">
                     <p class="font-bold" style="font-family: Roboto, sans-serif;">
                         Voir toutes nos publications
                     </p>

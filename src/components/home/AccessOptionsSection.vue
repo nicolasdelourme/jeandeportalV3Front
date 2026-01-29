@@ -109,7 +109,7 @@ const handleViewFormulas = () => {
                     </div>
 
                     <!-- Bouton CTA -->
-                    <Button @click="handleExploreBoutique" color="yellow-600" class="w-full mt-auto" size="lg">
+                    <Button size="lg" class="w-full mt-auto" color="yellow-600" @click="handleExploreBoutique">
                         <p class="font-bold" style="font-family: Roboto, sans-serif;">
                             Parcourir la boutique
                         </p>
@@ -173,7 +173,7 @@ const handleViewFormulas = () => {
                     </div>
 
                     <!-- Bouton CTA -->
-                    <Button @click="handleViewFormulas" color="primary" class="w-full mt-auto" size="lg">
+                    <Button size="lg" class="w-full mt-auto" color="primary" @click="handleViewFormulas">
                         <p class="font-bold" style="font-family: Roboto, sans-serif;">
                             Découvrir l'Académie
                         </p>

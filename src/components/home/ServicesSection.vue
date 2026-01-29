@@ -73,7 +73,7 @@ const handleDiscoverCollections = () => {
                             <!-- Badge "Contenus Premium" -->
                             <div class="bg-neutral-200 flex gap-3 items-center px-4 py-2 rounded-full shadow-sm">
                                 <div
-                                    class="bg-primary animate-pulse duration-1000 opacity-[0.876]  rounded-full w-3 h-3" />
+                                    class="bg-primary animate-pulse duration-1000 opacity-[0.876]  rounded-full w-3 h-3" ></div>
                                 <p class="font-bold text-xs text-neutral-800 leading-5"
                                     style="font-family: Roboto, sans-serif;">
                                     Contenus Premium
@@ -150,7 +150,7 @@ const handleDiscoverCollections = () => {
                         </div>
 
                         <!-- Bouton CTA -->
-                        <Button @click="handleLearnMoreAcademie" class="w-full mt-auto" size="lg">
+                        <Button size="lg" class="w-full mt-auto" @click="handleLearnMoreAcademie">
                             <p class="font-bold " style="font-family: Roboto, sans-serif;">
                                 Découvrir l'Académie
                             </p>
@@ -237,8 +237,8 @@ const handleDiscoverCollections = () => {
                         </div>
 
                         <!-- Bouton CTA -->
-                        <Button @click="handleDiscoverCollections" variant="outline" color="yellow-500"
-                            class="w-full mt-auto" size="lg">
+                        <Button size="lg" class="w-full mt-auto" color="yellow-500"
+                            variant="outline" @click="handleDiscoverCollections">
                             <p class="font-bold" style="font-family: Roboto, sans-serif;">
                                 Découvrir nos collections
                             </p>

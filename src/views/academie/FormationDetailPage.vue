@@ -88,7 +88,7 @@ const goBack = () => {
             </div>
 
             <!-- Colonne centrale: Contenu -->
-            <div class="space-y-10 order-last lg:order-none">
+            <div class="space-y-10 order-last lg:order-0">
               <!-- Description et points clés -->
               <div>
                 <h1 class="font-heading font-bold text-2xl md:text-3xl text-foreground mb-2">
@@ -139,7 +139,7 @@ const goBack = () => {
             </div>
 
             <!-- Colonne droite: Sidebar (sticky) -->
-            <div class="lg:sticky lg:top-24 lg:self-start order-first lg:order-none">
+            <div class="lg:sticky lg:top-24 lg:self-start order-first lg:order-0">
               <FormationSidebar :formation="formation" />
             </div>
           </div>

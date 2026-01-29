@@ -75,7 +75,7 @@ const onSubmit = handleSubmit((values) => {
 </script>
 
 <template>
-    <form @submit.prevent="onSubmit" class="space-y-1">
+    <form class="space-y-1" @submit.prevent="onSubmit">
         <!-- Email -->
         <FormField v-slot="{ componentField }" name="email">
             <FormItem class="gap-1">
@@ -108,9 +108,9 @@ const onSubmit = handleSubmit((values) => {
                         </div>
                         <Input :type="showPassword ? 'text' : 'password'" placeholder="••••••••" class="pl-10 pr-10"
                             autocomplete="current-password" v-bind="componentField" />
-                        <button type="button" @click="showPassword = !showPassword"
+                        <button type="button" :aria-label="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
                             class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
-                            :aria-label="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'">
+                            @click="showPassword = !showPassword">
                             <FontAwesomeIcon v-if="showPassword && getIcon('eyeSlash')" :icon="getIcon('eyeSlash')"
                                 class="w-4 h-4" />
                             <FontAwesomeIcon v-else-if="getIcon('eye')" :icon="getIcon('eye')" class="w-4 h-4" />
@@ -129,8 +129,8 @@ const onSubmit = handleSubmit((values) => {
                     Rester connecté
                 </span>
             </label>
-            <button type="button" @click="emit('forgot-password')" class="text-sm text-secondary hover:underline"
-                style="font-family: Roboto, sans-serif;">
+            <button type="button" style="font-family: Roboto, sans-serif;" class="text-sm text-secondary hover:underline"
+                @click="emit('forgot-password')">
                 Mot de passe oublié ?
             </button>
         </div>

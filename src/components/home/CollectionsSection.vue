@@ -201,8 +201,8 @@ const handleViewAllCollections = () => {
             <div class="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-6 w-full">
                 <CollectionCard
                     v-for="collection in collections"
-                    :key="collection.id"
                     :id="collection.id"
+                    :key="collection.id"
                     :title="collection.title"
                     :subtitle="collection.subtitle"
                     :description="collection.description"
@@ -215,7 +215,7 @@ const handleViewAllCollections = () => {
 
             <!-- CTA pour voir toutes les collections -->
             <div class="flex justify-center">
-                <Button @click="handleViewAllCollections" variant="outline" color="primary" size="lg">
+                <Button size="lg" color="primary" variant="outline" @click="handleViewAllCollections">
                     <p class="font-bold" style="font-family: Roboto, sans-serif;">
                         Voir toutes nos collections
                     </p>

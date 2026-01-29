@@ -94,7 +94,7 @@ const getIcon = (iconKey: keyof typeof icons.value): IconDefinition | undefined 
 </script>
 
 <template>
-  <form @submit="onSubmit" class="space-y-6">
+  <form class="space-y-6" @submit="onSubmit">
     <!-- Label optionnel -->
     <FormField v-slot="{ componentField }" name="label">
       <FormItem>

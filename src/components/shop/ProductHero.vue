@@ -107,8 +107,8 @@ const goToImage = (index: number) => {
     </AspectRatio>
 
     <!-- Overlay gradient -->
-    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none" />
-    <div class="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent pointer-events-none" />
+    <div class="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent pointer-events-none" ></div>
+    <div class="absolute inset-0 bg-linear-to-r from-black/40 via-transparent to-transparent pointer-events-none" ></div>
 
     <!-- Bouton retour -->
     <div class="absolute top-4 left-4 z-10">
@@ -170,7 +170,7 @@ const goToImage = (index: number) => {
           "
           :aria-label="`Voir image ${index + 1}`"
           @click="goToImage(index)"
-        />
+        ></button>
       </div>
 
       <!-- Miniatures (visible sur desktop) -->
