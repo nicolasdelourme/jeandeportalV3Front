@@ -43,13 +43,10 @@ function saveBasketCode(code: string | null): void {
   try {
     if (code) {
       localStorage.setItem(BASKET_CODE_KEY, code)
-      console.log('🛒 [CART STORE] BasketCode sauvegardé:', code.substring(0, 8) + '...')
       // Vérification immédiate
       const verify = localStorage.getItem(BASKET_CODE_KEY)
-      console.log('🔍 [DEBUG] Vérification localStorage:', verify ? 'OK' : 'ÉCHEC')
     } else {
       localStorage.removeItem(BASKET_CODE_KEY)
-      console.log('🛒 [CART STORE] BasketCode supprimé du localStorage')
     }
   } catch (error) {
     console.error('❌ Erreur lors de la sauvegarde du basketCode:', error)
@@ -62,10 +59,8 @@ function saveBasketCode(code: string | null): void {
 function loadBasketCode(): string | null {
   try {
     const code = localStorage.getItem(BASKET_CODE_KEY)
-    console.log('🔍 [DEBUG] loadBasketCode:', code ? code.substring(0, 8) + '...' : 'null')
     return code
-  } catch (error) {
-    console.error('❌ Erreur lors du chargement du basketCode:', error)
+  } catch {
     return null
   }
 }
@@ -78,7 +73,6 @@ function clearOldLocalStorageCart(): void {
     const oldCart = localStorage.getItem(CART_CONFIG.STORAGE_KEY)
     if (oldCart) {
       localStorage.removeItem(CART_CONFIG.STORAGE_KEY)
-      console.info('🛒 [CART STORE] Ancien panier localStorage vidé (migration vers backend)')
     }
   } catch (error) {
     console.error('Erreur lors du nettoyage du localStorage:', error)
@@ -225,7 +219,6 @@ export const useCartStore = defineStore('cart', () => {
   async function syncWithBackend(): Promise<void> {
     // Si pas de basketCode, pas de panier à synchroniser
     if (!cartState.value.basketCode) {
-      console.log('🛒 [CART STORE] Pas de basketCode, pas de synchronisation nécessaire')
       cartState.value.isSynced = true
       return
     }
@@ -233,8 +226,6 @@ export const useCartStore = defineStore('cart', () => {
     cartState.value.isLoading = true
 
     try {
-      console.log('🔄 [CART STORE] Synchronisation avec le backend...')
-
       const response = await cartService.fetchCart(cartState.value.basketCode)
       const mapped = cartService.mapAPIResponse(response)
 
@@ -243,8 +234,6 @@ export const useCartStore = defineStore('cart', () => {
       cartState.value.basketCode = mapped.basketCode
       cartState.value.isSynced = true
       cartState.value.lastSyncTimestamp = Date.now()
-
-      console.log(`✅ [CART STORE] Panier synchronisé: ${mapped.items.length} items, basketCode=${mapped.basketCode ? '***' : 'null'}`)
     } catch (error) {
       console.error('❌ [CART STORE] Erreur lors de la synchronisation:', error)
       throw error
@@ -265,7 +254,6 @@ export const useCartStore = defineStore('cart', () => {
     const savedBasketCode = loadBasketCode()
     if (savedBasketCode) {
       cartState.value.basketCode = savedBasketCode
-      console.log('🛒 [CART STORE] BasketCode restauré:', savedBasketCode.substring(0, 8) + '...')
     }
 
     // Charger le panier depuis le backend (si on a un basketCode)
@@ -274,21 +262,11 @@ export const useCartStore = defineStore('cart', () => {
     } catch (error) {
       // Debug: voir l'erreur complète
       const cartError = error as CartError
-      console.log('🔍 [DEBUG] initialize error:', {
-        name: cartError?.name,
-        code: cartError?.code,
-        message: getErrorMessage(error),
-        isCartError: error instanceof CartError
-      })
 
       // Si le panier n'existe plus côté backend, supprimer le basketCode local
       if (cartError?.code === 'BASKET_NOT_FOUND') {
-        console.warn('🛒 [CART STORE] Panier expiré/invalide, suppression du basketCode local')
         cartState.value.basketCode = null
         saveBasketCode(null)
-      } else {
-        // Autre erreur - garder le basketCode au cas où c'est temporaire
-        console.info('🛒 [CART STORE] Erreur de synchronisation (réseau?), basketCode conservé')
       }
     }
   }
@@ -303,8 +281,6 @@ export const useCartStore = defineStore('cart', () => {
     cartState.value.isLoading = true
 
     try {
-      console.log(`🛒 [CART STORE] Ajout au panier: referenceId=${referenceId}, quantity=${quantity}, basketCode=${cartState.value.basketCode ? '***' : 'null'}`)
-
       // Passer le basketCode actuel (null si premier ajout → création du panier)
       const response = await cartService.addToCart(
         referenceId,
@@ -313,12 +289,6 @@ export const useCartStore = defineStore('cart', () => {
         cartState.value.basketCode
       )
       const mapped = cartService.mapAPIResponse(response)
-
-      console.log('🔍 [DEBUG] addItem response mapped:', {
-        itemsCount: mapped.items.length,
-        basketCode: mapped.basketCode ? mapped.basketCode.substring(0, 8) + '...' : 'NULL',
-        receipt: mapped.receipt
-      })
 
       cartState.value.items = mapped.items
       cartState.value.receipt = mapped.receipt
@@ -332,9 +302,6 @@ export const useCartStore = defineStore('cart', () => {
       } else {
         console.error('❌ [CART STORE] ATTENTION: basketCode est null/undefined dans la réponse!')
       }
-
-      // Toast géré par le composant appelant (avec le nom du produit)
-      console.log('✅ [CART STORE] Article ajouté')
     } catch (error) {
       console.error('❌ [CART STORE] Erreur lors de l\'ajout:', error)
       throw error
@@ -357,8 +324,6 @@ export const useCartStore = defineStore('cart', () => {
     cartState.value.isLoading = true
 
     try {
-      console.log(`🛒 [CART STORE] Mise à jour quantité: priceId=${priceId}, quantity=${quantity}`)
-
       const response = await cartService.updateQuantity(priceId, quantity, cartState.value.basketCode)
       const mapped = cartService.mapAPIResponse(response)
 
@@ -373,7 +338,6 @@ export const useCartStore = defineStore('cart', () => {
         toast.success('Quantité mise à jour')
       }
 
-      console.log('✅ [CART STORE] Quantité mise à jour')
     } catch (error) {
       console.error('❌ [CART STORE] Erreur lors de la mise à jour:', error)
       throw error
@@ -404,8 +368,6 @@ export const useCartStore = defineStore('cart', () => {
     cartState.value.isLoading = true
 
     try {
-      console.log(`🛒 [CART STORE] Suppression: itemId=${itemId}, quantity=${quantityToRemove}`)
-
       const response = await cartService.deleteReference(
         itemId, // referenceId = itemId
         quantityToRemove,
@@ -419,7 +381,6 @@ export const useCartStore = defineStore('cart', () => {
       cartState.value.lastSyncTimestamp = Date.now()
 
       toast.success('Article retiré du panier')
-      console.log('✅ [CART STORE] Article supprimé')
     } catch (error) {
       console.error('❌ [CART STORE] Erreur lors de la suppression:', error)
       throw error
@@ -439,8 +400,6 @@ export const useCartStore = defineStore('cart', () => {
     cartState.value.isLoading = true
 
     try {
-      console.log('🛒 [CART STORE] Vidage du panier')
-
       const response = await cartService.clearCart(cartState.value.items, cartState.value.basketCode)
       const mapped = cartService.mapAPIResponse(response)
 
@@ -450,7 +409,6 @@ export const useCartStore = defineStore('cart', () => {
       cartState.value.lastSyncTimestamp = Date.now()
 
       toast.success('Panier vidé')
-      console.log('✅ [CART STORE] Panier vidé')
     } catch (error) {
       console.error('❌ [CART STORE] Erreur lors du vidage:', error)
       throw error
@@ -493,7 +451,6 @@ export const useCartStore = defineStore('cart', () => {
    * le backend gère l'association du panier au compte.
    */
   function resetCart(): void {
-    console.log('🛒 [CART STORE] Réinitialisation du panier (déconnexion)')
     cartState.value = createEmptyCartState()
     saveBasketCode(null) // Effacer le basketCode du localStorage
   }

@@ -96,7 +96,6 @@ export const useUserSubscriptionStore = defineStore('userSubscription', () => {
   async function fetchData(force = false): Promise<void> {
     // Si on a déjà des données et qu'on ne force pas, ne rien faire
     if (!force && hasData.value) {
-      console.log('📦 User subscriptions already loaded')
       return
     }
 
@@ -108,10 +107,6 @@ export const useUserSubscriptionStore = defineStore('userSubscription', () => {
       subscriptions.value = result.subscriptions
       invoices.value = result.invoices
       lastFetchTimestamp.value = Date.now()
-
-      console.log(
-        `✅ User subscriptions loaded: ${result.subscriptions.length} subscriptions, ${result.invoices.length} invoices`
-      )
     } catch (err) {
       const errorMessage =
         err instanceof UserSubscriptionAPIError
@@ -129,7 +124,6 @@ export const useUserSubscriptionStore = defineStore('userSubscription', () => {
    * Force le rechargement des données
    */
   async function refresh(): Promise<void> {
-    console.log('🔄 Force refreshing user subscriptions...')
     await fetchData(true)
   }
 
@@ -137,7 +131,6 @@ export const useUserSubscriptionStore = defineStore('userSubscription', () => {
    * Vide les données (utile lors de la déconnexion)
    */
   function clearData(): void {
-    console.log('🗑️ Clearing user subscriptions...')
     subscriptions.value = []
     invoices.value = []
     lastFetchTimestamp.value = 0

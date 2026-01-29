@@ -161,11 +161,9 @@ export function useCheckoutFlow(type: CheckoutType): CheckoutFlow {
 
     if (type === 'shop') {
       // Boutique: PaymentIntent
-      console.log('💳 [CHECKOUT FLOW] Init PaymentIntent (shop)')
       return paymentService.initPayment(code, shippingId, billingId, 'eur')
     } else {
       // OneClick: SetupIntent
-      console.log('💳 [CHECKOUT FLOW] Init SetupIntent (oneclick)')
       return oneClickBasketService.initPayment(code, shippingId, billingId)
     }
   }
@@ -183,7 +181,6 @@ export function useCheckoutFlow(type: CheckoutType): CheckoutFlow {
   ): Promise<{ success: boolean; error?: string }> {
     if (type === 'shop') {
       // Boutique: confirmCardPayment
-      console.log('💳 [CHECKOUT FLOW] confirmCardPayment (shop)')
 
       const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
@@ -202,7 +199,6 @@ export function useCheckoutFlow(type: CheckoutType): CheckoutFlow {
 
       if (paymentIntent?.status === 'requires_action') {
         // 3D Secure gere automatiquement par Stripe
-        console.log('💳 [CHECKOUT FLOW] 3D Secure en cours...')
         return { success: true }
       }
 
@@ -214,7 +210,6 @@ export function useCheckoutFlow(type: CheckoutType): CheckoutFlow {
       return { success: false, error: `Statut inattendu: ${paymentIntent?.status}` }
     } else {
       // OneClick: confirmCardSetup
-      console.log('💳 [CHECKOUT FLOW] confirmCardSetup (oneclick)')
 
       const { error, setupIntent } = await stripe.confirmCardSetup(clientSecret, {
         payment_method: {
@@ -233,7 +228,6 @@ export function useCheckoutFlow(type: CheckoutType): CheckoutFlow {
 
       if (setupIntent?.status === 'requires_action') {
         // 3D Secure gere automatiquement par Stripe
-        console.log('💳 [CHECKOUT FLOW] 3D Secure en cours...')
         return { success: true }
       }
 
@@ -246,10 +240,8 @@ export function useCheckoutFlow(type: CheckoutType): CheckoutFlow {
    */
   function resetBasket(): void {
     if (type === 'shop') {
-      console.log('🛒 [CHECKOUT FLOW] Reset cart (shop)')
       cartStore.resetCart()
     } else {
-      console.log('🛒 [CHECKOUT FLOW] Reset basket (oneclick)')
       oneClickStore.resetBasket()
     }
   }

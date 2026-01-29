@@ -61,8 +61,6 @@ class SubscriptionCatalogService {
     this.abortController = new AbortController()
 
     try {
-      console.log(`📡 Fetching subscription catalog from: ${API_CONFIG.ENDPOINTS.CATALOG}`)
-
       // Timeout de la requete
       const timeoutId = setTimeout(() => {
         this.abortController?.abort()
@@ -80,22 +78,13 @@ class SubscriptionCatalogService {
 
       // Validation basique de la structure
       if (!rawData || !rawData.oneClick_array) {
-        console.error('🔍 [DEBUG] Invalid response structure:', {
-          type: typeof rawData,
-          hasOneClickArray: rawData && 'oneClick_array' in rawData,
-          sample: rawData,
-        })
         throw new SubscriptionCatalogAPIError(
           'Structure de reponse API invalide: attendu un objet avec oneClick_array'
         )
       }
 
-      console.log(`📡 Received ${rawData.oneClick_array.length} subscription products`)
-
       // Mapper les donnees brutes vers notre modele normalise
       const catalog = mapAPIResponseToSubscriptionCatalog(rawData)
-
-      console.log(`✅ Subscription catalog loaded: ${catalog.plans.length} plans`)
 
       return { plans: catalog.plans }
     } catch (error) {
@@ -136,9 +125,7 @@ class SubscriptionCatalogService {
         )
       }
 
-      throw new SubscriptionCatalogAPIError(
-        'Erreur inconnue lors de la recuperation du catalogue'
-      )
+      throw new SubscriptionCatalogAPIError('Erreur inconnue lors de la recuperation du catalogue')
     } finally {
       this.abortController = null
     }

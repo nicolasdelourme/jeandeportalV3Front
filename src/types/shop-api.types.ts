@@ -417,16 +417,12 @@ export function mapAPIResponseToShopCatalog(apiResponse: APIRawStoreResponse): S
       return { references: [] }
     }
 
-    console.log(`📊 Processing store "${apiResponse.name}" with ${apiResponse.category_array.length} categories`)
-
     // Parcourir les catégories et mapper les items
     const references: ShopReference[] = []
 
     for (const category of apiResponse.category_array) {
       const categoryId = String(category.categoryId || 'uncategorized')
       const categoryName = category.name || ''
-
-      console.log(`  📂 Category "${categoryName}": ${(category.item_array || []).length} items`)
 
       for (const item of category.item_array || []) {
         try {
@@ -437,8 +433,6 @@ export function mapAPIResponseToShopCatalog(apiResponse: APIRawStoreResponse): S
         }
       }
     }
-
-    console.log(`✅ Successfully mapped ${references.length} references`)
 
     return { references }
   } catch (err) {

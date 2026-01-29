@@ -50,8 +50,6 @@ class ShopService {
     this.abortController = new AbortController()
 
     try {
-      console.log(`📡 Fetching shop catalog from: ${API_CONFIG.ENDPOINTS.CATALOG}`)
-
       // Timeout de la requête
       const timeoutId = setTimeout(() => {
         this.abortController?.abort()
@@ -71,20 +69,11 @@ class ShopService {
 
       // Validation basique de la structure (nouvelle structure avec category_array)
       if (!rawData || !rawData.category_array) {
-        console.error('🔍 [DEBUG] Invalid response structure:', {
-          type: typeof rawData,
-          hasCategories: rawData && 'category_array' in rawData,
-          sample: rawData
-        })
         throw new ShopAPIError('Structure de réponse API invalide: attendu un objet avec category_array')
       }
 
-      console.log(`📡 Received store "${rawData.name}" with ${rawData.category_array.length} categories`)
-
       // Mapper les données brutes vers notre modèle normalisé
       const data = mapAPIResponseToShopCatalog(rawData)
-
-      console.log(`✅ Shop catalog loaded: ${data.references.length} references`)
 
       return data
     } catch (error) {

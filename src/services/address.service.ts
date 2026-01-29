@@ -94,9 +94,6 @@ class AddressService {
                 mainBillAdress: data.isDefaultBilling ?? false
             }
 
-            console.log('📍 [CREATE ADDRESS] Payload envoyé:', JSON.stringify(payload, null, 2))
-            console.log('📍 [CREATE ADDRESS] Data reçue:', JSON.stringify(data, null, 2))
-
             const response = await apiClient.post<AddressAPIResponse>('/createAdress', payload)
 
             if (response.status === 'error') {
@@ -152,8 +149,6 @@ class AddressService {
                 adressId: addressId,
                 adress_array: adressArray
             }
-
-            console.log('📍 [UPDATE ADDRESS] Payload envoyé:', JSON.stringify(payload, null, 2))
 
             const response = await apiClient.post<AddressAPIResponse>('/updateAdress', payload)
 

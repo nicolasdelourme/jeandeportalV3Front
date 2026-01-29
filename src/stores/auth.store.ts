@@ -61,19 +61,15 @@ export const useAuthStore = defineStore('auth', () => {
      * On vérifie juste si le backend reconnaît la session
      */
     async function initialize(): Promise<void> {
-        console.log('🔄 [AUTH STORE] initialize() appelé')
 
         // Évite les doubles initialisations
         if (isInitialized.value) {
-            console.log('🔄 [AUTH STORE] Déjà initialisé, skip')
             return
         }
 
         const storedUser = getAuthUser()
-        console.log('🔄 [AUTH STORE] storedUser:', storedUser)
 
         if (!storedUser) {
-            console.log('🔄 [AUTH STORE] Pas de user stocké, skip init')
             isInitialized.value = true
             return
         }
@@ -84,16 +80,13 @@ export const useAuthStore = defineStore('auth', () => {
         try {
             // ✅ Valide la session en récupérant le profil utilisateur
             // Le cookie HttpOnly sera automatiquement envoyé avec la requête
-            console.log('🔄 [AUTH STORE] Validation de la session via /me...')
             const freshUser = await authService.getUserProfile()
-            console.log('✅ [AUTH STORE] Session valide, user:', freshUser)
 
             // ✅ Only set state AFTER successful validation
             user.value = sanitizeUser(freshUser)
             setAuthUser(freshUser)
-        } catch (error) {
+        } catch {
             // Cookie invalide ou expiré, on déconnecte
-            console.error('❌ [AUTH STORE] Session invalide lors de l\'initialisation:', error)
             logger.warn('Session invalide lors de l\'initialisation, déconnexion')
             clearAuthData()
             user.value = null
@@ -133,30 +126,22 @@ export const useAuthStore = defineStore('auth', () => {
         error.value = null
 
         try {
-            console.log('🔐 [AUTH STORE] Début du login...')
-
             // Le service lance une exception si la réponse contient une erreur
             // Le backend définit le cookie HttpOnly dans Set-Cookie header
             const response = await authService.login(credentials)
-            console.log('✅ [AUTH STORE] Login API réussi, response:', response)
 
             // Récupérer les infos utilisateur (le cookie sera envoyé automatiquement)
-            console.log('👤 [AUTH STORE] Récupération du profil utilisateur...')
             const userProfile = await authService.getUserProfile()
-            console.log('✅ [AUTH STORE] Profil récupéré:', userProfile)
 
             user.value = sanitizeUser(userProfile)  // ✅ Sanitized
             setAuthUser(userProfile)
-            console.log('✅ [AUTH STORE] User défini dans le store:', user.value)
 
             // Synchroniser le panier anonyme avec le compte utilisateur
             // Le backend associera le panier (via basketCode) au compte connecté
             const cartStore = useCartStore()
             if (cartStore.basketCode) {
-                console.log('🛒 [AUTH STORE] Synchronisation du panier anonyme avec le compte...')
                 try {
                     await cartStore.syncWithBackend()
-                    console.log('✅ [AUTH STORE] Panier synchronisé avec le compte')
                 } catch (err) {
                     console.warn('⚠️ [AUTH STORE] Erreur lors de la sync panier (non bloquant):', err)
                 }
@@ -164,10 +149,8 @@ export const useAuthStore = defineStore('auth', () => {
 
             // Retourner l'URL de redirection
             const redirectUrl = response.afterLogin || '/'
-            console.log('🔀 [AUTH STORE] URL de redirection:', redirectUrl)
             return redirectUrl
         } catch (err: any) {
-            console.error('❌ [AUTH STORE] Erreur lors du login:', err)
             error.value = err instanceof AuthError ? err : new AuthError(
                 'Une erreur est survenue lors de la connexion',
                 'UNKNOWN_ERROR'
@@ -192,12 +175,8 @@ export const useAuthStore = defineStore('auth', () => {
         error.value = null
 
         try {
-            console.log('📝 [AUTH STORE] Début de l\'inscription...')
-
             // Le service lance une exception si la réponse contient une erreur
             await authService.register(credentials)
-
-            console.log('✅ [AUTH STORE] Inscription réussie, email de vérification envoyé')
 
             // PAS d'auto-login : l'utilisateur doit vérifier son email
             // On ne récupère PAS le profil utilisateur
@@ -205,7 +184,6 @@ export const useAuthStore = defineStore('auth', () => {
 
             return { success: true }
         } catch (err: any) {
-            console.error('❌ [AUTH STORE] Erreur lors de l\'inscription:', err)
             error.value = err instanceof AuthError ? err : new AuthError(
                 'Une erreur est survenue lors de l\'inscription',
                 'UNKNOWN_ERROR'
@@ -228,12 +206,9 @@ export const useAuthStore = defineStore('auth', () => {
         error.value = null
 
         try {
-            console.log('✅ [AUTH STORE] Vérification de l\'email...')
             const result = await authService.verifyEmail(token)
-            console.log('✅ [AUTH STORE] Résultat vérification:', result)
             return result
         } catch (err: any) {
-            console.error('❌ [AUTH STORE] Erreur lors de la vérification:', err)
             error.value = err instanceof AuthError ? err : new AuthError(
                 'Une erreur est survenue lors de la vérification',
                 'UNKNOWN_ERROR'
@@ -251,26 +226,20 @@ export const useAuthStore = defineStore('auth', () => {
      */
     async function logout(): Promise<void> {
         isLoading.value = true
-        console.log('🚪 [AUTH STORE] Début du logout...')
 
         try {
             // Appeler le backend pour supprimer le cookie HttpOnly
-            console.log('🚪 [AUTH STORE] Appel de /logout...')
             await authService.logout()
-            console.log('✅ [AUTH STORE] /logout appelé avec succès')
         } catch (err) {
-            console.error('❌ [AUTH STORE] Erreur lors du logout backend:', err)
             logger.error('Erreur lors de la déconnexion côté serveur:', err)
         } finally {
             // Nettoyer l'état local (même si l'appel backend a échoué)
-            console.log('🧹 [AUTH STORE] Nettoyage de l\'état local...')
             user.value = null
             clearAuthData()
 
             // Réinitialiser le panier (vide le basketCode)
             const cartStore = useCartStore()
             cartStore.resetCart()
-            console.log('✅ [AUTH STORE] Logout terminé')
 
             isLoading.value = false
 
@@ -314,15 +283,12 @@ export const useAuthStore = defineStore('auth', () => {
         error.value = null
 
         try {
-            console.log('👤 [AUTH STORE] Mise à jour du profil...')
             const updatedUser = await authService.updateProfile(data)
-            console.log('✅ [AUTH STORE] Profil mis à jour:', updatedUser)
 
             // Mettre à jour le state avec le user sanitisé
             user.value = sanitizeUser(updatedUser)
             setAuthUser(updatedUser)
         } catch (err: any) {
-            console.error('❌ [AUTH STORE] Erreur lors de la mise à jour:', err)
             error.value = err instanceof AuthError ? err : new AuthError(
                 'Une erreur est survenue lors de la mise à jour du profil',
                 'UNKNOWN_ERROR'

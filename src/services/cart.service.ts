@@ -62,16 +62,10 @@ class CartService {
                 ...(basketCode && { basketCode }), // N'inclure basketCode que s'il existe
             }
 
-            // DEBUG: Afficher le body exact envoyé
-            console.log('🔍 [DEBUG] Request body:', JSON.stringify(request))
-
             const response = await apiClient.post<CartAPIResponse>(
                 '/addReference',
                 request
             )
-
-            // DEBUG: Afficher la réponse complète
-            console.log('🔍 [DEBUG] addReference response:', JSON.stringify(response, null, 2))
 
             // Vérifier si le backend retourne une erreur
             if (response.status === 'error') {
@@ -105,11 +99,9 @@ class CartService {
             logger.info(`🛒 [CART SERVICE] Récupération du panier: basketCode=${basketCode ? basketCode.substring(0, 8) + '...' : 'null'}`)
 
             const request: FetchCartRequest = { basketCode, storeId: CART_CONFIG.STORE_ID }
-            console.log('🔍 [DEBUG] fetchBasket request body:', JSON.stringify(request))
             const response = await apiClient.post<CartAPIResponse>('/fetchBasket', request)
 
             // Debug: afficher la réponse brute
-            console.log('🔍 [DEBUG] fetchCart response:', JSON.stringify(response, null, 2))
 
             // Vérifier si le backend retourne une erreur
             if (response.status === 'error') {
@@ -219,11 +211,9 @@ class CartService {
                 basketCode,
             }
 
-            console.log('🔍 [DEBUG] deleteReference request body:', JSON.stringify(request))
 
             const response = await apiClient.post<CartAPIResponse>('/deleteReference', request)
 
-            console.log('🔍 [DEBUG] deleteReference response:', JSON.stringify(response, null, 2))
 
             // Vérifier si le backend retourne une erreur
             if (response.status === 'error') {

@@ -78,46 +78,28 @@ class UserSubscriptionService {
     this.abortController = new AbortController()
 
     try {
-      console.log(`📡 Fetching user subscriptions from: ${API_CONFIG.ENDPOINTS.FETCH}`)
-
       // Timeout de la requête
       const timeoutId = setTimeout(() => {
         this.abortController?.abort()
       }, API_CONFIG.TIMEOUT)
 
       // Appel API
-      const rawData = await apiClient.get<APIUserSubscriptionResponse>(
-        API_CONFIG.ENDPOINTS.FETCH,
-        {
-          signal: this.abortController.signal,
-        }
-      )
+      const rawData = await apiClient.get<APIUserSubscriptionResponse>(API_CONFIG.ENDPOINTS.FETCH, {
+        signal: this.abortController.signal,
+      })
 
       clearTimeout(timeoutId)
 
       // Validation basique de la structure
       if (!rawData || rawData.status !== 'success') {
-        console.error('🔍 [DEBUG] Invalid response structure:', {
-          type: typeof rawData,
-          status: rawData?.status,
-          sample: rawData,
-        })
-        throw new UserSubscriptionAPIError(
-          rawData?.message || 'Structure de réponse API invalide'
-        )
+        throw new UserSubscriptionAPIError(rawData?.message || 'Structure de réponse API invalide')
       }
-
-      console.log(
-        `📡 Received ${rawData.subscription_array?.length || 0} subscriptions and ${rawData.invoice_array?.length || 0} invoices`
-      )
 
       // Mapper les données brutes vers notre modèle normalisé
       const result: UserSubscriptionResult = {
         subscriptions: (rawData.subscription_array || []).map(mapAPISubscription),
         invoices: (rawData.invoice_array || []).map(mapAPIInvoice),
       }
-
-      console.log(`✅ User subscriptions loaded: ${result.subscriptions.length} subscriptions`)
 
       return result
     } catch (error) {
@@ -158,9 +140,7 @@ class UserSubscriptionService {
         )
       }
 
-      throw new UserSubscriptionAPIError(
-        'Erreur inconnue lors de la récupération des abonnements'
-      )
+      throw new UserSubscriptionAPIError('Erreur inconnue lors de la récupération des abonnements')
     } finally {
       this.abortController = null
     }
@@ -196,8 +176,6 @@ class UserSubscriptionService {
     }
 
     try {
-      console.log(`📡 Requesting payment method update: ${API_CONFIG.ENDPOINTS.UPDATE_PAYMENT}`)
-
       const result = await apiClient.post<APIUpdatePaymentResponse>(
         API_CONFIG.ENDPOINTS.UPDATE_PAYMENT
       )
@@ -208,7 +186,6 @@ class UserSubscriptionService {
         )
       }
 
-      console.log('✅ Payment method update initiated')
       return result
     } catch (error) {
       if (error instanceof UserSubscriptionAPIError) {

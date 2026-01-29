@@ -193,14 +193,12 @@ export const useSubscriptionCatalogStore = defineStore('subscriptionCatalog', ()
 
       // Verifier la version du cache frontend
       if (!cacheData.version || cacheData.version !== CACHE_VERSION) {
-        console.log('🔄 Subscription cache version mismatch, invalidating cache')
         localStorage.removeItem(CACHE_KEY)
         return false
       }
 
       // Verifier si le cache est encore valide temporellement
       if (now - cacheData.timestamp > CACHE_DURATION) {
-        console.log('⏰ Subscription cache expired, invalidating cache')
         localStorage.removeItem(CACHE_KEY)
         return false
       }
@@ -209,10 +207,8 @@ export const useSubscriptionCatalogStore = defineStore('subscriptionCatalog', ()
       plans.value = cacheData.plans
       lastFetchTimestamp.value = cacheData.timestamp
 
-      console.log('✅ Subscription catalog loaded from localStorage cache')
       return true
     } catch (err) {
-      console.warn('Failed to load subscription catalog from localStorage:', err)
       localStorage.removeItem(CACHE_KEY)
       return false
     }
@@ -229,7 +225,6 @@ export const useSubscriptionCatalogStore = defineStore('subscriptionCatalog', ()
         timestamp: lastFetchTimestamp.value,
       }
       localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData))
-      console.log('💾 Subscription catalog saved to localStorage (v' + CACHE_VERSION + ')')
     } catch (err) {
       console.warn('Failed to save subscription catalog to localStorage:', err)
     }
@@ -241,7 +236,6 @@ export const useSubscriptionCatalogStore = defineStore('subscriptionCatalog', ()
   const fetchCatalog = async (force = false): Promise<void> => {
     // Si le cache est valide et qu'on ne force pas le refresh, ne rien faire
     if (!force && isCacheValid.value && plans.value.length > 0) {
-      console.log('📦 Subscription catalog already loaded and cache is valid')
       return
     }
 
@@ -262,7 +256,6 @@ export const useSubscriptionCatalogStore = defineStore('subscriptionCatalog', ()
       // Sauvegarder dans localStorage
       saveToLocalStorage()
 
-      console.log(`✅ Subscription catalog loaded: ${data.plans.length} plans`)
     } catch (err) {
       error.value =
         err instanceof SubscriptionCatalogAPIError
@@ -278,7 +271,6 @@ export const useSubscriptionCatalogStore = defineStore('subscriptionCatalog', ()
    * Force le rechargement du catalogue (ignore le cache)
    */
   const refresh = async (): Promise<void> => {
-    console.log('🔄 Force refreshing subscription catalog...')
     await fetchCatalog(true)
   }
 
@@ -286,7 +278,6 @@ export const useSubscriptionCatalogStore = defineStore('subscriptionCatalog', ()
    * Vide completement le cache (memoire + localStorage)
    */
   const clearCache = () => {
-    console.log('🗑️ Clearing subscription catalog cache...')
     plans.value = []
     lastFetchTimestamp.value = 0
     localStorage.removeItem(CACHE_KEY)

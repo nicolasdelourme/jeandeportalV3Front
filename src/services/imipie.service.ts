@@ -90,20 +90,17 @@ class ImiPieService {
     // Vérifier le cache
     const cached = this.cache.get(cacheKey)
     if (cached && this.isCacheValid(cached)) {
-      console.log(`📊 [imiPie] Cache hit for ${params.family}/${params.serie}`)
       return cached.data
     }
 
     // Vérifier si une requête est déjà en cours pour les mêmes paramètres
     const pending = this.pendingRequests.get(cacheKey)
     if (pending) {
-      console.log(`📊 [imiPie] Waiting for pending request ${params.family}/${params.serie}`)
       return pending
     }
 
     // Mode mock : utiliser les données fictives
     if (USE_MOCK) {
-      console.log(`📊 [imiPie] Mock mode - generating fake data for ${params.family}/${params.serie}`)
       const promise = mockFetchChart(params)
         .then((data) => {
           this.cache.set(cacheKey, { data, timestamp: Date.now() })
@@ -119,7 +116,6 @@ class ImiPieService {
 
     // Mode réel : appeler l'API
     const url = this.buildUrl(params)
-    console.log(`📊 [imiPie] Fetching chart from: ${url}`)
 
     const promise = this.fetchFromAPI(url)
       .then((data) => {
@@ -163,7 +159,6 @@ class ImiPieService {
 
       // L'API retourne directement le payload enrichi { type, chart, formatter, sdk }
       // On le retourne tel quel sans encapsulation
-      console.log(`✅ [imiPie] Chart data loaded from ${url}`)
       return data as ImiPieChartResponse
     } catch (error) {
       clearTimeout(timeoutId)
@@ -192,7 +187,6 @@ class ImiPieService {
    */
   clearCache(): void {
     this.cache.clear()
-    console.log('📊 [imiPie] Cache cleared')
   }
 
   /**

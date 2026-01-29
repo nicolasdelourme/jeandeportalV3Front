@@ -95,7 +95,6 @@ export const useOneClickBasketStore = defineStore('oneClickBasket', () => {
   async function initialize(): Promise<void> {
     // Pas de restauration localStorage - le panier vit uniquement pendant la session de checkout
     state.value.isSynced = true
-    console.log('🛒 [ONECLICK STORE] Initialise (pas de persistence localStorage)')
   }
 
   /**
@@ -117,7 +116,6 @@ export const useOneClickBasketStore = defineStore('oneClickBasket', () => {
       state.value.items = result.items
       state.value.isSynced = true
 
-      console.log('✅ [ONECLICK STORE] Panier synchronise:', result.items.length, 'item(s)')
     } catch (error) {
       state.value.error = getErrorMessage(error)
       throw error
@@ -143,7 +141,6 @@ export const useOneClickBasketStore = defineStore('oneClickBasket', () => {
       // (les plans annuels ont des IDs differents des plans mensuels)
       const actualPlanId = isAnnual ? planId : planId
 
-      console.log('🛒 [ONECLICK STORE] Ajout plan:', { planId: actualPlanId, isAnnual })
 
       // Toujours creer un nouveau panier (basketCode = null)
       // L'utilisateur choisit un nouveau plan, pas de reprise d'ancien panier
@@ -159,7 +156,6 @@ export const useOneClickBasketStore = defineStore('oneClickBasket', () => {
 
       // Pas de sauvegarde localStorage - le panier vit uniquement pendant la session
 
-      console.log('✅ [ONECLICK STORE] Plan ajoute:', result.items[0]?.name)
       toast.success('Abonnement ajoute')
     } catch (error) {
       state.value.error = getErrorMessage(error)
@@ -190,7 +186,6 @@ export const useOneClickBasketStore = defineStore('oneClickBasket', () => {
       state.value.items = result.items
       state.value.isSynced = true
 
-      console.log('✅ [ONECLICK STORE] Plan supprime')
       toast.success('Abonnement retire')
     } catch (error) {
       state.value.error = getErrorMessage(error)
@@ -205,7 +200,6 @@ export const useOneClickBasketStore = defineStore('oneClickBasket', () => {
    * Vide le panier (local seulement)
    */
   function clearBasket(): void {
-    console.log('🛒 [ONECLICK STORE] Vidage du panier')
     state.value = createEmptyState()
   }
 
@@ -213,7 +207,6 @@ export const useOneClickBasketStore = defineStore('oneClickBasket', () => {
    * Reinitialise le panier (apres paiement ou deconnexion)
    */
   function resetBasket(): void {
-    console.log('🛒 [ONECLICK STORE] Reinitialisation du panier')
     state.value = createEmptyState()
   }
 

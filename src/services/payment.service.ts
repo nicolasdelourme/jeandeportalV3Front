@@ -41,9 +41,6 @@ class PaymentService {
         currency,
       }
 
-      // DEBUG: Log du payload pour aider le backend à debug
-      console.log('🔍 [DEBUG] initPayment request payload:', JSON.stringify(request, null, 2))
-
       const response = await apiClient.post<InitPaymentResponse>('/initPayment', request)
 
       if (response.status === 'error' || !response.client_secret || !response.stripePublicKey) {

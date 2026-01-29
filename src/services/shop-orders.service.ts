@@ -54,7 +54,6 @@ class ShopOrdersService {
     this.abortController = new AbortController()
 
     try {
-      console.log(`📡 Fetching shop orders from: ${API_CONFIG.ENDPOINTS.FETCH}`)
 
       // Timeout de la requête
       const timeoutId = setTimeout(() => {
@@ -69,7 +68,6 @@ class ShopOrdersService {
       clearTimeout(timeoutId)
 
       // Debug: logger la réponse brute complète
-      console.log('🔍 [DEBUG] Raw API response:', JSON.stringify(rawData, null, 2))
 
       // Validation flexible de la structure
       // L'API peut renvoyer:
@@ -89,16 +87,12 @@ class ShopOrdersService {
         // Format: objet avec invoice_array
         invoiceArray = rawData.invoice_array || []
       } else {
-        console.error('🔍 [DEBUG] Invalid response structure:', rawData)
         throw new ShopOrdersAPIError('Structure de réponse API invalide')
       }
 
-      console.log(`📡 Received ${invoiceArray.length} order invoices`)
 
       // Mapper les données brutes vers notre modèle normalisé
       const result = invoiceArray.map((item) => mapAPIOrderInvoice(item as import('@/types/shop-orders-api.types').APIRawOrderInvoice))
-
-      console.log(`✅ Shop orders loaded: ${result.length} invoices`)
 
       return result
     } catch (error) {

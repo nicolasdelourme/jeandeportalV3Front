@@ -370,19 +370,14 @@ export class AuthService {
      */
     async requestEmailChange(newEmail: string): Promise<ChangeEmailResponse> {
         try {
-            console.log('🔍 [DEBUG] requestEmailChange appelé avec:', newEmail)
-            console.log('🔍 [DEBUG] USE_MOCK:', USE_MOCK)
 
             if (USE_MOCK) {
-                console.log('🔍 [DEBUG] Utilisation du mock')
                 return await mockRequestEmailChangeAPI(newEmail)
             } else {
-                console.log('🔍 [DEBUG] Appel API réel: POST /accountKey/modification')
                 const response = await apiClient.post<any>(
                     '/accountKey/modification',
                     { email: newEmail }
                 )
-                console.log('🔍 [DEBUG] Réponse API:', response)
 
                 // L'API peut retourner { status: "success" } ou { email: ["error", "message"] }
                 if (response.status === 'success') {
@@ -401,7 +396,6 @@ export class AuthService {
                 return { status: 'success' }
             }
         } catch (error) {
-            console.error('🔍 [DEBUG] Erreur dans requestEmailChange:', error)
             logger.error('Erreur lors de la demande de modification d\'email:', error)
 
             const httpData = getHttpErrorData<{ message?: string }>(error)

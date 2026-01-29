@@ -251,14 +251,12 @@ export const useShopStore = defineStore('shop', () => {
 
       // Vérifier la version du cache frontend
       if (!cacheData.version || cacheData.version !== CACHE_VERSION) {
-        console.log('🔄 Cache version mismatch, invalidating cache')
         localStorage.removeItem(CACHE_KEY)
         return false
       }
 
       // Vérifier si le cache est encore valide temporellement
       if (now - cacheData.timestamp > CACHE_DURATION) {
-        console.log('⏰ Cache expired, invalidating cache')
         localStorage.removeItem(CACHE_KEY)
         return false
       }
@@ -267,10 +265,8 @@ export const useShopStore = defineStore('shop', () => {
       catalog.value = cacheData.catalog
       lastFetchTimestamp.value = cacheData.timestamp
 
-      console.log('✅ Shop catalog loaded from localStorage cache')
       return true
     } catch (err) {
-      console.warn('Failed to load shop catalog from localStorage:', err)
       localStorage.removeItem(CACHE_KEY)
       return false
     }
@@ -287,7 +283,6 @@ export const useShopStore = defineStore('shop', () => {
         timestamp: lastFetchTimestamp.value,
       }
       localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData))
-      console.log('💾 Shop catalog saved to localStorage (v' + CACHE_VERSION + ')')
     } catch (err) {
       console.warn('Failed to save shop catalog to localStorage:', err)
     }
@@ -299,7 +294,6 @@ export const useShopStore = defineStore('shop', () => {
   const fetchCatalog = async (force = false): Promise<void> => {
     // Si le cache est valide et qu'on ne force pas le refresh, ne rien faire
     if (!force && isCacheValid.value && catalog.value.references.length > 0) {
-      console.log('📦 Shop catalog already loaded and cache is valid')
       return
     }
 
@@ -320,7 +314,6 @@ export const useShopStore = defineStore('shop', () => {
       // Sauvegarder dans localStorage
       saveToLocalStorage()
 
-      console.log(`✅ Shop catalog loaded: ${data.references.length} references`)
     } catch (err) {
       error.value = err instanceof ShopAPIError ? err : new ShopAPIError('Erreur inconnue')
       console.error('❌ Failed to fetch shop catalog:', err)
@@ -333,7 +326,6 @@ export const useShopStore = defineStore('shop', () => {
    * Force le rechargement du catalogue (ignore le cache)
    */
   const refresh = async (): Promise<void> => {
-    console.log('🔄 Force refreshing shop catalog...')
     await fetchCatalog(true)
   }
 
@@ -414,7 +406,6 @@ export const useShopStore = defineStore('shop', () => {
    * Vide complètement le cache (mémoire + localStorage) et réinitialise le store
    */
   const clearCache = () => {
-    console.log('🗑️ Clearing shop catalog cache...')
     catalog.value = { references: [] }
     lastFetchTimestamp.value = 0
     localStorage.removeItem(CACHE_KEY)

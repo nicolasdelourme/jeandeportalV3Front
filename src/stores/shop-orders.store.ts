@@ -58,7 +58,6 @@ export const useShopOrdersStore = defineStore('shopOrders', () => {
   async function fetchData(force = false): Promise<void> {
     // Si on a déjà des données et qu'on ne force pas, ne rien faire
     if (!force && hasData.value) {
-      console.log('📦 Shop orders already loaded')
       return
     }
 
@@ -70,7 +69,6 @@ export const useShopOrdersStore = defineStore('shopOrders', () => {
       orders.value = result
       lastFetchTimestamp.value = Date.now()
 
-      console.log(`✅ Shop orders loaded: ${result.length} invoices`)
     } catch (err) {
       const errorMessage =
         err instanceof ShopOrdersAPIError
@@ -78,7 +76,6 @@ export const useShopOrdersStore = defineStore('shopOrders', () => {
           : 'Impossible de charger vos achats'
 
       error.value = errorMessage
-      console.error('❌ Failed to fetch shop orders:', err)
     } finally {
       isLoading.value = false
     }
@@ -88,7 +85,6 @@ export const useShopOrdersStore = defineStore('shopOrders', () => {
    * Force le rechargement des données
    */
   async function refresh(): Promise<void> {
-    console.log('🔄 Force refreshing shop orders...')
     await fetchData(true)
   }
 
@@ -96,7 +92,6 @@ export const useShopOrdersStore = defineStore('shopOrders', () => {
    * Vide les données (utile lors de la déconnexion)
    */
   function clearData(): void {
-    console.log('🗑️ Clearing shop orders...')
     orders.value = []
     lastFetchTimestamp.value = 0
     error.value = null
