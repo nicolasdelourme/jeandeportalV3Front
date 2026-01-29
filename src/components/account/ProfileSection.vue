@@ -216,7 +216,7 @@ const onSubmit = handleSubmit(async (values) => {
                 <!-- Avatar Section -->
                 <div v-if="false" class="flex items-center gap-6">
                     <Avatar class="h-24 w-24">
-                        <AvatarImage v-if="avatarUrl" :src="avatarUrl" alt="Photo de profil" />
+                        <AvatarImage v-if="avatarUrl" :src="avatarUrl!" alt="Photo de profil" />
                         <AvatarFallback class="text-2xl bg-secondary text-white">{{ avatarInitials }}</AvatarFallback>
                     </Avatar>
                     <div class="space-y-2">
