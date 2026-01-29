@@ -150,7 +150,7 @@ export const useAuthStore = defineStore('auth', () => {
             // Retourner l'URL de redirection
             const redirectUrl = response.afterLogin || '/'
             return redirectUrl
-        } catch (err: any) {
+        } catch (err) {
             error.value = err instanceof AuthError ? err : new AuthError(
                 'Une erreur est survenue lors de la connexion',
                 'UNKNOWN_ERROR'
@@ -183,7 +183,7 @@ export const useAuthStore = defineStore('auth', () => {
             // On ne stocke RIEN dans le state
 
             return { success: true }
-        } catch (err: any) {
+        } catch (err) {
             error.value = err instanceof AuthError ? err : new AuthError(
                 'Une erreur est survenue lors de l\'inscription',
                 'UNKNOWN_ERROR'
@@ -208,7 +208,7 @@ export const useAuthStore = defineStore('auth', () => {
         try {
             const result = await authService.verifyEmail(token)
             return result
-        } catch (err: any) {
+        } catch (err) {
             error.value = err instanceof AuthError ? err : new AuthError(
                 'Une erreur est survenue lors de la vérification',
                 'UNKNOWN_ERROR'
@@ -288,7 +288,7 @@ export const useAuthStore = defineStore('auth', () => {
             // Mettre à jour le state avec le user sanitisé
             user.value = sanitizeUser(updatedUser)
             setAuthUser(updatedUser)
-        } catch (err: any) {
+        } catch (err) {
             error.value = err instanceof AuthError ? err : new AuthError(
                 'Une erreur est survenue lors de la mise à jour du profil',
                 'UNKNOWN_ERROR'

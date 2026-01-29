@@ -75,7 +75,17 @@ export interface ChangeEmailRequest {
 }
 
 /**
- * Réponse de demande de modification d'email
+ * Réponse brute de l'API pour la modification d'email
+ * POST /accountKey/modification
+ * Format: { status: "success" } ou { email: ["error", "message"] }
+ */
+export interface APIChangeEmailResponse {
+    status?: 'success' | 'error'
+    email?: [string, string]  // [errorType, errorMessage]
+}
+
+/**
+ * Réponse de demande de modification d'email (normalisée)
  * POST /accountKey/modification
  */
 export interface ChangeEmailResponse {

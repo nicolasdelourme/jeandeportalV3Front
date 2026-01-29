@@ -4,7 +4,7 @@
  */
 
 import { apiClient } from '@/api/client'
-import type { LoginCredentials, RegisterCredentials, AuthResponse, AuthSuccessResponse, User, VerifyEmailResponse, ResetPasswordResponse, ChangeEmailResponse, ValidateEmailChangeResponse, UpdateProfileDto } from '@/types/auth.types'
+import type { LoginCredentials, RegisterCredentials, AuthResponse, AuthSuccessResponse, User, VerifyEmailResponse, ResetPasswordResponse, APIChangeEmailResponse, ChangeEmailResponse, ValidateEmailChangeResponse, UpdateProfileDto } from '@/types/auth.types'
 import { AuthError } from '@/types/auth.types'
 import { logger } from '@/utils/logger'
 import { getHttpErrorCode, getHttpErrorData } from '@/lib/error-utils'
@@ -374,7 +374,7 @@ export class AuthService {
             if (USE_MOCK) {
                 return await mockRequestEmailChangeAPI(newEmail)
             } else {
-                const response = await apiClient.post<any>(
+                const response = await apiClient.post<APIChangeEmailResponse>(
                     '/accountKey/modification',
                     { email: newEmail }
                 )
@@ -385,7 +385,7 @@ export class AuthService {
                 }
 
                 // Gérer le format d'erreur { email: ["error", "message"] }
-                if (response.email && Array.isArray(response.email)) {
+                if (response.email) {
                     const [errorType, errorMessage] = response.email
                     if (errorType === 'error') {
                         return { status: 'error', message: errorMessage }

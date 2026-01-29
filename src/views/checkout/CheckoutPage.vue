@@ -251,9 +251,9 @@ async function proceedToPayment() {
     cardElement.value.on('ready', () => {
       cardElementReady.value = true
     })
-  } catch (err: any) {
+  } catch (err) {
     logger.error('Erreur initialisation paiement:', err)
-    const errorMessage = err.message || 'Impossible d\'initialiser le paiement'
+    const errorMessage = err instanceof Error ? err.message : 'Impossible d\'initialiser le paiement'
     error.value = errorMessage
     toast.error(errorMessage)
   } finally {
@@ -316,9 +316,9 @@ async function handleConfirmPayment() {
     setTimeout(() => {
       router.push('/mon-compte')
     }, 3000)
-  } catch (err: any) {
+  } catch (err) {
     logger.error('Erreur confirmation paiement:', err)
-    const errorMessage = err.message || 'Erreur lors du paiement'
+    const errorMessage = err instanceof Error ? err.message : 'Erreur lors du paiement'
     error.value = errorMessage
     toast.error(errorMessage)
   } finally {

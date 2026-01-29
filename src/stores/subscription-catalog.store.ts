@@ -209,7 +209,7 @@ export const useSubscriptionCatalogStore = defineStore('subscriptionCatalog', ()
       lastFetchTimestamp.value = cacheData.timestamp
 
       return true
-    } catch (err) {
+    } catch {
       localStorage.removeItem(CACHE_KEY)
       return false
     }

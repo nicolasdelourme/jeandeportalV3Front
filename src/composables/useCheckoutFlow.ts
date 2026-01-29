@@ -3,7 +3,7 @@
  * Abstrait les differences entre la boutique (PaymentIntent) et OneClick (SetupIntent)
  */
 
-import { computed, type ComputedRef, type Component, markRaw } from 'vue'
+import { computed, type ComputedRef } from 'vue'
 import type { Stripe, StripeCardElement } from '@stripe/stripe-js'
 import { useCartStore } from '@/stores/cart.store'
 import { useOneClickBasketStore } from '@/stores/oneclick-basket.store'

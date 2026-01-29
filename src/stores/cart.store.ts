@@ -10,12 +10,10 @@
 
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { CartItem, CartState, CartReceipt } from '@/types/cart.types'
+import type { CartItem, CartState } from '@/types/cart.types'
 import { CartError, CART_CONFIG } from '@/types/cart.types'
 import { cartService } from '@/services/cart.service'
-import { decodeHtmlEntities } from '@/utils/html.utils'
 import { toast } from 'vue-sonner'
-import { getErrorMessage } from '@/lib/error-utils'
 import { logger } from '@/utils/logger'
 
 /**
@@ -44,8 +42,6 @@ function saveBasketCode(code: string | null): void {
   try {
     if (code) {
       localStorage.setItem(BASKET_CODE_KEY, code)
-      // Vérification immédiate
-      const verify = localStorage.getItem(BASKET_CODE_KEY)
     } else {
       localStorage.removeItem(BASKET_CODE_KEY)
     }
