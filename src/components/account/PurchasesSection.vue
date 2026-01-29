@@ -2,48 +2,29 @@
 /**
  * Section Mes Achats
  * Historique des achats de l'utilisateur
+ * Données chargées depuis l'API /fetchPaidInvoicePerOrder
  */
-import { ref, computed } from 'vue'
-import { toast } from 'vue-sonner'
+import { computed, onMounted } from 'vue'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
+import { Empty } from '@/components/ui/empty'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@/lib/icons'
+import { useShopOrdersStore } from '@/stores/shop-orders.store'
+import type { ShopOrderInvoice } from '@/types/shop-orders-api.types'
 
 /**
- * Type pour un achat
+ * Store des factures de commandes
  */
-interface Purchase {
-    id: string
-    date: string
-    price: number
-    invoiceUrl: string
-}
+const store = useShopOrdersStore()
 
 /**
- * Liste des achats (mock data)
+ * Charger les données au montage
  */
-const purchases = ref<Purchase[]>([
-    {
-        id: 'ACH-2024-001',
-        date: '2024-03-15',
-        price: 49.90,
-        invoiceUrl: '#'
-    },
-    {
-        id: 'ACH-2024-002',
-        date: '2024-03-10',
-        price: 39.90,
-        invoiceUrl: '#'
-    },
-    {
-        id: 'ACH-2024-003',
-        date: '2024-02-28',
-        price: 29.90,
-        invoiceUrl: '#'
-    }
-])
+onMounted(() => {
+    store.fetchData()
+})
 
 /**
  * Icônes
@@ -52,19 +33,10 @@ const icons = computed(() => ({
     fileLines: byPrefixAndName.fas?.['file-lines'],
     download: byPrefixAndName.fas?.['download'],
     shoppingBag: byPrefixAndName.fas?.['shopping-bag'],
+    spinner: byPrefixAndName.fas?.['spinner'],
+    triangleExclamation: byPrefixAndName.fas?.['triangle-exclamation'],
+    undo: byPrefixAndName.fas?.['undo'],
 }))
-
-/**
- * Formater la date
- */
-const formatDate = (dateString: string): string => {
-    const date = new Date(dateString)
-    return new Intl.DateTimeFormat('fr-FR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    }).format(date)
-}
 
 /**
  * Formater le prix
@@ -77,22 +49,46 @@ const formatPrice = (price: number): string => {
 }
 
 /**
- * Télécharger la facture
+ * Ouvrir la facture dans un nouvel onglet
  */
-const downloadInvoice = (purchase: Purchase) => {
-    try {
-        // TODO: Implémenter le téléchargement réel de la facture
-        console.log('Téléchargement facture:', purchase.id)
-        toast.success(`Téléchargement de la facture ${purchase.id}`)
-    } catch (error) {
-        console.error('Erreur:', error)
-        toast.error('Impossible de télécharger la facture')
+const openInvoice = (order: ShopOrderInvoice): void => {
+    if (order.downloadUrl) {
+        window.open(order.downloadUrl, '_blank', 'noopener,noreferrer')
     }
 }
 </script>
 
 <template>
-    <Card>
+    <!-- État de chargement -->
+    <div v-if="store.isLoading" class="text-center py-12">
+        <FontAwesomeIcon
+            v-if="icons.spinner"
+            :icon="icons.spinner"
+            class="w-8 h-8 text-neutral-400 animate-spin mb-4"
+        />
+        <p class="text-neutral-600">Chargement de vos achats...</p>
+    </div>
+
+    <!-- État d'erreur -->
+    <div v-else-if="store.error" class="text-center py-12">
+        <FontAwesomeIcon
+            v-if="icons.triangleExclamation"
+            :icon="icons.triangleExclamation"
+            class="w-8 h-8 text-destructive mb-4"
+        />
+        <p class="text-destructive mb-4">{{ store.error }}</p>
+        <Button @click="store.refresh()" variant="outline">
+            <FontAwesomeIcon
+                v-if="icons.undo"
+                :icon="icons.undo"
+                class="w-4 h-4 mr-2"
+            />
+            Réessayer
+        </Button>
+    </div>
+
+    <!-- Contenu principal -->
+    <Card v-else>
         <CardHeader>
             <CardTitle>Mes achats</CardTitle>
             <CardDescription>
@@ -101,30 +97,33 @@ const downloadInvoice = (purchase: Purchase) => {
         </CardHeader>
         <CardContent>
             <!-- État vide -->
-            <div v-if="purchases.length === 0" class="text-center py-12">
-                <FontAwesomeIcon
-                    v-if="icons.shoppingBag"
-                    :icon="icons.shoppingBag"
-                    class="w-12 h-12 text-neutral-300 mx-auto mb-4"
-                />
-                <p class="text-neutral-500">
-                    Vous n'avez encore effectué aucun achat
-                </p>
-            </div>
+            <Empty
+                v-if="store.orders.length === 0"
+                title="Aucun achat"
+                description="Vous n'avez encore effectué aucun achat."
+            >
+                <template #icon>
+                    <FontAwesomeIcon
+                        v-if="icons.shoppingBag"
+                        :icon="icons.shoppingBag"
+                        class="h-10 w-10 text-neutral-400"
+                    />
+                </template>
+            </Empty>
 
             <!-- Tableau des achats -->
             <div v-else class="border rounded-lg overflow-hidden">
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead class="font-medium">Article</TableHead>
+                            <TableHead class="font-medium">N° Commande</TableHead>
                             <TableHead class="font-medium">Date</TableHead>
                             <TableHead class="font-medium text-right">Montant</TableHead>
                             <TableHead class="font-medium text-center w-[100px]">Facture</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        <TableRow v-for="purchase in purchases" :key="purchase.id">
+                        <TableRow v-for="order in store.orders" :key="order.id">
                             <TableCell>
                                 <div class="flex items-center gap-2">
                                     <FontAwesomeIcon
@@ -132,21 +131,26 @@ const downloadInvoice = (purchase: Purchase) => {
                                         :icon="icons.fileLines"
                                         class="w-4 h-4 text-neutral-400"
                                     />
-                                    <span class="text-neutral-800">ID Commande</span>
+                                    <span class="text-neutral-800">{{ order.orderNumber }}</span>
                                 </div>
                             </TableCell>
                             <TableCell class="text-neutral-600">
-                                {{ formatDate(purchase.date) }}
+                                {{ order.date }}
                             </TableCell>
                             <TableCell class="text-right font-medium text-neutral-800">
-                                {{ formatPrice(purchase.price) }}
+                                {{ formatPrice(order.amount) }}
                             </TableCell>
                             <TableCell class="text-center">
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    @click="downloadInvoice(purchase)"
-                                    class="h-8 w-8 p-0"
+                                    :disabled="!order.downloadUrl"
+                                    :class="[
+                                        'h-8 w-8 p-0',
+                                        !order.downloadUrl && 'opacity-50 cursor-not-allowed'
+                                    ]"
+                                    :title="order.downloadUrl ? 'Télécharger la facture' : 'Facture non disponible'"
+                                    @click="openInvoice(order)"
                                 >
                                     <FontAwesomeIcon
                                         v-if="icons.download"
