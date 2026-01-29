@@ -109,8 +109,9 @@ const goToLogin = () => {
                 <Button
                     type="button"
                     color="primary"
+                    rounded="lg"
                     size="lg"
-                    class="w-full"
+                    class="w-full text-secondary hover:text-secondary"
                     @click="goToLogin"
                 >
                     <span class="font-bold">Se connecter</span>
@@ -137,7 +138,8 @@ const goToLogin = () => {
                         type="button"
                         color="primary"
                         size="lg"
-                        class="w-full"
+                        rounded="lg"
+                        class="w-full text-secondary hover:text-secondary"
                         @click="goToLogin"
                     >
                         <span class="font-bold">Retour à la connexion</span>
