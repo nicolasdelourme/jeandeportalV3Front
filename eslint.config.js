@@ -55,6 +55,8 @@ export default [
         MutationObserver: 'readonly',
         ResizeObserver: 'readonly',
         IntersectionObserver: 'readonly',
+        requestAnimationFrame: 'readonly',
+        cancelAnimationFrame: 'readonly',
         // Browser dialogs
         alert: 'readonly',
         confirm: 'readonly',
@@ -115,6 +117,8 @@ export default [
         MutationObserver: 'readonly',
         ResizeObserver: 'readonly',
         IntersectionObserver: 'readonly',
+        requestAnimationFrame: 'readonly',
+        cancelAnimationFrame: 'readonly',
       }
     },
     plugins: {
