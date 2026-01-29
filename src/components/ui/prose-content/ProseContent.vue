@@ -98,7 +98,7 @@ function parseChartPlaceholder(divHtml: string): ArticleChartConfig | null {
 
     // family et serie sont requis
     if (!family || !serie) {
-        console.warn('[ProseContent] Chart placeholder missing required data-family or data-serie')
+        /* console.warn('[ProseContent] Chart placeholder missing required data-family or data-serie') */
         return null
     }
 
@@ -173,7 +173,8 @@ const segments = computed<ContentSegment[]>(() => {
     <div class="prose-tiptap">
         <template v-for="(segment, index) in segments" :key="index">
             <!-- HTML content -->
-            <div v-if="segment.type === 'html'" v-html="segment.content as string" />
+            <div v-if="segment.type === 'html'" v-html="segment.content as string">
+            </div>
 
             <!-- Table as shadcn component -->
             <Table v-else-if="segment.type === 'table'" class="my-6">

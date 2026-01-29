@@ -193,7 +193,6 @@ const onSubmit = handleSubmit(async (values) => {
         // Réinitialiser le formulaire avec les nouvelles valeurs pour que dirty redevienne false
         resetForm({ values })
     } catch (error) {
-        console.error('Erreur:', error)
         toast.error(getErrorMessage(error))
     } finally {
         isSubmitting.value = false

@@ -42,7 +42,6 @@ async function handleConfirm() {
     toast.success('Un email de réinitialisation vous a été envoyé')
     emit('update:open', false)
   } catch (error) {
-    console.error('Erreur envoi email:', error)
     toast.error("Impossible d'envoyer l'email de réinitialisation")
   } finally {
     isSubmitting.value = false

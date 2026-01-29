@@ -134,7 +134,6 @@ const handleAccount = () => {
 
 const handleOrders = () => {
     // TODO: Créer la page mes-commandes
-    console.log('Mes commandes clicked')
     router.push('/mes-commandes')
 }
 

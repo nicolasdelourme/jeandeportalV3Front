@@ -135,7 +135,6 @@ const handleSubmit = async (data: CreateAddressDto) => {
     await refreshUser()
     closeForm()
   } catch (error) {
-    console.error('Erreur lors de la sauvegarde de l\'adresse:', error)
     toast.error(getErrorMessage(error))
   } finally {
     isLoading.value = false
@@ -162,7 +161,6 @@ const deleteAddress = async () => {
     await refreshUser()
     toast.success('Adresse supprimée avec succès')
   } catch (error) {
-    console.error('Erreur lors de la suppression de l\'adresse:', error)
     toast.error(getErrorMessage(error))
   } finally {
     isDeleting.value = false
@@ -183,7 +181,6 @@ const setAsDefaultShipping = async (addressId: string) => {
     await refreshUser()
     toast.success('Adresse de livraison par défaut mise à jour')
   } catch (error) {
-    console.error('Erreur lors de la mise à jour:', error)
     toast.error(getErrorMessage(error))
   } finally {
     isLoading.value = false
@@ -202,7 +199,6 @@ const setAsDefaultBilling = async (addressId: string) => {
     await refreshUser()
     toast.success('Adresse de facturation par défaut mise à jour')
   } catch (error) {
-    console.error('Erreur lors de la mise à jour:', error)
     toast.error(getErrorMessage(error))
   } finally {
     isLoading.value = false

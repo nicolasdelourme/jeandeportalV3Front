@@ -70,22 +70,17 @@ const { handleSubmit, resetForm, values } = useForm({
  * Envoie la demande de changement d'email
  */
 const onSubmit = handleSubmit(async (formValues) => {
-  console.log('🔍 [DEBUG] onSubmit appelé avec:', formValues)
   isSubmitting.value = true
   try {
-    console.log('🔍 [DEBUG] Appel authService.requestEmailChange...')
     const result = await authService.requestEmailChange(formValues.newEmail)
-    console.log('🔍 [DEBUG] Résultat:', result)
 
     if (result.status === 'success') {
       emailSent.value = true
       toast.success('Un email de validation vous a été envoyé')
     } else {
-      console.log('🔍 [DEBUG] Status non-success:', result.status, result.message)
       toast.error(result.message || 'Impossible de demander le changement d\'email')
     }
   } catch (error) {
-    console.error('🔍 [DEBUG] Erreur dans onSubmit:', error)
     toast.error(getErrorMessage(error))
   } finally {
     isSubmitting.value = false

@@ -29,6 +29,7 @@ import { useUserSubscriptionStore } from '@/stores/user-subscription.store'
 import type { UserSubscription, UserInvoice } from '@/types/user-subscription-api.types'
 import type { ThemeType } from '@/components/ui/themed-card'
 import PaymentMethodDialog from '@/components/account/PaymentMethodDialog.vue'
+import { toast } from 'vue-sonner'
 
 /**
  * Store des abonnements utilisateur
@@ -90,7 +91,6 @@ async function handleUpdatePayment() {
  * Callback succès de la mise à jour du paiement
  */
 function onPaymentSuccess() {
-  console.log('Moyen de paiement mis à jour avec succès')
   store.clearPaymentResult()
 }
 
@@ -98,7 +98,7 @@ function onPaymentSuccess() {
  * Callback erreur de la mise à jour du paiement
  */
 function onPaymentError(message: string) {
-  console.error('Erreur paiement:', message)
+  toast.error(message)
 }
 
 /**

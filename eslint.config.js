@@ -49,6 +49,12 @@ export default [
         HTMLButtonElement: 'readonly',
         Element: 'readonly',
         globalThis: 'readonly',
+        // DOM APIs
+        DOMParser: 'readonly',
+        XMLSerializer: 'readonly',
+        MutationObserver: 'readonly',
+        ResizeObserver: 'readonly',
+        IntersectionObserver: 'readonly',
         // Browser dialogs
         alert: 'readonly',
         confirm: 'readonly',
@@ -105,6 +111,10 @@ export default [
         MouseEvent: 'readonly',
         HTMLElement: 'readonly',
         Element: 'readonly',
+        DOMParser: 'readonly',
+        MutationObserver: 'readonly',
+        ResizeObserver: 'readonly',
+        IntersectionObserver: 'readonly',
       }
     },
     plugins: {

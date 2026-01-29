@@ -295,7 +295,7 @@ onUnmounted(() => {
       :id="containerId"
       class="highcharts-container rounded-lg"
       :style="{ height: chartHeight }"
-    />
+    ></div>
   </div>
 </template>
 

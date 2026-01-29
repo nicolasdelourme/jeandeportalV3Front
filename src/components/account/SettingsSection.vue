@@ -27,11 +27,9 @@ const notifications = ref({
 const saveSettings = async () => {
     try {
         // TODO: Appeler l'API de sauvegarde des paramètres
-        console.log('Sauvegarde paramètres:', notifications.value)
         await new Promise(resolve => setTimeout(resolve, 500)) // Simulation
         toast.success('Paramètres enregistrés !')
     } catch (error) {
-        console.error('Erreur:', error)
         toast.error('Impossible de sauvegarder les paramètres')
     }
 }

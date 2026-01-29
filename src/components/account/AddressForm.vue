@@ -72,7 +72,6 @@ const { handleSubmit, setFieldValue } = useForm({
 })
 
 const onSubmit = handleSubmit((values) => {
-  console.log('📍 [FORM] Valeurs du formulaire:', JSON.stringify(values, null, 2))
   emit('submit', values as CreateAddressDto)
 })
 
@@ -208,7 +207,6 @@ const getIcon = (iconKey: keyof typeof icons.value): IconDefinition | undefined 
               :checked="Boolean(value)"
               @update:checked="(val: boolean | 'indeterminate') => {
                 const boolVal = val === true
-                console.log('shipping changed:', boolVal)
                 setFieldValue('isDefaultShipping', boolVal)
               }"
             />
@@ -226,7 +224,6 @@ const getIcon = (iconKey: keyof typeof icons.value): IconDefinition | undefined 
               :checked="Boolean(value)"
               @update:checked="(val: boolean | 'indeterminate') => {
                 const boolVal = val === true
-                console.log('billing changed:', boolVal)
                 setFieldValue('isDefaultBilling', boolVal)
               }"
             />
