@@ -87,6 +87,7 @@ const icons = computed(() => ({
  */
 const navItems = [
     { label: 'Accueil', href: '/', type: 'link' },
+    { label: 'Actualités', href: '/actualites', type: 'link' },
     {
         label: 'Académie',
         type: 'dropdown',
@@ -128,14 +129,6 @@ const handleRegister = () => {
     })
 }
 
-const handleAccount = () => {
-    router.push('/mon-compte')
-}
-
-const handleOrders = () => {
-    // TODO: Créer la page mes-commandes
-    router.push('/mes-commandes')
-}
 
 const handleLogout = async () => {
     await logout()
@@ -143,11 +136,10 @@ const handleLogout = async () => {
 }
 
 /**
- * Ferme le drawer et navigue vers la route
+ * Ferme le drawer (appelé au clic sur un lien)
  */
-const handleNavClick = (href: string) => {
+const closeDrawer = () => {
     drawerOpen.value = false
-    router.push(href)
 }
 
 /**
@@ -185,8 +177,9 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                     <nav class="flex flex-col gap-0.5">
                         <template v-for="item in navItems" :key="item.label">
                             <!-- Lien simple -->
-                            <button
+                            <RouterLink
                                 v-if="item.type === 'link'"
+                                :to="item.href"
                                 :class="[
                                     'w-full px-3 py-2.5 text-left text-sm font-medium rounded-xl transition-colors',
                                     'text-primary hover:bg-primary/5',
@@ -194,10 +187,10 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                                         ? 'bg-primary/10 font-semibold'
                                         : ''
                                 ]"
-                                @click="handleNavClick(item.href)"
+                                @click="closeDrawer"
                             >
                                 {{ item.label }}
-                            </button>
+                            </RouterLink>
 
                             <!-- Menu avec sous-items (Accordion) -->
                             <Accordion
@@ -221,9 +214,10 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                                     </AccordionTrigger>
                                     <AccordionContent class="pb-1">
                                         <div class="flex flex-col gap-0.5 mt-0.5">
-                                            <button
+                                            <RouterLink
                                                 v-for="subItem in item.items"
                                                 :key="subItem.label"
+                                                :to="subItem.href"
                                                 :class="[
                                                     'w-full pl-7 pr-3 py-2 text-left text-xs font-normal rounded-xl transition-colors',
                                                     'text-neutral-600 hover:bg-secondary/5 hover:text-secondary',
@@ -231,10 +225,10 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                                                         ? 'bg-secondary/10 text-secondary font-semibold'
                                                         : ''
                                                 ]"
-                                                @click="handleNavClick(subItem.href)"
+                                                @click="closeDrawer"
                                             >
                                                 {{ subItem.label }}
-                                            </button>
+                                            </RouterLink>
                                         </div>
                                     </AccordionContent>
                                 </AccordionItem>
@@ -262,21 +256,23 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                             </div>
 
                             <!-- Liens compte -->
-                            <button
+                            <RouterLink
+                                to="/mon-compte"
                                 class="w-full px-3 py-2 text-left flex items-center text-sm font-normal rounded-xl text-neutral-600 hover:bg-secondary/5 hover:text-secondary transition-colors"
-                                @click="handleAccount"
+                                @click="closeDrawer"
                             >
                                 <FontAwesomeIcon v-if="icons.userCircle" :icon="icons.userCircle" class="h-4 w-4 mr-3 shrink-0" />
                                 <span>Mon compte</span>
-                            </button>
+                            </RouterLink>
 
-                            <button
+                            <RouterLink
+                                to="/mes-commandes"
                                 class="w-full px-3 py-2 text-left flex items-center text-sm font-normal rounded-xl text-neutral-600 hover:bg-secondary/5 hover:text-secondary transition-colors"
-                                @click="handleOrders"
+                                @click="closeDrawer"
                             >
                                 <FontAwesomeIcon v-if="icons.box" :icon="icons.box" class="h-4 w-4 mr-3 shrink-0" />
                                 <span>Mes commandes</span>
-                            </button>
+                            </RouterLink>
 
                             <div class="h-px bg-neutral-200 my-2"></div>
 
@@ -435,14 +431,18 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                         <DropdownMenuContent align="end" class="w-56 rounded-lg bg-secondary-foreground">
                             <DropdownMenuLabel class="text-secondary">{{ displayName }}</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem class="cursor-pointer rounded-lg" @click="handleAccount">
-                                <FontAwesomeIcon v-if="icons.userCircle" :icon="icons.userCircle"
-                                    class="h-4 w-4 mr-2 text-secondary" />
-                                Mon compte
+                            <DropdownMenuItem as-child class="cursor-pointer rounded-lg">
+                                <RouterLink to="/mon-compte" class="flex items-center w-full">
+                                    <FontAwesomeIcon v-if="icons.userCircle" :icon="icons.userCircle"
+                                        class="h-4 w-4 mr-2 text-secondary" />
+                                    Mon compte
+                                </RouterLink>
                             </DropdownMenuItem>
-                            <DropdownMenuItem class="cursor-pointer rounded-lg" @click="handleOrders">
-                                <FontAwesomeIcon v-if="icons.box" :icon="icons.box" class="h-4 w-4 mr-2 text-secondary" />
-                                Mes formations
+                            <DropdownMenuItem as-child class="cursor-pointer rounded-lg">
+                                <RouterLink to="/mes-commandes" class="flex items-center w-full">
+                                    <FontAwesomeIcon v-if="icons.box" :icon="icons.box" class="h-4 w-4 mr-2 text-secondary" />
+                                    Mes formations
+                                </RouterLink>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem class="cursor-pointer text-red-600 rounded-lg" @click="handleLogout">

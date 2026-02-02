@@ -3,7 +3,6 @@
  * FormationSidebar - Sidebar sticky avec pricing et CTA
  */
 import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import type { Formation } from '@/data/formations.data'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -14,8 +13,6 @@ import SubscriptionModal from '@/components/academie/SubscriptionModal.vue'
 const props = defineProps<{
   formation: Formation
 }>()
-
-const router = useRouter()
 
 // État modal
 const showSubscriptionModal = ref(false)
@@ -41,10 +38,6 @@ const openSubscriptionModal = () => {
 
 const handlePlanSelection = (_planId: string, _isAnnual: boolean) => {
   // TODO: Redirection vers checkout
-}
-
-const goToStarsInfo = () => {
-  router.push('/#stars-section')
 }
 </script>
 
@@ -75,14 +68,16 @@ const goToStarsInfo = () => {
       <!-- CTA -->
       <Button
         v-if="formation.isBonus"
+        as-child
         variant="outline"
         size="lg"
         rounded="lg"
         class="w-full mb-6"
-        @click="goToStarsInfo"
       >
-        <FontAwesomeIcon v-if="icons.star" :icon="icons.star" class="size-4 mr-2 text-primary" />
-        Comment gagner des étoiles
+        <RouterLink to="/#stars-section">
+          <FontAwesomeIcon v-if="icons.star" :icon="icons.star" class="size-4 mr-2 text-primary" />
+          Comment gagner des étoiles
+        </RouterLink>
       </Button>
 
       <Button

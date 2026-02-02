@@ -6,15 +6,12 @@
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@/lib/icons'
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
 import {
     Accordion,
     AccordionContent,
     AccordionItem,
     AccordionTrigger,
 } from '@/components/ui/accordion'
-
-const router = useRouter()
 
 /**
  * Icônes FontAwesome
@@ -27,13 +24,6 @@ const icons = computed(() => ({
  * Année courante pour le copyright
  */
 const currentYear = new Date().getFullYear()
-
-/**
- * Navigation
- */
-const navigate = (path: string) => {
-    router.push(path)
-}
 </script>
 
 <template>
@@ -67,22 +57,21 @@ const navigate = (path: string) => {
                         Navigation
                     </h4>
                     <div class="flex flex-col gap-2 text-[14px] leading-5" style="font-family: Roboto, sans-serif;">
-                        <a href="/" class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer"
-                            @click.prevent="navigate('/')">
+                        <RouterLink to="/" class="font-normal text-[#b0bec5] hover:text-white transition-colors">
                             Accueil
-                        </a>
-                        <a href="/academie" class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer"
-                            @click.prevent="navigate('/academie')">
+                        </RouterLink>
+                        <RouterLink to="/actualites" class="font-normal text-[#b0bec5] hover:text-white transition-colors">
+                            Actualités
+                        </RouterLink>
+                        <RouterLink to="/academie" class="font-normal text-[#b0bec5] hover:text-white transition-colors">
                             Académie
-                        </a>
-                        <a href="/boutique" class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer"
-                            @click.prevent="navigate('/boutique')">
+                        </RouterLink>
+                        <RouterLink to="/boutique" class="font-normal text-[#b0bec5] hover:text-white transition-colors">
                             Boutique
-                        </a>
-                        <a href="/notre-maison" class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer"
-                            @click.prevent="navigate('/notre-maison')">
+                        </RouterLink>
+                        <RouterLink to="/notre-maison" class="font-normal text-[#b0bec5] hover:text-white transition-colors">
                             Notre Maison
-                        </a>
+                        </RouterLink>
                     </div>
                 </div>
 
@@ -142,22 +131,21 @@ const navigate = (path: string) => {
                     </AccordionTrigger>
                     <AccordionContent class="pb-4">
                         <div class="flex flex-col gap-3 text-sm leading-5" style="font-family: Roboto, sans-serif;">
-                            <a href="/" class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer py-1"
-                                @click.prevent="navigate('/')">
+                            <RouterLink to="/" class="font-normal text-[#b0bec5] hover:text-white transition-colors py-1">
                                 Accueil
-                            </a>
-                            <a href="/academie" class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer py-1"
-                                @click.prevent="navigate('/academie')">
+                            </RouterLink>
+                            <RouterLink to="/actualites" class="font-normal text-[#b0bec5] hover:text-white transition-colors py-1">
+                                Actualités
+                            </RouterLink>
+                            <RouterLink to="/academie" class="font-normal text-[#b0bec5] hover:text-white transition-colors py-1">
                                 Académie
-                            </a>
-                            <a href="/boutique" class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer py-1"
-                                @click.prevent="navigate('/boutique')">
+                            </RouterLink>
+                            <RouterLink to="/boutique" class="font-normal text-[#b0bec5] hover:text-white transition-colors py-1">
                                 Boutique
-                            </a>
-                            <a href="/notre-maison" class="font-normal text-[#b0bec5] hover:text-white transition-colors cursor-pointer py-1"
-                                @click.prevent="navigate('/notre-maison')">
+                            </RouterLink>
+                            <RouterLink to="/notre-maison" class="font-normal text-[#b0bec5] hover:text-white transition-colors py-1">
                                 Notre Maison
-                            </a>
+                            </RouterLink>
                         </div>
                     </AccordionContent>
                 </AccordionItem>
@@ -192,12 +180,12 @@ const navigate = (path: string) => {
                     style="font-family: Roboto, sans-serif;">
                     <!-- Liens légaux - Grid 2x2 sur mobile, horizontal sur desktop -->
                     <div class="grid grid-cols-2 gap-x-4 gap-y-2 md:flex md:gap-6 text-[#b0bec5]">
-                        <a href="/cgv" class="hover:text-white transition-colors cursor-pointer" @click.prevent="navigate('/cgv')">CGV</a>
-                        <a href="/mentions-legales" class="hover:text-white transition-colors cursor-pointer" @click.prevent="navigate('/mentions-legales')">Mentions légales</a>
-                        <a href="/confidentialite" class="hover:text-white transition-colors cursor-pointer" @click.prevent="navigate('/confidentialite')">Confidentialité</a>
-                        <a href="/cookies" class="hover:text-white transition-colors cursor-pointer" @click.prevent="navigate('/cookies')">Cookies</a>
+                        <RouterLink to="/cgv" class="hover:text-white transition-colors">CGV</RouterLink>
+                        <RouterLink to="/mentions-legales" class="hover:text-white transition-colors">Mentions légales</RouterLink>
+                        <RouterLink to="/confidentialite" class="hover:text-white transition-colors">Confidentialité</RouterLink>
+                        <RouterLink to="/cookies" class="hover:text-white transition-colors">Cookies</RouterLink>
                         <span class="hidden md:inline text-neutral-500">–</span>
-                        <a href="/rgpd" class="hover:text-white transition-colors cursor-pointer" @click.prevent="navigate('/rgpd')">RGPD (legacy)</a>
+                        <RouterLink to="/rgpd" class="hover:text-white transition-colors">RGPD (legacy)</RouterLink>
                     </div>
 
                     <!-- Copyright -->

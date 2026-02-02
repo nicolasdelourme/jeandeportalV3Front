@@ -40,20 +40,13 @@ interface Props {
      * Statistiques (nombre de publications, pages, etc.)
      */
     stats: Array<{ value: string; label: string }>
+    /**
+     * Lien vers la collection
+     */
+    link: string
 }
 
-const props = defineProps<Props>()
-
-/**
- * Émissions
- */
-const emit = defineEmits<{
-    explore: [collectionId: string]
-}>()
-
-const handleExplore = () => {
-    emit('explore', props.id)
-}
+defineProps<Props>()
 </script>
 
 <template>
@@ -94,10 +87,12 @@ const handleExplore = () => {
         </div>
 
         <!-- Bouton CTA -->
-        <Button size="default" class="w-full mt-auto" :color="color" @click="handleExplore">
-            <p class="font-bold text-sm" style="font-family: Roboto, sans-serif;">
-                Explorer la collection
-            </p>
+        <Button as-child size="default" class="w-full mt-auto" :color="color">
+            <RouterLink :to="link">
+                <p class="font-bold text-sm" style="font-family: Roboto, sans-serif;">
+                    Explorer la collection
+                </p>
+            </RouterLink>
         </Button>
     </div>
 </template>

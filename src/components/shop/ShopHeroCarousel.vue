@@ -5,7 +5,6 @@
  * Auto-play 5 secondes + navigation manuelle
  */
 import { computed, onUnmounted, ref, watch } from "vue";
-import { useRouter } from "vue-router";
 import { useShopStore } from "@/stores/shop.store";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,7 +21,6 @@ import {
 import type { ShopReference } from "@/types/shop-api.types";
 import { getShopImageUrl, decodeHTMLEntities, getFirstTagByPrefix, formatPrice } from "@/types/shop-api.types";
 
-const router = useRouter();
 const shopStore = useShopStore();
 
 /**
@@ -126,13 +124,6 @@ const stopAutoplay = () => {
 const goToSlide = (index: number) => {
     emblaApi.value?.scrollTo(index);
     stopAutoplay();
-};
-
-/**
- * Navigation vers la page détail produit
- */
-const handleViewProduct = (reference: ShopReference) => {
-    router.push(`/boutique/${reference.id}`);
 };
 
 /**
@@ -261,17 +252,19 @@ onUnmounted(() => {
 
                                     <!-- CTA -->
                                     <Button
+                                        as-child
                                         size="lg"
                                         rounded="sm"
                                         class="bg-white text-secondary hover:bg-white/90 font-semibold"
-                                        @click="handleViewProduct(reference)"
                                     >
-                                        Découvrir
-                                        <FontAwesomeIcon
-                                            v-if="icons.arrowRight"
-                                            :icon="icons.arrowRight"
-                                            class="ml-2 h-4 w-4"
-                                        />
+                                        <RouterLink :to="`/boutique/${reference.id}`">
+                                            Découvrir
+                                            <FontAwesomeIcon
+                                                v-if="icons.arrowRight"
+                                                :icon="icons.arrowRight"
+                                                class="ml-2 h-4 w-4"
+                                            />
+                                        </RouterLink>
                                     </Button>
                                 </div>
                             </div>

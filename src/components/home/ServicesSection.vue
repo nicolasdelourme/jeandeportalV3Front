@@ -7,10 +7,7 @@ import { Button } from '@/components/ui/button'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@/lib/icons'
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
 import { Badge } from '@/components/ui/badge'
-
-const router = useRouter()
 
 /**
  * Icônes FontAwesome
@@ -19,17 +16,6 @@ const icons = computed(() => ({
     graduationCap: byPrefixAndName.fas?.['graduation-cap'],
     book: byPrefixAndName.fas?.['book'],
 }))
-
-/**
- * Actions
- */
-const handleLearnMoreAcademie = () => {
-    router.push('/academie')
-}
-
-const handleDiscoverCollections = () => {
-    router.push('/boutique')
-}
 </script>
 
 <template>
@@ -150,10 +136,12 @@ const handleDiscoverCollections = () => {
                         </div>
 
                         <!-- Bouton CTA -->
-                        <Button size="lg" class="w-full mt-auto" @click="handleLearnMoreAcademie">
-                            <p class="font-bold " style="font-family: Roboto, sans-serif;">
-                                Découvrir l'Académie
-                            </p>
+                        <Button as-child size="lg" class="w-full mt-auto">
+                            <RouterLink to="/academie">
+                                <p class="font-bold " style="font-family: Roboto, sans-serif;">
+                                    Découvrir l'Académie
+                                </p>
+                            </RouterLink>
                         </Button>
                     </div>
                 </div>
@@ -237,11 +225,12 @@ const handleDiscoverCollections = () => {
                         </div>
 
                         <!-- Bouton CTA -->
-                        <Button size="lg" class="w-full mt-auto" color="yellow-500"
-                            variant="outline" @click="handleDiscoverCollections">
-                            <p class="font-bold" style="font-family: Roboto, sans-serif;">
-                                Découvrir nos collections
-                            </p>
+                        <Button as-child size="lg" class="w-full mt-auto" color="yellow-500" variant="outline">
+                            <RouterLink to="/boutique">
+                                <p class="font-bold" style="font-family: Roboto, sans-serif;">
+                                    Découvrir nos collections
+                                </p>
+                            </RouterLink>
                         </Button>
                     </div>
                 </div>

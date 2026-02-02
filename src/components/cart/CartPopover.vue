@@ -4,7 +4,6 @@
  * Aperçu rapide avec actions de base
  */
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
 import { useCartStore } from '@/stores/cart.store'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Button } from '@/components/ui/button'
@@ -14,7 +13,6 @@ import { Empty } from '@/components/ui/empty'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@/lib/icons'
 
-const router = useRouter()
 const cartStore = useCartStore()
 
 const icons = computed(() => ({
@@ -36,20 +34,6 @@ async function handleRemoveItem(itemId: number) {
   } catch (error) {
     // Toast d'erreur géré par le store
   }
-}
-
-/**
- * Navigue vers la page panier
- */
-function goToCart() {
-  router.push('/panier')
-}
-
-/**
- * Navigue vers le checkout (commande directe)
- */
-function goToCheckout() {
-  router.push('/commander')
 }
 
 /**
@@ -181,33 +165,37 @@ function formatPrice(price: number): string {
         <div class="flex flex-col gap-2">
           <!-- CTA Principal : Commander -->
           <Button
+            as-child
             class="w-full bg-success hover:bg-success/90 text-success-foreground"
             rounded="lg"
             size="lg"
-            @click="goToCheckout"
           >
-            <FontAwesomeIcon
-              v-if="icons.creditCard"
-              :icon="icons.creditCard"
-              class="w-4 h-4 mr-2"
-            />
-            Commander
+            <RouterLink to="/commander">
+              <FontAwesomeIcon
+                v-if="icons.creditCard"
+                :icon="icons.creditCard"
+                class="w-4 h-4 mr-2"
+              />
+              Commander
+            </RouterLink>
           </Button>
           <!-- CTA Secondaire : Voir le panier -->
           <Button
+            as-child
             class="w-full hover:bg-secondary hover:border-secondary"
             rounded="lg"
             size="lg"
             color="secondary"
             variant="outline"
-            @click="goToCart"
           >
-            <FontAwesomeIcon
-              v-if="icons.eye"
-              :icon="icons.eye"
-              class="w-4 h-4 mr-2"
-            />
-            Voir le panier
+            <RouterLink to="/panier">
+              <FontAwesomeIcon
+                v-if="icons.eye"
+                :icon="icons.eye"
+                class="w-4 h-4 mr-2"
+              />
+              Voir le panier
+            </RouterLink>
           </Button>
         </div>
       </div>

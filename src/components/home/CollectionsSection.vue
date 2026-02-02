@@ -9,7 +9,6 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@/lib/icons'
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
 import { Badge } from '@/components/ui/badge'
 import CollectionCard from './CollectionCard.vue'
 import {
@@ -18,8 +17,6 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from '@/components/ui/accordion'
-
-const router = useRouter()
 
 /**
  * Icônes FontAwesome
@@ -120,17 +117,6 @@ const collections = [
 const getIcon = (iconKey: IconKey): IconDefinition => {
     return icons.value[iconKey] as IconDefinition
 }
-
-/**
- * Actions
- */
-const handleExploreCollection = (collectionId: string) => {
-    router.push(`/boutique?collection=${collectionId}`)
-}
-
-const handleViewAllCollections = () => {
-    router.push('/boutique')
-}
 </script>
 
 <template>
@@ -191,7 +177,7 @@ const handleViewAllCollections = () => {
                             :icon="getIcon(collection.icon)"
                             :color="collection.color"
                             :stats="collection.stats"
-                            @explore="handleExploreCollection"
+                            :link="`/boutique?collection=${collection.id}`"
                         />
                     </AccordionContent>
                 </AccordionItem>
@@ -209,16 +195,18 @@ const handleViewAllCollections = () => {
                     :icon="getIcon(collection.icon)"
                     :color="collection.color"
                     :stats="collection.stats"
-                    @explore="handleExploreCollection"
+                    :link="`/boutique?collection=${collection.id}`"
                 />
             </div>
 
             <!-- CTA pour voir toutes les collections -->
             <div class="flex justify-center">
-                <Button size="lg" color="primary" variant="outline" @click="handleViewAllCollections">
-                    <p class="font-bold" style="font-family: Roboto, sans-serif;">
-                        Voir toutes nos collections
-                    </p>
+                <Button as-child size="lg" color="primary" variant="outline">
+                    <RouterLink to="/boutique">
+                        <p class="font-bold" style="font-family: Roboto, sans-serif;">
+                            Voir toutes nos collections
+                        </p>
+                    </RouterLink>
                 </Button>
             </div>
         </div>

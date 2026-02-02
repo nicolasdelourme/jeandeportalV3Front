@@ -8,9 +8,6 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@/lib/icons'
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
-
-const router = useRouter()
 
 /**
  * Icônes FontAwesome
@@ -27,17 +24,6 @@ type IconKey = 'basket' | 'graduationCap'
  */
 const getIcon = (iconKey: IconKey): IconDefinition => {
     return icons.value[iconKey] as IconDefinition
-}
-
-/**
- * Actions
- */
-const handleExploreBoutique = () => {
-    router.push('/boutique')
-}
-
-const handleViewFormulas = () => {
-    router.push('/academie')
 }
 </script>
 
@@ -109,10 +95,12 @@ const handleViewFormulas = () => {
                     </div>
 
                     <!-- Bouton CTA -->
-                    <Button size="lg" class="w-full mt-auto" color="yellow-600" @click="handleExploreBoutique">
-                        <p class="font-bold" style="font-family: Roboto, sans-serif;">
-                            Parcourir la boutique
-                        </p>
+                    <Button as-child size="lg" class="w-full mt-auto" color="yellow-600">
+                        <RouterLink to="/boutique">
+                            <p class="font-bold" style="font-family: Roboto, sans-serif;">
+                                Parcourir la boutique
+                            </p>
+                        </RouterLink>
                     </Button>
                 </div>
 
@@ -173,10 +161,12 @@ const handleViewFormulas = () => {
                     </div>
 
                     <!-- Bouton CTA -->
-                    <Button size="lg" class="w-full mt-auto" color="primary" @click="handleViewFormulas">
-                        <p class="font-bold" style="font-family: Roboto, sans-serif;">
-                            Découvrir l'Académie
-                        </p>
+                    <Button as-child size="lg" class="w-full mt-auto" color="primary">
+                        <RouterLink to="/academie">
+                            <p class="font-bold" style="font-family: Roboto, sans-serif;">
+                                Découvrir l'Académie
+                            </p>
+                        </RouterLink>
                     </Button>
                 </div>
             </div>

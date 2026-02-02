@@ -7,8 +7,7 @@ import { Button } from '@/components/ui/button'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@/lib/icons'
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, onUnmounted, ref } from 'vue'
 import { Badge } from '@/components/ui/badge'
 import {
     Carousel,
@@ -18,8 +17,6 @@ import {
     CarouselPrevious,
 } from '@/components/ui/carousel'
 import { type CarouselApi } from '@/components/ui/carousel'
-
-const router = useRouter()
 
 /**
  * Carousel API et autoplay
@@ -312,16 +309,6 @@ const publications = [
     },
 ]
 
-/**
- * Actions
- */
-const handleViewPublication = (publicationId: string) => {
-    router.push(`/boutique/${publicationId}`)
-}
-
-const handleViewAllPublications = () => {
-    router.push('/boutique')
-}
 </script>
 
 <template>
@@ -355,8 +342,7 @@ const handleViewAllPublications = () => {
                 <CarouselContent class="-ml-4">
                     <CarouselItem v-for="publication in publications" :key="publication.id"
                         class="pl-4 md:basis-1/3 lg:basis-1/6">
-                        <div class="bg-white border border-neutral-200 rounded-lg overflow-hidden flex flex-col h-full hover:shadow-lg transition-shadow group cursor-pointer"
-                            @click="handleViewPublication(publication.id)">
+                        <RouterLink :to="`/boutique/${publication.id}`" class="bg-white border border-neutral-200 rounded-lg overflow-hidden flex flex-col h-full hover:shadow-lg transition-shadow group cursor-pointer">
                             <!-- Cover A4 (ratio 1:1.414) -->
                             <div class="relative w-full bg-neutral-100 overflow-hidden"
                                 style="aspect-ratio: 1 / 1.414;">
@@ -423,7 +409,7 @@ const handleViewAllPublications = () => {
                                     </span>
                                 </div>
                             </div>
-                        </div>
+                        </RouterLink>
                     </CarouselItem>
                 </CarouselContent>
 
@@ -456,10 +442,12 @@ const handleViewAllPublications = () => {
 
             <!-- CTA pour voir toutes les publications -->
             <div class="flex justify-center">
-                <Button size="lg" color="primary" variant="outline" @click="handleViewAllPublications">
-                    <p class="font-bold" style="font-family: Roboto, sans-serif;">
-                        Voir toutes nos publications
-                    </p>
+                <Button as-child size="lg" color="primary" variant="outline">
+                    <RouterLink to="/boutique">
+                        <p class="font-bold" style="font-family: Roboto, sans-serif;">
+                            Voir toutes nos publications
+                        </p>
+                    </RouterLink>
                 </Button>
             </div>
         </div>
