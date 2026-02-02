@@ -7,6 +7,43 @@
 // ============================================
 
 /**
+ * Requête pour valider le checkout boutique
+ * POST /checkout
+ * DOIT être appelé avant /initPayment
+ */
+export interface CheckoutRequest {
+  basketCode: string
+}
+
+/**
+ * Réponse de validation du checkout boutique
+ */
+export interface CheckoutResponse {
+  status: 'success' | 'error'
+  stripePublicKey?: string
+  basket?: {
+    basketCode: string
+    referenceNumber: number
+    count: number
+    tax: number
+    total: number
+    discountTotal: number
+    referenceList: Array<{
+      name: string
+      itemId: number
+      storeId: number
+      priceId: number
+      quantity: number
+      price: number
+      HTPrice: number
+      vat: number
+      currency: string
+    }>
+  }
+  message?: string
+}
+
+/**
  * Requête pour initialiser un paiement
  * POST /initPayment
  */

@@ -148,6 +148,10 @@ export function useCheckoutFlow(type: CheckoutType): CheckoutFlow {
   /**
    * Initialise le paiement aupres du backend
    * Retourne le client_secret et la cle publique Stripe
+   *
+   * Flow:
+   * 1. Appel /checkout ou /oneClickCheckout (associe l'utilisateur au panier)
+   * 2. Appel /initPayment ou /oneClickInitPayment (crée le PaymentIntent/SetupIntent)
    */
   async function initPayment(
     shippingId: number,
@@ -160,10 +164,12 @@ export function useCheckoutFlow(type: CheckoutType): CheckoutFlow {
     }
 
     if (type === 'shop') {
-      // Boutique: PaymentIntent
+      // Boutique: 1) checkout puis 2) initPayment (PaymentIntent)
+      await paymentService.checkout(code)
       return paymentService.initPayment(code, shippingId, billingId, 'eur')
     } else {
-      // OneClick: SetupIntent
+      // OneClick: 1) oneClickCheckout puis 2) oneClickInitPayment (SetupIntent)
+      await oneClickBasketService.checkout(code)
       return oneClickBasketService.initPayment(code, shippingId, billingId)
     }
   }
