@@ -21,12 +21,7 @@ const routes: RouteRecordRaw[] = [
     {
         path: "/",
         name: "home",
-        component: () => import("@/views/AcademieHomePage.vue"),
-    },
-    {
-        path: "/notre-maison",
-        name: "notre-maison",
-        component: () => import("@/views/NotreMaisonPage.vue"),
+        component: () => import("@/views/news/NewsPage.vue"),
     },
     {
         path: "/ui",
@@ -57,7 +52,7 @@ const routes: RouteRecordRaw[] = [
     {
         path: "/actualites",
         name: "actualites",
-        component: () => import("@/views/news/NewsPage.vue"),
+        component: () => import("@/views/news/NewsCatalogPage.vue"),
     },
     {
         path: "/actualites/:slug",
@@ -68,7 +63,7 @@ const routes: RouteRecordRaw[] = [
     {
         path: "/academie",
         name: "academie",
-        component: () => import("@/views/academie/AcademiePage.vue"),
+        component: () => import("@/views/AcademieHomePage.vue"),
     },
     {
         path: "/academie/formation/:id",
