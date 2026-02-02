@@ -62,9 +62,9 @@ const readTimeText = computed(() => {
     <Card
       class="news-card group relative border border-secondary hover:shadow-md rounded-lg overflow-hidden transition-all duration-500 p-2 gap-0"
     >
-    <div class="flex flex-col sm:flex-row">
+    <div class="flex flex-col sm:flex-row gap-2">
       <!-- Thumbnail -->
-      <div class="relative w-full aspect-video sm:aspect-auto sm:w-48 md:w-56 lg:w-64 shrink-0 overflow-hidden">
+      <div class="relative w-full sm:w-48 md:w-56 lg:w-64 aspect-video shrink-0 overflow-hidden rounded-md">
         <img
           :src="item.thumbnail"
           :alt="item.title"
@@ -96,7 +96,7 @@ const readTimeText = computed(() => {
       </div>
 
       <!-- Content -->
-      <div class="flex flex-col justify-between p-4 flex-1 min-w-0">
+      <div class="flex flex-col justify-between flex-1 min-w-0">
         <div class="flex flex-col gap-2">
           <!-- Badge -->
           <NewsBadge :type="item.type" />

@@ -81,7 +81,7 @@ const readTimeText = computed(() => {
         </Badge>
 
         <!-- Type badge - top left -->
-        <div class="absolute top-3 left-3">
+        <div class="absolute top-3 right-3">
           <NewsBadge :type="item.type" class="shadow-sm" />
         </div>
       </div>
