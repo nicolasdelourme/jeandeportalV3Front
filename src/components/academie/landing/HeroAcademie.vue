@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
- * HeroAcademie - Section hero de la page Académie
- * Présentation du concept avec CTA vers les offres
+ * HeroAcademie V5 - Split design avec portrait
+ * Style éditorial/magazine, portrait découpé
  */
 import { computed } from 'vue'
 import { Button } from '@/components/ui/button'
@@ -11,8 +11,9 @@ import { byPrefixAndName } from '@/lib/icons'
 
 const icons = computed(() => ({
   arrowDown: byPrefixAndName.fas?.['arrow-down'],
+  arrowRight: byPrefixAndName.fas?.['arrow-right'],
   graduationCap: byPrefixAndName.fas?.['graduation-cap'],
-  star: byPrefixAndName.fas?.['star'],
+  quote: byPrefixAndName.fas?.['quote-left'],
 }))
 
 const scrollToPricing = () => {
@@ -24,75 +25,101 @@ const scrollToPricing = () => {
 </script>
 
 <template>
-  <section class="relative overflow-hidden bg-gradient-to-br from-primary via-primary/95 to-primary/85">
-    <!-- Éléments décoratifs -->
-    <div class="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-    <div class="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
-
-    <div class="relative max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24">
-      <div class="flex flex-col md:flex-row items-center gap-10 md:gap-16">
-        <!-- Contenu texte -->
-        <div class="flex-1 text-center md:text-left">
+  <section class="relative overflow-hidden">
+    <div class="flex flex-col lg:flex-row min-h-[600px]">
+      <!-- Partie gauche - Contenu -->
+      <div class="flex-1 bg-white flex items-center">
+        <div class="max-w-xl mx-auto px-6 md:px-12 py-16 lg:py-24 lg:ml-auto lg:mr-16">
           <Badge
-            variant="outline"
-            rounded="sm"
-            class="mb-6 border-white/30 bg-white/10 text-white backdrop-blur-sm gap-2"
+            variant="default"
+            rounded="lg"
+            class="mb-6 gap-2"
           >
             <FontAwesomeIcon v-if="icons.graduationCap" :icon="icons.graduationCap" class="size-3" />
-            Formation Premium
+            Infocash Académie
           </Badge>
 
-          <h1 class="font-heading font-bold text-3xl md:text-4xl lg:text-5xl text-white leading-tight mb-4">
-            Infocash Académie
+          <h1 class="font-heading font-bold text-3xl md:text-4xl lg:text-5xl text-foreground leading-tight mb-6">
+            L'Académie qui vous accompagne vers la liberté
           </h1>
 
-          <p class="text-xl md:text-2xl text-white/90 font-medium mb-4">
-            Votre parcours vers l'indépendance financière
-          </p>
+          <!-- Citation -->
+          <div class="relative mb-8  p-4">
+            <FontAwesomeIcon
+              v-if="icons.quote"
+              :icon="icons.quote"
+              class="absolute -left-0.5 -top-0.5 size-4 text-primary/30"
+            />
+            <p class="text-muted-foreground italic">
+              "Mon objectif : vous transmettre 20 ans d'expérience en investissement
+              de manière simple et actionnable."
+            </p>
+            <p class="text-sm font-semibold text-foreground mt-2">— Nicolas Delourme</p>
+          </div>
 
-          <p class="text-white/70 text-base md:text-lg leading-relaxed mb-8 max-w-xl">
-            Accédez à des contenus exclusifs chaque semaine : newsletters, tutoriels vidéo et consultations en direct
-            sur les thématiques qui comptent pour votre patrimoine.
-          </p>
-
-          <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+          <div class="group flex flex-col sm:flex-row gap-4">
             <Button
               size="lg"
-              rounded="sm"
-              class="bg-white text-primary hover:bg-white/90 font-semibold gap-2"
+              rounded="lg"
+              variant="secondary"
+              class="group-hover:text-primary font-semibold gap-2"
               @click="scrollToPricing"
             >
-              Découvrir les offres
-              <FontAwesomeIcon v-if="icons.arrowDown" :icon="icons.arrowDown" class="size-4" />
+              Rejoindre l'Académie
+              <FontAwesomeIcon v-if="icons.arrowRight" :icon="icons.arrowRight" class="size-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="lg"
+              rounded="lg"
+              color="secondary"
+              class="group-hover:underline font-semibold gap-2"
+            >
+              À partir de 9,90€/mois
             </Button>
           </div>
         </div>
+      </div>
 
-        <!-- Illustration / Stats -->
-        <div class="shrink-0 w-full md:w-auto">
-          <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto md:mx-0">
-            <!-- Stat 1 -->
-            <div class="bg-white/10 backdrop-blur-sm rounded-sm p-6 text-center border border-white/20">
-              <p class="font-heading font-bold text-3xl text-white mb-1">3</p>
-              <p class="text-white/70 text-sm">Thématiques</p>
+      <!-- Partie droite - Image -->
+      <div class="lg:w-1/2 bg-secondary relative">
+        <!-- Décor géométrique -->
+        <div class="absolute top-0 rounded-lg left-0 w-32 h-32 bg-accent-yellow/20" />
+        <div class="absolute bottom-0 rounded-lg right-0 w-48 h-48 bg-white/5" />
+
+        <!-- Image placeholder -->
+        <div class="relative h-full min-h-[400px] rounded-lg lg:min-h-0 flex items-center justify-center p-8">
+          <!--
+            IMAGE À FOURNIR AU GRAPHISTE:
+            - Portrait de Nicolas Delourme
+            - Style éditorial/magazine
+            - Détouré ou sur fond uni
+            - Expression confiante, regard vers la gauche (vers le texte)
+            - Peut être en noir et blanc avec touche de couleur
+            - Format: 600x800px minimum (portrait)
+          -->
+          <div class="bg-white/10 rounded-lg w-full max-w-md aspect-[3/4] flex items-center justify-center">
+            <div class="text-center text-white/50 p-8">
+              <p class="font-heading font-bold text-xl mb-2">Portrait Nicolas</p>
+              <p class="text-sm">Style éditorial / magazine</p>
+              <p class="text-xs mt-2">600x800px</p>
             </div>
-            <!-- Stat 2 -->
-            <div class="bg-white/10 backdrop-blur-sm rounded-sm p-6 text-center border border-white/20">
-              <p class="font-heading font-bold text-3xl text-white mb-1">12</p>
-              <p class="text-white/70 text-sm">Contenus/mois</p>
-            </div>
-            <!-- Stat 3 -->
-            <div class="bg-white/10 backdrop-blur-sm rounded-sm p-6 text-center border border-white/20">
-              <p class="font-heading font-bold text-3xl text-white mb-1">
-                <FontAwesomeIcon v-if="icons.star" :icon="icons.star" class="size-6 text-accent-yellow" />
-              </p>
-              <p class="text-white/70 text-sm">Récompenses</p>
-            </div>
-            <!-- Stat 4 -->
-            <div class="bg-white/10 backdrop-blur-sm rounded-sm p-6 text-center border border-white/20">
-              <p class="font-heading font-bold text-3xl text-white mb-1">9,90€</p>
-              <p class="text-white/70 text-sm">à partir de</p>
-            </div>
+          </div>
+        </div>
+
+        <!-- Stats flottantes -->
+        <div class="absolute bottom-8 left-8 right-8 flex justify-between text-white">
+          <div>
+            <p class="font-heading font-bold text-2xl">4</p>
+            <p class="text-white/60 text-xs">Thématiques</p>
+          </div>
+          <div>
+            <p class="font-heading font-bold text-2xl">12+</p>
+            <p class="text-white/60 text-xs">Contenus/mois</p>
+          </div>
+          <div>
+            <p class="font-heading font-bold text-2xl">Live</p>
+            <p class="text-white/60 text-xs">Consultations</p>
           </div>
         </div>
       </div>
