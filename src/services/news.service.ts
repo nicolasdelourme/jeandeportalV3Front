@@ -14,8 +14,8 @@ import {
   mockFetchFeatured,
 } from '@/api/news.mock'
 
-// MOCK MODE : Contrôlé par VITE_API_MODE
-const USE_MOCK = import.meta.env.VITE_API_MODE === 'mock'
+// MOCK MODE : Contrôlé par VITE_API_MODE ou VITE_NEWS_MOCK (pour prod sans backend news)
+const USE_MOCK = import.meta.env.VITE_API_MODE === 'mock' || import.meta.env.VITE_NEWS_MOCK === 'true'
 
 /**
  * Configuration de l'API News
