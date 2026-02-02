@@ -1,8 +1,7 @@
 <script setup lang="ts">
 /**
  * Page 404 - Not Found
- * Page d'erreur affichée lorsqu'une route n'existe pas
- * Design thématique avec la couleur primary
+ * Design géométrique cohérent avec les empty states
  */
 import { Button } from '@/components/ui/button'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -13,146 +12,94 @@ import DefaultLayout from '@/components/layout/DefaultLayout.vue'
 
 const router = useRouter()
 
-/**
- * Icônes FontAwesome
- */
 const icons = computed(() => ({
-    home: byPrefixAndName.fas?.['home'],
-    arrowLeft: byPrefixAndName.fas?.['arrow-left'],
-    compass: byPrefixAndName.fas?.['compass'],
-    search: byPrefixAndName.fas?.['magnifying-glass'],
+  home: byPrefixAndName.fas?.['home'],
+  arrowLeft: byPrefixAndName.fas?.['arrow-left'],
+  compass: byPrefixAndName.fas?.['compass'],
 }))
 
-/**
- * Actions
- */
 const goHome = () => {
-    router.push('/')
+  router.push('/')
 }
 
 const goBack = () => {
-    // Si l'historique existe, revenir en arrière, sinon aller à l'accueil
-    if (window.history.length > 1) {
-        router.back()
-    } else {
-        router.push('/')
-    }
-}
-
-const goToShop = () => {
-    router.push('/boutique')
+  if (window.history.length > 1) {
+    router.back()
+  } else {
+    router.push('/')
+  }
 }
 </script>
 
 <template>
-    <DefaultLayout>
-        <section class="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 py-16 bg-linear-to-b from-white to-neutral-50">
-            <div class="max-w-2xl mx-auto flex flex-col items-center gap-8 text-center">
-                <!-- Icône 404 avec design primary -->
-                <div class="relative">
-                    <!-- Circle background avec effet de pulse -->
-                    <div class="absolute inset-0 bg-primary/10 rounded-full animate-pulse"></div>
-
-                    <!-- Icône principale -->
-                    <div class="relative bg-primary p-8 md:py-8 md:px-7 rounded-full shadow-2xl shadow-primary/20">
-                        <FontAwesomeIcon
-                            v-if="icons.compass"
-                            :icon="icons.compass"
-                            class="w-16 h-16 md:w-20 md:h-20 text-secondary fa-2x animate-spin"
-                            style="animation-duration: 8s;"
-                        />
-                    </div>
-                </div>
-
-                <!-- Code 404 -->
-                <div class="flex flex-col gap-2">
-                    <h1 class="font-black text-6xl md:text-8xl text-secondary leading-none tracking-tight"
-                        style="font-family: Roboto, sans-serif;">
-                        404
-                    </h1>
-                    <div class="h-1 w-24 mx-auto bg-primary rounded-full"></div>
-                </div>
-
-                <!-- Message principal -->
-                <div class="flex flex-col gap-3">
-                    <h2 class="font-bold text-2xl md:text-4xl text-neutral-800 leading-tight"
-                        style="font-family: Roboto, sans-serif;">
-                        Page introuvable
-                    </h2>
-                    <p class="font-normal text-base md:text-lg text-neutral-600 leading-relaxed max-w-md"
-                        style="font-family: Roboto, sans-serif;">
-                        Désolé, la page que vous recherchez n'existe pas ou a été déplacée.
-                        Utilisez les boutons ci-dessous pour retrouver votre chemin.
-                    </p>
-                </div>
-
-                <!-- Suggestions avec icônes -->
-                <div class="flex flex-col gap-3 w-full max-w-md">
-                    <p class="font-semibold text-sm text-neutral-500 uppercase tracking-wide"
-                       style="font-family: Roboto, sans-serif;">
-                        Suggestions
-                    </p>
-                    <div class="flex flex-wrap gap-2 justify-center">
-                        <div class="flex items-center gap-2 px-3 py-2 bg-neutral-100 rounded-lg text-sm text-neutral-600"
-                             style="font-family: Roboto, sans-serif;">
-                            <FontAwesomeIcon v-if="icons.search" :icon="icons.search" class="w-3 h-3" />
-                            Vérifiez l'URL
-                        </div>
-                        <div class="flex items-center gap-2 px-3 py-2 bg-neutral-100 rounded-lg text-sm text-neutral-600"
-                             style="font-family: Roboto, sans-serif;">
-                            <FontAwesomeIcon v-if="icons.home" :icon="icons.home" class="w-3 h-3" />
-                            Retournez à l'accueil
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Boutons d'action -->
-                <div class="flex flex-col sm:flex-row gap-3 w-full max-w-md">
-                    <!-- Bouton principal : Retour accueil -->
-                    <Button
-                        variant="default"
-                        rounded="lg"
-                        color="primary"
-                        size="lg"
-                        class="flex-1 text-secondary hover:text-secondary"
-                        @click="goHome"
-                    >
-                        <FontAwesomeIcon v-if="icons.home" :icon="icons.home" class="w-4 h-4 mr-2 text-secondary" />
-                        Retour à l'accueil
-                    </Button>
-
-                    <!-- Bouton secondaire : Retour arrière -->
-                    <Button
-                        variant="outline"
-                        color="secondary"
-                        rounded="lg"
-                        size="lg"
-                        class="flex-1"
-                        @click="goBack"
-                    >
-                        <FontAwesomeIcon v-if="icons.arrowLeft" :icon="icons.arrowLeft" class="w-4 h-4 mr-2" />
-                        Page précédente
-                    </Button>
-                </div>
-
-                <!-- Lien vers la boutique -->
-                <div class="pt-4 border-t border-neutral-200 w-full max-w-md">
-                    <p class="font-normal text-sm text-neutral-600 mb-3"
-                       style="font-family: Roboto, sans-serif;">
-                        Ou découvrez nos publications
-                    </p>
-                    <Button
-                        variant="ghost"
-                        color="secondary"
-                        class="mx-auto"
-                        @click="goToShop"
-                    >
-                        <span class="font-semibold" style="font-family: Roboto, sans-serif;">
-                            Visiter la boutique →
-                        </span>
-                    </Button>
-                </div>
+  <DefaultLayout>
+    <section class="min-h-[calc(100vh-200px)] flex items-center justify-center px-4 py-16 md:py-24">
+      <div class="flex flex-col items-center text-center">
+        <!-- Illustration géométrique -->
+        <div class="relative mb-10">
+          <!-- Cercle externe -->
+          <div class="w-40 h-40 md:w-52 md:h-52 rounded-full bg-primary/10 flex items-center justify-center">
+            <!-- Cercle intermédiaire -->
+            <div class="w-32 h-32 md:w-40 md:h-40 rounded-full bg-primary/20 flex items-center justify-center">
+              <!-- Cercle interne avec icône -->
+              <div class="w-24 h-24 md:w-28 md:h-28 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/30">
+                <FontAwesomeIcon
+                  v-if="icons.compass"
+                  :icon="icons.compass"
+                  class="w-12 h-12 md:w-14 md:h-14 text-secondary animate-spin"
+                  style="animation-duration: 10s;"
+                />
+              </div>
             </div>
-        </section>
-    </DefaultLayout>
+          </div>
+
+          <!-- Éléments décoratifs -->
+          <div class="absolute -top-3 -right-3 w-5 h-5 bg-primary rounded-full opacity-70"></div>
+          <div class="absolute -bottom-2 -left-4 w-4 h-4 bg-secondary rounded-full opacity-50"></div>
+          <div class="absolute top-1/3 -right-8 w-3 h-3 bg-primary/60 rounded-full"></div>
+          <div class="absolute bottom-1/4 -left-6 w-2 h-2 bg-primary/40 rounded-full"></div>
+        </div>
+
+        <!-- Code 404 -->
+        <h1 class="font-heading font-black text-7xl md:text-9xl text-secondary leading-none tracking-tight mb-4">
+          404
+        </h1>
+
+        <!-- Message -->
+        <h2 class="font-heading font-bold text-2xl md:text-3xl text-secondary mb-3">
+          Page introuvable
+        </h2>
+
+        <p class="text-muted-foreground max-w-md mb-10 leading-relaxed">
+          La page que vous recherchez n'existe pas ou a été déplacée.
+        </p>
+
+        <!-- Boutons -->
+        <div class="flex flex-col sm:flex-row gap-3 w-full max-w-sm">
+          <Button
+            variant="default"
+            rounded="lg"
+            color="primary"
+            size="lg"
+            class="flex-1 text-secondary hover:text-secondary gap-2"
+            @click="goHome"
+          >
+            <FontAwesomeIcon v-if="icons.home" :icon="icons.home" class="w-4 h-4" />
+            Accueil
+          </Button>
+
+          <Button
+            variant="outline"
+            rounded="lg"
+            size="lg"
+            class="flex-1 text-secondary hover:text-secondary gap-2"
+            @click="goBack"
+          >
+            <FontAwesomeIcon v-if="icons.arrowLeft" :icon="icons.arrowLeft" class="w-4 h-4" />
+            Retour
+          </Button>
+        </div>
+      </div>
+    </section>
+  </DefaultLayout>
 </template>
