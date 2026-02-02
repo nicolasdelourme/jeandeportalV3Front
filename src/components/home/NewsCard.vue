@@ -7,10 +7,9 @@
  */
 import { computed } from 'vue'
 import type { NewsItem } from '@/types/news.types'
-import NewsBadge from './NewsBadge.vue'
+import NewsBadge from '@/components/shared/NewsBadge.vue'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { AspectRatio } from '@/components/ui/aspect-ratio'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@/lib/icons'
 
@@ -61,18 +60,16 @@ const readTimeText = computed(() => {
 <template>
   <RouterLink :to="detailUrl" class="block">
     <Card
-      class="news-card group relative border border-secondary/10 shadow-md hover:shadow-lg rounded-lg overflow-hidden transition-all duration-500 py-0"
+      class="news-card group relative border border-secondary hover:shadow-md rounded-lg overflow-hidden transition-all duration-500 py-0 gap-0"
     >
     <div class="flex flex-col sm:flex-row">
-      <!-- Thumbnail (4:3) -->
-      <div class="relative w-full sm:w-48 md:w-56 lg:w-64 shrink-0">
-        <AspectRatio :ratio="4/3" class="overflow-hidden bg-neutral-100">
-          <img
-            :src="item.thumbnail"
-            :alt="item.title"
-            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        </AspectRatio>
+      <!-- Thumbnail -->
+      <div class="relative w-full aspect-video sm:aspect-auto sm:w-48 md:w-56 lg:w-64 shrink-0 overflow-hidden">
+        <img
+          :src="item.thumbnail"
+          :alt="item.title"
+          class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
 
         <!-- Play button for videos -->
         <div

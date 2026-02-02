@@ -9,9 +9,13 @@ import type { NewsItem } from '@/types/news.types'
 import { NEWS_CONFIG } from '@/types/news.types'
 import { newsService } from '@/services/news.service'
 import DefaultLayout from '@/components/layout/DefaultLayout.vue'
-import NewsHero from '@/components/news/NewsHero.vue'
-import NewsCard from '@/components/news/NewsCard.vue'
-import NewsSidebar from '@/components/news/NewsSidebar.vue'
+import NewsHero from '@/components/home/NewsHero.vue'
+import NewsCard from '@/components/home/NewsCard.vue'
+import NewsSidebar from '@/components/home/NewsSidebar.vue'
+import NewsHeroSkeleton from '@/components/shared/NewsHeroSkeleton.vue'
+import NewsCardSkeleton from '@/components/shared/NewsCardSkeleton.vue'
+import NewsSidebarSkeleton from '@/components/shared/NewsSidebarSkeleton.vue'
+import NewsEmptyState from '@/components/shared/NewsEmptyState.vue'
 import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-vue-next'
 
@@ -85,40 +89,34 @@ onMounted(async () => {
     <div class="min-h-screen bg-white">
       <div class="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12">
       <!-- Loading State -->
-      <div v-if="isLoading" class="space-y-8">
+      <div v-if="isLoading" class="space-y-10 md:space-y-14">
         <!-- Hero skeleton -->
-        <div class="aspect-[16/9] md:aspect-[21/9] rounded-2xl bg-neutral-200 animate-pulse" />
+        <NewsHeroSkeleton />
 
         <!-- Content skeleton -->
-        <div class="flex flex-col lg:flex-row gap-8">
+        <div class="flex flex-col lg:flex-row gap-8 lg:gap-12">
+          <!-- Feed skeletons -->
           <div class="flex-1 space-y-6">
-            <div v-for="i in 4" :key="i" class="flex gap-4 animate-pulse">
-              <div class="w-48 h-36 rounded-lg bg-neutral-200" />
-              <div class="flex-1 space-y-3">
-                <div class="h-5 bg-neutral-200 rounded w-20" />
-                <div class="h-6 bg-neutral-200 rounded w-3/4" />
-                <div class="h-4 bg-neutral-200 rounded w-full" />
-                <div class="h-4 bg-neutral-200 rounded w-1/2" />
-              </div>
-            </div>
+            <div class="h-8 w-48 bg-neutral-200 rounded animate-pulse mb-6" />
+            <NewsCardSkeleton v-for="i in 4" :key="i" />
           </div>
-          <div class="w-full lg:w-80 space-y-6">
-            <div class="h-64 bg-neutral-200 rounded-xl animate-pulse" />
-            <div class="h-64 bg-neutral-200 rounded-xl animate-pulse" />
+
+          <!-- Sidebar skeleton -->
+          <div class="w-full lg:w-80 shrink-0">
+            <NewsSidebarSkeleton />
           </div>
         </div>
       </div>
 
       <!-- Error State -->
-      <div
+      <NewsEmptyState
         v-else-if="error"
-        class="flex flex-col items-center justify-center py-20 text-center"
-      >
-        <p class="text-lg text-muted-foreground mb-4">{{ error }}</p>
-        <Button variant="default" @click="$router.go(0)">
-          Reessayer
-        </Button>
-      </div>
+        type="error"
+        :description="error"
+        show-action
+        action-label="Réessayer"
+        @action="$router.go(0)"
+      />
 
       <!-- Content -->
       <template v-else>
@@ -142,18 +140,18 @@ onMounted(async () => {
             </div>
 
             <!-- Empty state -->
-            <p
+            <NewsEmptyState
               v-if="filteredFeedItems.length === 0"
-              class="text-center text-muted-foreground py-10"
-            >
-              Aucune actualite pour le moment
-            </p>
+              type="feed"
+            />
 
             <!-- Load More Button -->
             <div v-if="hasMore" class="flex justify-center mt-8">
               <Button
                 variant="outline"
+                rounded="lg"
                 size="lg"
+                class="text-secondary hover:text-secondary"
                 :disabled="isLoadingMore"
                 @click="loadMore"
               >

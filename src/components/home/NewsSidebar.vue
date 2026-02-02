@@ -4,9 +4,9 @@
  * Sidebar complète de la page actualités
  * Sticky sur desktop, s'adapte sur mobile
  */
-import SidebarLive from './SidebarLive.vue'
-import SidebarTrending from './SidebarTrending.vue'
-import SidebarAcademy from './SidebarAcademy.vue'
+import SidebarLive from '@/components/home/SidebarLive.vue'
+import SidebarTrending from '@/components/home/SidebarTrending.vue'
+import SidebarAcademy from '@/components/shared/SidebarAcademy.vue'
 </script>
 
 <template>

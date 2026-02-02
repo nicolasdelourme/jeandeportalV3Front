@@ -5,7 +5,7 @@
  */
 import { computed } from 'vue'
 import type { NewsItem } from '@/types/news.types'
-import NewsBadge from './NewsBadge.vue'
+import NewsBadge from '@/components/shared/NewsBadge.vue'
 
 const props = withDefaults(defineProps<{
   item: NewsItem

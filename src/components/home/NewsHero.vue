@@ -6,7 +6,7 @@
  */
 import { computed } from 'vue'
 import type { NewsItem } from '@/types/news.types'
-import NewsBadge from './NewsBadge.vue'
+import NewsBadge from '@/components/shared/NewsBadge.vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@/lib/icons'
 
