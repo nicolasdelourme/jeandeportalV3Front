@@ -5,7 +5,7 @@ export { default as Button } from "./Button.vue";
 
 export const buttonVariants = cva(
     // Base styles - reprend le design de .button de JDP
-    "inline-block relative cursor-pointer outline-none whitespace-nowrap transition-all duration-200 ease-in-out disabled:pointer-events-none disabled:opacity-50 uppercase tracking-wider font-bold",
+    "inline-flex items-center justify-center relative cursor-pointer outline-none whitespace-nowrap transition-all duration-200 ease-in-out disabled:pointer-events-none disabled:opacity-50 uppercase tracking-wider font-bold",
     {
         variants: {
             variant: {
