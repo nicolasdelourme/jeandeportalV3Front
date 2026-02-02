@@ -69,9 +69,6 @@ const currentYear = new Date().getFullYear()
                         <RouterLink to="/boutique" class="font-normal text-[#b0bec5] hover:text-white transition-colors">
                             Boutique
                         </RouterLink>
-                        <RouterLink to="/notre-maison" class="font-normal text-[#b0bec5] hover:text-white transition-colors">
-                            Notre Maison
-                        </RouterLink>
                     </div>
                 </div>
 
@@ -142,9 +139,6 @@ const currentYear = new Date().getFullYear()
                             </RouterLink>
                             <RouterLink to="/boutique" class="font-normal text-[#b0bec5] hover:text-white transition-colors py-1">
                                 Boutique
-                            </RouterLink>
-                            <RouterLink to="/notre-maison" class="font-normal text-[#b0bec5] hover:text-white transition-colors py-1">
-                                Notre Maison
                             </RouterLink>
                         </div>
                     </AccordionContent>
