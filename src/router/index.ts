@@ -53,6 +53,18 @@ const routes: RouteRecordRaw[] = [
         name: "article-long",
         component: () => import("@/views/ArticleLongPage.vue"),
     },
+    // ═══ Actualités (News) ═══
+    {
+        path: "/actualites",
+        name: "actualites",
+        component: () => import("@/views/news/NewsPage.vue"),
+    },
+    {
+        path: "/actualites/:slug",
+        name: "news-detail",
+        component: () => import("@/views/news/NewsDetailPage.vue"),
+    },
+    // ═══ Académie ═══
     {
         path: "/academie",
         name: "academie",
