@@ -103,9 +103,9 @@ const currentIcon = computed(() => {
       </div>
 
       <!-- Éléments décoratifs -->
-      <div class="absolute -top-2 -right-2 w-4 h-4 bg-primary rounded-full opacity-60" />
-      <div class="absolute -bottom-1 -left-3 w-3 h-3 bg-secondary rounded-full opacity-40" />
-      <div class="absolute top-1/2 -right-6 w-2 h-2 bg-primary/50 rounded-full" />
+      <div class="absolute -top-2 -right-2 w-4 h-4 bg-primary rounded-full opacity-60" ></div>
+      <div class="absolute -bottom-1 -left-3 w-3 h-3 bg-secondary rounded-full opacity-40" ></div>
+      <div class="absolute top-1/2 -right-6 w-2 h-2 bg-primary/50 rounded-full" ></div>
     </div>
 
     <!-- Titre -->

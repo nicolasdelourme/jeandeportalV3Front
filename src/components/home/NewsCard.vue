@@ -60,7 +60,7 @@ const readTimeText = computed(() => {
 <template>
   <RouterLink :to="detailUrl" class="block">
     <Card
-      class="news-card group relative border border-secondary hover:shadow-md rounded-lg overflow-hidden transition-all duration-500 py-0 gap-0"
+      class="news-card group relative border border-secondary hover:shadow-md rounded-lg overflow-hidden transition-all duration-500 p-2 gap-0"
     >
     <div class="flex flex-col sm:flex-row">
       <!-- Thumbnail -->

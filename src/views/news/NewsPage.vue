@@ -97,7 +97,7 @@ onMounted(async () => {
         <div class="flex flex-col lg:flex-row gap-8 lg:gap-12">
           <!-- Feed skeletons -->
           <div class="flex-1 space-y-6">
-            <div class="h-8 w-48 bg-neutral-200 rounded animate-pulse mb-6" />
+            <div class="h-8 w-48 bg-neutral-200 rounded animate-pulse mb-6" ></div>
             <NewsCardSkeleton v-for="i in 4" :key="i" />
           </div>
 
@@ -124,14 +124,14 @@ onMounted(async () => {
         <NewsHero v-if="featuredItem" :item="featuredItem" class="mb-10 md:mb-14" />
 
         <!-- Main Layout: Feed + Sidebar -->
-        <div class="flex flex-col lg:flex-row gap-8 lg:gap-12">
+        <div class="flex flex-col lg:flex-row gap-4 lg:gap-6">
           <!-- Feed (Main Content) -->
           <main class="flex-1 min-w-0">
             <h2 class="font-heading font-bold text-2xl text-secondary mb-6">
               Toutes les actualites
             </h2>
 
-            <div class="flex flex-col gap-6">
+            <div class="flex flex-col gap-3">
               <NewsCard
                 v-for="item in filteredFeedItems"
                 :key="item.id"
