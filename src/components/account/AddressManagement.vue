@@ -14,6 +14,7 @@ import { getErrorMessage } from '@/lib/error-utils'
 import AddressForm from './AddressForm.vue'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Empty } from '@/components/ui/empty'
 import {
   Dialog,
   DialogContent,
@@ -323,23 +324,26 @@ const formatFullAddress = (address: Address) => {
       </div>
 
       <!-- Aucune adresse -->
-      <div v-else class="flex flex-col items-center justify-center py-12 text-center border-2 border-dashed rounded-lg">
-        <FontAwesomeIcon
-          v-if="getIcon('locationDot')"
-          :icon="getIcon('locationDot')"
-          class="w-10 h-10 text-muted-foreground mb-3"
-        />
-        <h3 class="text-base font-semibold mb-1" style="font-family: Roboto, sans-serif">
-          Aucune adresse enregistrée
-        </h3>
-        <p class="text-sm text-muted-foreground mb-4 max-w-sm">
-          Ajoutez votre première adresse pour faciliter vos commandes
-        </p>
-        <Button variant="outline" @click="openCreateForm">
-          <FontAwesomeIcon v-if="getIcon('plus')" :icon="getIcon('plus')" class="mr-2" />
-          Ajouter une adresse
-        </Button>
-      </div>
+      <Empty
+        v-else
+        title="Aucune adresse enregistrée"
+        description="Ajoutez votre première adresse pour faciliter vos commandes"
+        class="border-2 border-dashed rounded-lg"
+      >
+        <template #icon>
+          <FontAwesomeIcon
+            v-if="getIcon('locationDot')"
+            :icon="getIcon('locationDot')"
+            class="w-full h-full"
+          />
+        </template>
+        <template #action>
+          <Button variant="outline" @click="openCreateForm">
+            <FontAwesomeIcon v-if="getIcon('plus')" :icon="getIcon('plus')" class="mr-2" />
+            Ajouter une adresse
+          </Button>
+        </template>
+      </Empty>
     </CardContent>
 
     <!-- Dialog du formulaire -->

@@ -7,6 +7,7 @@ import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import DefaultLayout from '@/components/layout/DefaultLayout.vue'
 import { Button } from '@/components/ui/button'
+import { Empty } from '@/components/ui/empty'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
@@ -425,17 +426,25 @@ const resetFilters = () => {
             </div>
 
             <!-- Empty state -->
-            <div
+            <Empty
               v-if="filteredMedia.length === 0"
-              class="text-center py-16 bg-white rounded-lg"
+              title="Aucun contenu trouvé"
+              description="Aucun contenu ne correspond à vos critères."
+              class="bg-white rounded-lg"
             >
-              <p class="text-muted-foreground text-lg mb-4">
-                Aucun contenu ne correspond à vos critères.
-              </p>
-              <Button variant="outline" @click="resetFilters">
-                Réinitialiser les filtres
-              </Button>
-            </div>
+              <template #icon>
+                <FontAwesomeIcon
+                  v-if="icons.search"
+                  :icon="icons.search"
+                  class="w-full h-full"
+                />
+              </template>
+              <template #action>
+                <Button variant="outline" @click="resetFilters">
+                  Réinitialiser les filtres
+                </Button>
+              </template>
+            </Empty>
           </div>
 
           <!-- Sidebar -->

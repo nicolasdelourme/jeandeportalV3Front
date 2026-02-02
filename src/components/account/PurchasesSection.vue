@@ -106,7 +106,7 @@ const openInvoice = (order: ShopOrderInvoice): void => {
                     <FontAwesomeIcon
                         v-if="icons.shoppingBag"
                         :icon="icons.shoppingBag"
-                        class="h-10 w-10 text-neutral-400"
+                        class="w-full h-full"
                     />
                 </template>
             </Empty>

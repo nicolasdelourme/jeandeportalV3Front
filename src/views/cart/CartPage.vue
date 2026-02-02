@@ -117,7 +117,7 @@ function goToCheckout() {
             <FontAwesomeIcon
               v-if="icons.shoppingCart"
               :icon="icons.shoppingCart"
-              class="h-12 w-12 text-neutral-400"
+              class="w-full h-full"
             />
           </template>
           <template #action>

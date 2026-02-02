@@ -224,7 +224,7 @@ const openInvoice = (invoice: UserInvoice): void => {
                             <FontAwesomeIcon
                                 v-if="getIcon('newspaper')"
                                 :icon="getIcon('newspaper')!"
-                                class="h-10 w-10 text-neutral-400"
+                                class="w-full h-full"
                             />
                         </template>
                     </Empty>
@@ -497,7 +497,7 @@ const openInvoice = (invoice: UserInvoice): void => {
                             <FontAwesomeIcon
                                 v-if="getIcon('fileInvoice')"
                                 :icon="getIcon('fileInvoice')!"
-                                class="h-10 w-10 text-neutral-400"
+                                class="w-full h-full"
                             />
                         </template>
                     </Empty>

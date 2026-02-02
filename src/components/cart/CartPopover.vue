@@ -91,7 +91,7 @@ function formatPrice(price: number): string {
             <FontAwesomeIcon
               v-if="icons.shoppingCart"
               :icon="icons.shoppingCart"
-              class="h-10 w-10 text-neutral-400"
+              class="w-full h-full"
             />
           </template>
         </Empty>
