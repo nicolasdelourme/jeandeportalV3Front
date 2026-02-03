@@ -163,14 +163,14 @@ onMounted(loadData)
           <!-- Filters -->
           <div class="pb-4">
             <Tabs :default-value="activeFilter" @update:model-value="onFilterChange">
-              <TabsList class="h-auto p-1 bg-neutral-100/80 rounded-xl">
+              <TabsList class="h-auto p-1 bg-white rounded-lg">
                 <TabsTrigger
                   v-for="filter in filters"
                   :key="filter.value"
                   :value="filter.value"
-                  class="relative px-4 py-2.5 rounded-lg font-medium text-sm transition-all duration-200
-                         data-[state=active]:bg-white data-[state=active]:text-secondary data-[state=active]:shadow-sm
-                         data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:text-secondary"
+                  class="relative px-4 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 hover:cursor-pointer
+                         data-[state=active]:bg-secondary data-[state=active]:text-primary data-[state=active]:shadow-sm
+                         data-[state=inactive]:text-secondary data-[state=inactive]:hover:bg-primary/20"
                 >
                   <span class="flex items-center gap-2">
                     <FontAwesomeIcon
@@ -181,7 +181,7 @@ onMounted(loadData)
                     {{ filter.label }}
                     <span
                       class="ml-1 px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-neutral-200/80
-                             data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
+                             data-[state=active]:bg-primary/10 data-[state=active]:text-secondary"
                     >
                       {{ countByType[filter.value] }}
                     </span>
@@ -194,9 +194,9 @@ onMounted(loadData)
       </header>
 
       <!-- Content -->
-      <main class="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12">
+      <main class="max-w-7xl mx-auto px-4 md:p-8">
         <!-- Loading State -->
-        <div v-if="isLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 auto-rows-fr">
+        <div v-if="isLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 auto-rows-fr">
           <NewsCatalogCardSkeleton v-for="i in 6" :key="i" />
         </div>
 
@@ -221,7 +221,7 @@ onMounted(loadData)
           <!-- Cards grid -->
           <div
             v-else
-            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 auto-rows-fr"
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 auto-rows-fr"
           >
             <NewsCatalogCard
               v-for="item in filteredItems"
