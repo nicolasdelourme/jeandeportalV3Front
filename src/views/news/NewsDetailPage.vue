@@ -149,14 +149,14 @@ watch(
 
       <!-- Loading State -->
       <div v-if="isLoading" class="max-w-4xl mx-auto space-y-6 animate-pulse">
-        <div class="h-6 bg-neutral-200 rounded w-24" />
-        <div class="h-12 bg-neutral-200 rounded w-3/4" />
-        <div class="h-4 bg-neutral-200 rounded w-48" />
-        <div class="aspect-video bg-neutral-200 rounded-xl" />
+        <div class="h-6 bg-neutral-200 rounded w-24" ></div>
+        <div class="h-12 bg-neutral-200 rounded w-3/4" ></div>
+        <div class="h-4 bg-neutral-200 rounded w-48" ></div>
+        <div class="aspect-video bg-neutral-200 rounded-xl" ></div>
         <div class="space-y-3">
-          <div class="h-4 bg-neutral-200 rounded w-full" />
-          <div class="h-4 bg-neutral-200 rounded w-full" />
-          <div class="h-4 bg-neutral-200 rounded w-2/3" />
+          <div class="h-4 bg-neutral-200 rounded w-full" ></div>
+          <div class="h-4 bg-neutral-200 rounded w-full" ></div>
+          <div class="h-4 bg-neutral-200 rounded w-2/3" ></div>
         </div>
       </div>
 
@@ -295,7 +295,7 @@ watch(
                     <!-- Encadré court (alerte) -->
                     <Card
                       v-if="encadre.type === 'alerte'"
-                      class="border-l-4 border-l-primary rounded-lg bg-primary/10"
+                      class="border-l-4 border-l-primary rounded-lg bg-primary/10 p-0"
                     >
                       <CardContent class="p-4 lg:p-6">
                         <div class="flex items-start gap-3">
@@ -305,9 +305,9 @@ watch(
                             class="w-5 h-5 mt-0.5 shrink-0 text-primary"
                           />
                           <p
-                            class="text-sm text-foreground leading-relaxed"
+                            class="text-lg text-foreground leading-relaxed"
                             v-html="encadre.content"
-                          />
+                          ></p>
                         </div>
                       </CardContent>
                     </Card>
@@ -315,7 +315,7 @@ watch(
                     <!-- Encadré long (info box avec titre) -->
                     <Card
                       v-else-if="encadre.type === 'info'"
-                      class="border-2 border-primary rounded-lg"
+                      class="border-2 border-primary rounded-lg p-0"
                     >
                       <CardContent class="p-4 lg:p-6 space-y-3">
                         <div class="flex items-center gap-2">
@@ -327,9 +327,9 @@ watch(
                           <h4 class="font-heading font-bold text-lg">{{ encadre.title }}</h4>
                         </div>
                         <p
-                          class="text-sm text-muted-foreground leading-relaxed"
+                          class="text-lg text-muted-foreground leading-relaxed"
                           v-html="encadre.content"
-                        />
+                        ></p>
                       </CardContent>
                     </Card>
                   </template>
@@ -359,7 +359,7 @@ watch(
                   <img
                     :src="item.thumbnail"
                     :alt="item.title"
-                    class="w-full aspect-[4/3] object-cover rounded-lg"
+                    class="w-full aspect-4/3 object-cover rounded-lg"
                   />
                 </div>
               </div>
