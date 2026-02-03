@@ -114,6 +114,9 @@ export function sanitizeUser(user: unknown): User {
         // Marketing/Optin
         optinStatus: sanitizeNullableString(data.optinStatus ?? data.optin_status),
 
+        // Gamification
+        jdpStar: typeof data.jdpStar === 'number' ? data.jdpStar : null,
+
         // Métadonnées
         tag: sanitizeNullableString(data.tag),
         createdOn: sanitizeNullableString(data.createdOn ?? data.created_on),

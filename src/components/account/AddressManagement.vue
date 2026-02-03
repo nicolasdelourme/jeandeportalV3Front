@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@/lib/icons'
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
-import type { Address, CreateAddressDto } from '@/types/address.types'
+import type { Address, CreateAddressDto, AddressAPIItem } from '@/types/address.types'
 import { COUNTRY_CODES, type CountryCode } from '@/types/address.types'
 import type { UserAddress } from '@/types/auth.types'
 import { toast } from 'vue-sonner'
@@ -52,13 +52,42 @@ const getIcon = (iconKey: keyof typeof icons.value): IconDefinition => {
 }
 
 /**
- * Convertit une UserAddress (format API) en Address (format composant)
+ * Convertit une AddressAPIItem (format endpoint /fetchUserAdress) en Address
+ * Ce format inclut mainAdress/mainBillAdress (0|1) de façon fiable
+ */
+function mapAPIAddressToAddress(apiAddr: AddressAPIItem): Address {
+  const isShipping = apiAddr.mainAdress === 1
+  const isBilling = apiAddr.mainBillAdress === 1
+
+  let type: Address['type'] = 'both'
+  if (isShipping && !isBilling) type = 'shipping'
+  else if (isBilling && !isShipping) type = 'billing'
+
+  return {
+    id: String(apiAddr.adressId),
+    label: apiAddr.recipient ?? undefined,
+    title: undefined,
+    firstName: apiAddr.firstname,
+    lastName: apiAddr.lastname,
+    street: apiAddr.line1,
+    streetComplement: apiAddr.line2 ?? undefined,
+    postalCode: apiAddr.zipcode,
+    city: apiAddr.city,
+    country: apiAddr.country,
+    phone: undefined,
+    isDefaultShipping: isShipping,
+    isDefaultBilling: isBilling,
+    type,
+  }
+}
+
+/**
+ * Convertit une UserAddress (format auth store /me) en Address (fallback)
  */
 function mapUserAddressToAddress(userAddr: UserAddress, index: number): Address {
   const isShipping = userAddr.isDefaultShipping ?? false
   const isBilling = userAddr.isDefaultBilling ?? false
 
-  // Déterminer le type basé sur les flags
   let type: Address['type'] = 'both'
   if (isShipping && !isBilling) type = 'shipping'
   else if (isBilling && !isShipping) type = 'billing'
@@ -74,7 +103,7 @@ function mapUserAddressToAddress(userAddr: UserAddress, index: number): Address 
     postalCode: userAddr.zipcode,
     city: userAddr.city,
     country: userAddr.country,
-    phone: undefined, // Le backend ne renvoie pas le téléphone dans l'adresse
+    phone: undefined,
     isDefaultShipping: isShipping,
     isDefaultBilling: isBilling,
     type,
@@ -82,11 +111,33 @@ function mapUserAddressToAddress(userAddr: UserAddress, index: number): Address 
 }
 
 /**
- * Adresses mappées depuis le store utilisateur
+ * Adresses — chargées depuis /fetchUserAdress pour avoir mainAdress/mainBillAdress fiables,
+ * fallback sur le auth store si l'endpoint n'est pas disponible (mock mode)
  */
-const addresses = computed<Address[]>(() => {
-  if (!user.value?.addresses) return []
-  return user.value.addresses.map((addr, idx) => mapUserAddressToAddress(addr, idx))
+const addresses = ref<Address[]>([])
+
+// Initialisation immédiate depuis le auth store (pas de latence)
+function initFromAuthStore() {
+  if (user.value?.addresses) {
+    addresses.value = user.value.addresses.map((addr, idx) => mapUserAddressToAddress(addr, idx))
+  }
+}
+
+// Chargement depuis l'endpoint dédié (données complètes avec mainAdress/mainBillAdress)
+async function loadAddresses() {
+  try {
+    const response = await addressService.fetchAddresses()
+    addresses.value = response.adress_array.map(mapAPIAddressToAddress)
+  } catch {
+    // Fallback: garder les données du auth store
+    initFromAuthStore()
+  }
+}
+
+// Init immédiate + fetch async
+initFromAuthStore()
+onMounted(() => {
+  loadAddresses()
 })
 
 // État du formulaire
@@ -132,8 +183,9 @@ const handleSubmit = async (data: CreateAddressDto) => {
       toast.success('Adresse mise à jour avec succès')
     }
 
-    // Rafraîchir les données utilisateur
+    // Rafraîchir les données utilisateur + recharger les adresses avec données complètes
     await refreshUser()
+    await loadAddresses()
     closeForm()
   } catch (error) {
     toast.error(getErrorMessage(error))
@@ -158,8 +210,9 @@ const deleteAddress = async () => {
     const addressId = parseInt(addressToDelete.value)
     await addressService.deleteAddress(addressId)
 
-    // Rafraîchir les données utilisateur
+    // Rafraîchir les données utilisateur + recharger les adresses avec données complètes
     await refreshUser()
+    await loadAddresses()
     toast.success('Adresse supprimée avec succès')
   } catch (error) {
     toast.error(getErrorMessage(error))
@@ -178,8 +231,8 @@ const setAsDefaultShipping = async (addressId: string) => {
     const id = parseInt(addressId)
     await addressService.setDefaultShipping(id)
 
-    // Rafraîchir les données utilisateur
     await refreshUser()
+    await loadAddresses()
     toast.success('Adresse de livraison par défaut mise à jour')
   } catch (error) {
     toast.error(getErrorMessage(error))
@@ -196,8 +249,8 @@ const setAsDefaultBilling = async (addressId: string) => {
     const id = parseInt(addressId)
     await addressService.setDefaultBilling(id)
 
-    // Rafraîchir les données utilisateur
     await refreshUser()
+    await loadAddresses()
     toast.success('Adresse de facturation par défaut mise à jour')
   } catch (error) {
     toast.error(getErrorMessage(error))
@@ -362,6 +415,7 @@ const formatFullAddress = (address: Address) => {
           </DialogDescription>
         </DialogHeader>
         <AddressForm
+          :key="currentAddress?.id ?? 'new'"
           :address="currentAddress"
           :mode="formMode"
           @submit="handleSubmit"

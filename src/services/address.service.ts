@@ -87,8 +87,8 @@ class AddressService {
                 firstname: data.firstName || null,
                 lastname: data.lastName || null,
                 recipient: data.label || null,
-                mainAdress: data.isDefaultShipping ?? false,
-                mainBillAdress: data.isDefaultBilling ?? false
+                mainAdress: data.isDefaultShipping ? 1 : 0,
+                mainBillAdress: data.isDefaultBilling ? 1 : 0
             }
 
             const response = await apiClient.post<AddressAPIResponse>('/createAdress', payload)
@@ -137,8 +137,8 @@ class AddressService {
             if (data.firstName !== undefined) adressArray.firstname = data.firstName || null
             if (data.lastName !== undefined) adressArray.lastname = data.lastName || null
             if (data.label !== undefined) adressArray.recipient = data.label || null
-            if (data.isDefaultShipping !== undefined) adressArray.mainAdress = data.isDefaultShipping
-            if (data.isDefaultBilling !== undefined) adressArray.mainBillAdress = data.isDefaultBilling
+            if (data.isDefaultShipping !== undefined) adressArray.mainAdress = data.isDefaultShipping ? 1 : 0
+            if (data.isDefaultBilling !== undefined) adressArray.mainBillAdress = data.isDefaultBilling ? 1 : 0
 
             const payload: UpdateAddressAPIRequest = {
                 adressId: addressId,

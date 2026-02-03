@@ -44,7 +44,7 @@ const addressSchema = z.object({
   isDefaultBilling: z.boolean().default(false)
 })
 
-const { handleSubmit, setFieldValue } = useForm({
+const { handleSubmit, setFieldValue, values } = useForm({
   validationSchema: toTypedSchema(addressSchema),
   initialValues: props.address ? {
     label: props.address.label || '',
@@ -200,14 +200,13 @@ const getIcon = (iconKey: keyof typeof icons.value): IconDefinition | undefined 
 
     <!-- Adresses par défaut -->
     <div class="space-y-3">
-      <FormField v-slot="{ value }" name="isDefaultShipping">
+      <FormField name="isDefaultShipping">
         <FormItem class="flex items-center space-x-3 space-y-0">
           <FormControl>
             <Checkbox
-              :checked="Boolean(value)"
-              @update:checked="(val: boolean | 'indeterminate') => {
-                const boolVal = val === true
-                setFieldValue('isDefaultShipping', boolVal)
+              :model-value="values.isDefaultShipping === true"
+              @update:model-value="(val: boolean | 'indeterminate') => {
+                setFieldValue('isDefaultShipping', val === true)
               }"
             />
           </FormControl>
@@ -217,14 +216,13 @@ const getIcon = (iconKey: keyof typeof icons.value): IconDefinition | undefined 
         </FormItem>
       </FormField>
 
-      <FormField v-slot="{ value }" name="isDefaultBilling">
+      <FormField name="isDefaultBilling">
         <FormItem class="flex items-center space-x-3 space-y-0">
           <FormControl>
             <Checkbox
-              :checked="Boolean(value)"
-              @update:checked="(val: boolean | 'indeterminate') => {
-                const boolVal = val === true
-                setFieldValue('isDefaultBilling', boolVal)
+              :model-value="values.isDefaultBilling === true"
+              @update:model-value="(val: boolean | 'indeterminate') => {
+                setFieldValue('isDefaultBilling', val === true)
               }"
             />
           </FormControl>

@@ -19,8 +19,8 @@ export interface AddressAPIItem {
   zipcode: string
   city: string
   country: string           // Code ISO (FR, BE, CH, LU, CA)
-  mainAdress: boolean       // Adresse de livraison par défaut
-  mainBillAdress: boolean   // Adresse de facturation par défaut
+  mainAdress: number        // Adresse de livraison par défaut (0 | 1)
+  mainBillAdress: number    // Adresse de facturation par défaut (0 | 1)
 }
 
 /**
@@ -45,8 +45,8 @@ export interface CreateAddressAPIRequest {
   firstname?: string | null // Si null, utilise le prénom du user
   lastname?: string | null  // Si null, utilise le nom du user
   recipient?: string | null // Libellé de l'adresse
-  mainAdress: boolean
-  mainBillAdress: boolean
+  mainAdress: number
+  mainBillAdress: number
 }
 
 /**
@@ -56,8 +56,8 @@ export interface CreateAddressAPIRequest {
 export interface UpdateAddressAPIRequest {
   adressId: number
   adress_array: Partial<Omit<CreateAddressAPIRequest, 'mainAdress' | 'mainBillAdress'>> & {
-    mainAdress?: boolean
-    mainBillAdress?: boolean
+    mainAdress?: number
+    mainBillAdress?: number
   }
 }
 
