@@ -39,6 +39,7 @@ const MOCK_USERS: Array<User & { password: string }> = [
                 isDefaultBilling: true,
             }
         ],
+        jdpStar: 40,
         optinStatus: 'subscribed',
         tag: 'mock_user',
         createdOn: '2024-01-15 10:00:00',

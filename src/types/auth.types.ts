@@ -157,6 +157,9 @@ export interface User {
     // Marketing/Optin
     optinStatus: string | null       // API: "optinStatus" - "subscribed" | "unsubscribed" etc.
 
+    // Gamification
+    jdpStar: number | null           // API: "jdpStar" - étoiles JDP accumulées
+
     // Métadonnées (disponible maintenant)
     tag: string | null               // API: "tag" - segmentation marketing
     createdOn: string | null         // API: "createdOn" - date inscription

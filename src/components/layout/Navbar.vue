@@ -80,6 +80,7 @@ const icons = computed(() => ({
     userCircle: byPrefixAndName.fas?.['user-circle'],
     bars: byPrefixAndName.fas?.['bars'],
     login: byPrefixAndName.fas?.['right-to-bracket'],
+    star: byPrefixAndName.fas?.['star'],
 }))
 
 /**
@@ -240,7 +241,7 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                     <div class="border-t border-neutral-200 pt-4 space-y-0.5">
                         <!-- Mode connecté -->
                         <template v-if="isAuthenticated">
-                            <!-- Avatar + Nom -->
+                            <!-- Avatar + Nom + Étoiles -->
                             <div class="flex items-center gap-3 px-3 py-2 mb-2">
                                 <Avatar class="h-9 w-9 border border-secondary/10">
                                     <AvatarImage v-if="avatarUrl" :src="avatarUrl" :alt="displayName" />
@@ -248,10 +249,16 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                                         {{ avatarInitials }}
                                     </AvatarFallback>
                                 </Avatar>
-                                <div class="flex flex-col overflow-hidden">
+                                <div class="flex flex-col overflow-hidden flex-1">
                                     <p class="text-sm font-semibold text-secondary truncate">
                                         {{ displayName }}
                                     </p>
+                                </div>
+                                <div
+                                    class="flex items-center gap-1.5 px-3 py-1 rounded-lg border border-slate-200 shadow-sm"
+                                >
+                                    <span class="text-xs font-semibold text-foreground">{{ user?.jdpStar ?? 0 }}</span>
+                                    <FontAwesomeIcon v-if="icons.star" :icon="icons.star" class="h-3 w-3 text-primary" />
                                 </div>
                             </div>
 
@@ -413,8 +420,16 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                     </template>
                 </template>
 
-                <!-- Mode connecté: Avatar avec dropdown (visible uniquement sur desktop >= 768px) -->
+                <!-- Mode connecté: Étoiles + Avatar avec dropdown (visible uniquement sur desktop >= 768px) -->
                 <template v-else>
+                    <!-- Badge étoiles JDP -->
+                    <div
+                        class="hidden md:flex items-center gap-2 px-4 py-1.5 rounded-lg border border-slate-200 bg-white shadow-sm"
+                    >
+                        <span class="text-sm font-semibold text-foreground">{{ user?.jdpStar ?? 0 }}</span>
+                        <FontAwesomeIcon v-if="icons.star" :icon="icons.star" class="h-3.5 w-3.5 text-primary" />
+                    </div>
+
                     <DropdownMenu>
                         <DropdownMenuTrigger as-child>
                             <button
