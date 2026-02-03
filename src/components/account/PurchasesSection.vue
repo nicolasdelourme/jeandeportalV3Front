@@ -88,7 +88,7 @@ const openInvoice = (order: ShopOrderInvoice): void => {
     </div>
 
     <!-- Contenu principal -->
-    <Card v-else>
+    <Card v-else class="border-secondary">
         <CardHeader>
             <CardTitle>Mes achats</CardTitle>
             <CardDescription>

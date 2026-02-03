@@ -173,7 +173,7 @@ const openInvoice = (invoice: UserInvoice): void => {
 </script>
 
 <template>
-    <div class="space-y-6">
+    <div class="space-y-3">
         <!-- État de chargement -->
         <div v-if="store.isLoading" class="text-center py-12">
             <FontAwesomeIcon
@@ -205,7 +205,7 @@ const openInvoice = (invoice: UserInvoice): void => {
         <!-- Contenu principal -->
         <template v-else>
             <!-- Card Abonnements -->
-            <Card>
+            <Card class="border-secondary">
                 <CardHeader>
                     <CardTitle>Abonnements</CardTitle>
                     <CardDescription>
@@ -404,7 +404,7 @@ const openInvoice = (invoice: UserInvoice): void => {
             </Card>
 
             <!-- Card Sécurité -->
-            <Card>
+            <Card class="border-secondary">
                 <CardHeader>
                     <CardTitle>Sécurité</CardTitle>
                     <CardDescription>
@@ -471,7 +471,7 @@ const openInvoice = (invoice: UserInvoice): void => {
             </Card>
 
             <!-- Card Historique de facturation -->
-            <Card>
+            <Card class="border-secondary">
                 <CardHeader>
                     <CardTitle class="flex items-center gap-2">
                         <FontAwesomeIcon

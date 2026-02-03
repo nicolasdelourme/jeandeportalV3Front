@@ -279,7 +279,7 @@ const formatFullAddress = (address: Address) => {
 </script>
 
 <template>
-  <Card>
+  <Card class="border-secondary">
     <CardHeader>
       <div class="flex items-center justify-between">
         <div>

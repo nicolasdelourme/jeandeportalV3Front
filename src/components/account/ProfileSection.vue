@@ -201,9 +201,9 @@ const onSubmit = handleSubmit(async (values) => {
 </script>
 
 <template>
-    <div class="space-y-6">
+    <div class="space-y-3">
         <!-- Informations personnelles -->
-        <Card>
+        <Card class="border-secondary">
             <CardHeader>
                 <CardTitle style="font-family: Roboto, sans-serif;">Informations personnelles</CardTitle>
                 <CardDescription style="font-family: Roboto, sans-serif;">
@@ -346,7 +346,7 @@ const onSubmit = handleSubmit(async (values) => {
         </Card>
 
         <!-- Sécurité / Mot de passe et Email -->
-        <Card>
+        <Card class="border-secondary">
             <CardHeader>
                 <CardTitle>Sécurité</CardTitle>
                 <CardDescription>
