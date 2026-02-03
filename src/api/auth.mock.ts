@@ -182,6 +182,7 @@ export async function mockRegisterAPI(credentials: RegisterCredentials): Promise
         avatarUrl: null,
         addresses: [],
         optinStatus: null,
+        jdpStar: 0,
         tag: 'new_user',
         createdOn: new Date().toISOString().replace('T', ' ').substring(0, 19),
         lastLogin: null,
