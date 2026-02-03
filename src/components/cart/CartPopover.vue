@@ -168,7 +168,7 @@ function formatPrice(price: number): string {
             as-child
             class="w-full bg-success hover:bg-success/90 text-success-foreground"
             rounded="lg"
-            size="lg"
+            
           >
             <RouterLink to="/commander">
               <FontAwesomeIcon
@@ -184,7 +184,7 @@ function formatPrice(price: number): string {
             as-child
             class="w-full hover:bg-secondary hover:border-secondary"
             rounded="lg"
-            size="lg"
+            
             color="secondary"
             variant="outline"
           >
