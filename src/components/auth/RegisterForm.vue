@@ -201,7 +201,7 @@ const onSubmit = handleSubmit((values) => {
 </script>
 
 <template>
-    <form class="space-y-1" @submit="onSubmit">
+    <form class="space-y-0" @submit="onSubmit">
         <!-- Prénom et Nom -->
         <div class="grid grid-cols-2 gap-4">
             <!-- Prénom -->
