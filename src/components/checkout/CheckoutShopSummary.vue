@@ -24,7 +24,7 @@ function formatPrice(price: number): string {
 </script>
 
 <template>
-  <Card class="sticky top-24">
+  <Card class="sticky top-24 border-0">
     <CardHeader>
       <CardTitle>{{ title }}</CardTitle>
     </CardHeader>

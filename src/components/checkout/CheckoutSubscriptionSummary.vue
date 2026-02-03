@@ -77,7 +77,7 @@ const themeColors = computed(() => {
 </script>
 
 <template>
-  <Card class="sticky top-24">
+  <Card class="sticky top-24 border-0">
     <CardHeader>
       <CardTitle>Votre abonnement</CardTitle>
     </CardHeader>

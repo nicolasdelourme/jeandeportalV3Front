@@ -64,7 +64,7 @@ defineExpose({
 </script>
 
 <template>
-  <Card>
+  <Card class="border-secondary rounded-lg">
     <CardHeader>
       <CardTitle class="flex items-center gap-2">
         <FontAwesomeIcon v-if="icons.lock" :icon="icons.lock" class="h-5 w-5" />

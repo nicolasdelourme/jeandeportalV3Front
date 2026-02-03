@@ -27,7 +27,8 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@/lib/icons'
 // Composants extraits
-import AddressSelector from '@/components/checkout/AddressSelector.vue'
+import AddressSelect from '@/components/checkout/AddressSelect.vue'
+import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible'
 import AddressSummary from '@/components/checkout/AddressSummary.vue'
 import CheckoutSubscriptionSummary from '@/components/checkout/CheckoutSubscriptionSummary.vue'
 import CheckoutShopSummary from '@/components/checkout/CheckoutShopSummary.vue'
@@ -141,16 +142,6 @@ const shopItems = computed<CartItem[]>(() => {
   return items.value as CartItem[]
 })
 
-// Labels dynamiques pour AddressSelector
-const shippingTitle = computed(() => {
-  return isSubscription ? 'Adresse de facturation' : 'Adresse de livraison'
-})
-
-const shippingDescription = computed(() => {
-  return isSubscription
-    ? "Sélectionnez l'adresse pour la facturation de votre abonnement"
-    : "Sélectionnez l'adresse où vous souhaitez recevoir votre commande"
-})
 
 // ============================================
 // Formatage
@@ -186,6 +177,11 @@ onMounted(async () => {
     selectedBillingId.value = Number(defaultBilling.id)
   } else if (addresses.value.length > 0 && addresses.value[0]?.id) {
     selectedBillingId.value = Number(addresses.value[0].id)
+  }
+
+  // Smart useSameAddress : si les 2 défauts sont la même adresse, cocher la case
+  if (!isSubscription) {
+    useSameAddress.value = selectedShippingId.value === selectedBillingId.value
   }
 })
 
@@ -292,28 +288,22 @@ function goBack() {
 <template>
   <DefaultLayout>
     <div class="min-h-screen bg-gray-50">
-      <!-- Hero Section -->
-      <section class="bg-white border-b border-gray-200 py-12">
-        <div class="max-w-4xl mx-auto px-4">
-          <div class="flex items-center gap-3 mb-3">
-            <FontAwesomeIcon
-              v-if="icons.creditCard"
-              :icon="icons.creditCard"
-              class="h-10 w-10 text-secondary"
-            />
-            <h1 class="text-4xl md:text-5xl font-bold text-neutral-800" style="font-family: Roboto, sans-serif;">
-              {{ pageTitle }}
-            </h1>
-          </div>
-          <p class="text-lg text-neutral-600">{{ pageSubtitle }}</p>
-        </div>
-      </section>
-
       <!-- Contenu principal -->
-      <section class="max-w-4xl mx-auto px-4 py-8">
+      <section class="max-w-4xl mx-auto px-4 py-6">
         <div class="grid lg:grid-cols-3 gap-8">
           <!-- Colonne gauche: Formulaire -->
-          <div class="lg:col-span-2 space-y-6">
+          <div class="lg:col-span-2 space-y-4">
+            <!-- Header compact -->
+            <div class="flex items-center justify-between">
+              <div>
+                <h1 class="text-2xl font-bold font-heading text-foreground">{{ pageTitle }}</h1>
+                <p class="text-sm text-muted-foreground mt-0.5">{{ pageSubtitle }}</p>
+              </div>
+              <Button variant="ghost" color="secondary" size="sm" @click="goBack">
+                <FontAwesomeIcon v-if="icons.arrowLeft" :icon="icons.arrowLeft" class="h-4 w-4 mr-1.5 " />
+                {{ isSubscription ? 'Retour' : 'Panier' }}
+              </Button>
+            </div>
             <!-- Alerte erreur -->
             <Alert v-if="error && currentStep !== 'error'" variant="destructive">
               <FontAwesomeIcon v-if="icons.exclamationTriangle" :icon="icons.exclamationTriangle" class="h-4 w-4" />
@@ -324,77 +314,72 @@ function goBack() {
             <!-- Étape 1: Sélection des adresses -->
             <template v-if="currentStep === 'addresses'">
               <!-- Pas d'adresses -->
-              <Card v-if="!hasAddresses">
+              <Card v-if="!hasAddresses" class="border-secondary">
                 <CardContent class="py-8 text-center">
                   <p class="text-neutral-600 mb-4">Vous n'avez pas encore d'adresse enregistrée.</p>
                   <Button @click="() => router.push('/mon-compte')">Ajouter une adresse</Button>
                 </CardContent>
               </Card>
 
-              <!-- Sélection adresse de livraison/facturation -->
-              <AddressSelector
-                v-else
-                v-model="selectedShippingId"
-                :addresses="addresses"
-                :title="shippingTitle"
-                :description="shippingDescription"
-                :icon="icons.shippingFast"
-              />
+              <!-- Sélection des adresses -->
+              <Card v-else class="border-secondary rounded-lg">
+                <CardContent class="pt-6 pb-5 space-y-5">
+                  <!-- Adresse de livraison / facturation (abonnement) -->
+                  <AddressSelect
+                    v-model="selectedShippingId"
+                    :addresses="addresses"
+                    :label="isSubscription ? 'Adresse de facturation' : 'Adresse de livraison'"
+                    :icon="icons.shippingFast"
+                  />
 
-              <!-- Même adresse de facturation (seulement pour boutique) -->
-              <Card v-if="hasAddresses && !isSubscription">
-                <CardContent class="py-4">
-                  <div class="flex items-center gap-3">
+                  <!-- Même adresse facturation (boutique seulement) -->
+                  <div v-if="!isSubscription" class="flex items-center gap-2.5">
                     <Checkbox
                       id="same-address"
-                      :checked="useSameAddress"
-                      @update:checked="(val: boolean | 'indeterminate') => useSameAddress = val === true"
+                      :model-value="useSameAddress"
+                      @update:model-value="(val: boolean | 'indeterminate') => useSameAddress = val === true"
                     />
-                    <Label for="same-address" class="cursor-pointer">
+                    <Label for="same-address" class="cursor-pointer text-sm">
                       Utiliser la même adresse pour la facturation
                     </Label>
                   </div>
+
+                  <!-- Adresse facturation (collapsible) -->
+                  <Collapsible :open="!useSameAddress && !isSubscription">
+                    <CollapsibleContent class="overflow-hidden data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up">
+                      <AddressSelect
+                        v-model="selectedBillingId"
+                        :addresses="addresses"
+                        label="Adresse de facturation"
+                        :icon="icons.fileInvoice"
+                      />
+                    </CollapsibleContent>
+                  </Collapsible>
                 </CardContent>
               </Card>
 
-              <!-- Sélection adresse de facturation (si différente) -->
-              <AddressSelector
-                v-if="hasAddresses && !useSameAddress && !isSubscription"
-                v-model="selectedBillingId"
-                :addresses="addresses"
-                title="Adresse de facturation"
-                description="Sélectionnez l'adresse pour la facturation"
-                :icon="icons.fileInvoice"
-              />
-
               <!-- Bouton continuer -->
-              <div class="flex gap-4">
-                <Button variant="outline" color="secondary" rounded="lg" class="hover:bg-secondary hover:border-secondary" @click="goBack">
-                  <FontAwesomeIcon v-if="icons.arrowLeft" :icon="icons.arrowLeft" class="h-4 w-4 mr-2" />
-                  {{ isSubscription ? 'Retour' : 'Retour au panier' }}
-                </Button>
-                <Button
-                  variant="secondary"
-                  rounded="lg"
-                  class="flex-1"
-                  :disabled="!canProceedToPayment || isLoading"
-                  @click="proceedToPayment"
-                >
-                  <FontAwesomeIcon
-                    v-if="isLoading && icons.spinner"
-                    :icon="icons.spinner"
-                    class="h-4 w-4 mr-2 animate-spin"
-                  />
-                  <span v-if="isLoading">Chargement...</span>
-                  <span v-else>Continuer vers le paiement</span>
-                </Button>
-              </div>
+              <Button
+                variant="secondary"
+                rounded="lg"
+                class="w-full"
+                :disabled="!canProceedToPayment || isLoading"
+                @click="proceedToPayment"
+              >
+                <FontAwesomeIcon
+                  v-if="isLoading && icons.spinner"
+                  :icon="icons.spinner"
+                  class="h-4 w-4 mr-2 animate-spin"
+                />
+                <span v-if="isLoading">Chargement...</span>
+                <span v-else>Continuer vers le paiement</span>
+              </Button>
             </template>
 
             <!-- Étape 2: Paiement Stripe -->
             <template v-if="currentStep === 'payment'">
               <!-- Résumé des adresses sélectionnées -->
-              <Card>
+              <Card class="border-secondary rounded-lg">
                 <CardHeader>
                   <CardTitle>{{ isSubscription ? 'Adresse sélectionnée' : 'Adresses sélectionnées' }}</CardTitle>
                 </CardHeader>
@@ -448,7 +433,7 @@ function goBack() {
 
             <!-- Étape 3: Traitement -->
             <template v-if="currentStep === 'processing'">
-              <Card>
+              <Card class="border-secondary rounded-lg">
                 <CardContent class="py-16 text-center">
                   <FontAwesomeIcon
                     v-if="icons.spinner"
