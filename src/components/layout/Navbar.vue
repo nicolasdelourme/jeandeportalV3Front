@@ -322,7 +322,7 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
 
             <!-- Desktop: Navigation Pill Glassmorphism (visible >= 768px) -->
             <div class="hidden md:flex flex-1 justify-center">
-                <nav class="nav-pill flex items-center gap-1 px-1 py-1 rounded-lg backdrop-blur-sm bg-white/80 border border-[rgba(32,32,32,0.08)]">
+                <nav class="nav-pill flex items-center gap-1 px-1 py-1 rounded-lg backdrop-blur-sm bg-white/80 border border-secondary/20">
                     <template v-for="item in navItems" :key="item.label">
                         <!-- Lien simple -->
                         <RouterLink
@@ -423,12 +423,19 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
                 <!-- Mode connecté: Étoiles + Avatar avec dropdown (visible uniquement sur desktop >= 768px) -->
                 <template v-else>
                     <!-- Badge étoiles JDP -->
-                    <div
-                        class="hidden md:flex items-center gap-2 px-4 py-1.5 rounded-lg border border-slate-200 bg-white shadow-sm"
+                    <Button
+                        variant="outline"
+                        rounded="lg"
+                        color="secondary"
+                        size="sm"
+                        class="hidden md:flex items-center bg-white"
+                        :disabled="(user?.jdpStar ?? 0) === 0"
+                        :class="(user?.jdpStar ?? 0) === 0 ? 'cursor-not-allowed' : ''"
+                        
                     >
-                        <span class="text-sm font-semibold text-foreground">{{ user?.jdpStar ?? 0 }}</span>
+                        <span class="text-sm font-semibold">{{ user?.jdpStar ?? 0 }}</span>
                         <FontAwesomeIcon v-if="icons.star" :icon="icons.star" class="h-3.5 w-3.5 text-primary" />
-                    </div>
+                    </Button>
 
                     <DropdownMenu>
                         <DropdownMenuTrigger as-child>

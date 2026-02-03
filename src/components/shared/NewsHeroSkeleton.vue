@@ -10,11 +10,11 @@ import { Skeleton } from '@/components/ui/skeleton'
 <template>
   <div class="relative w-full overflow-hidden rounded-lg">
     <!-- Background avec shimmer -->
-    <div class="aspect-[16/9] md:aspect-[21/9] relative">
+    <div class="aspect-video md:aspect-21/9 relative">
       <Skeleton class="absolute inset-0 rounded-lg" />
 
       <!-- Gradient overlay (comme le vrai hero) -->
-      <div class="absolute inset-0 bg-gradient-to-t from-secondary/80 via-secondary/30 to-transparent rounded-lg" />
+      <div class="absolute inset-0 bg-linear-to-t from-secondary/80 via-secondary/30 to-transparent rounded-lg" ></div>
 
       <!-- Content placeholders -->
       <div class="absolute bottom-0 left-0 right-0 p-6 md:p-10">

@@ -17,11 +17,11 @@ const icons = computed(() => ({
 
 <template>
   <section
-    class="relative overflow-hidden rounded-lg p-6 bg-gradient-to-br from-secondary via-secondary to-secondary/80"
+    class="relative overflow-hidden rounded-lg p-6 bg-linear-to-br from-secondary via-secondary to-secondary/80"
   >
     <!-- Background decoration -->
-    <div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-    <div class="absolute bottom-0 left-0 w-24 h-24 bg-primary/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+    <div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -translate-y-1/2 translate-x-1/2" ></div>
+    <div class="absolute bottom-0 left-0 w-24 h-24 bg-primary/5 rounded-full translate-y-1/2 -translate-x-1/2" ></div>
 
     <!-- Content -->
     <div class="relative z-10 flex flex-col gap-4">

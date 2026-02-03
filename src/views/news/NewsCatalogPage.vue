@@ -169,7 +169,7 @@ onMounted(loadData)
                   :key="filter.value"
                   :value="filter.value"
                   class="relative px-4 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 hover:cursor-pointer
-                         data-[state=active]:bg-secondary data-[state=active]:text-primary data-[state=active]:shadow-sm
+                         data-[state=active]:bg-primary data-[state=active]:text-secondary data-[state=active]:shadow-sm
                          data-[state=inactive]:text-secondary data-[state=inactive]:hover:bg-primary/20"
                 >
                   <span class="flex items-center gap-2">
