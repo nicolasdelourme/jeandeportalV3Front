@@ -6,6 +6,8 @@
 import { apiClient } from '@/api/client'
 import type { NewsItem, PaginatedNews, NewsQueryParams } from '@/types/news.types'
 import { NewsError, NEWS_CONFIG } from '@/types/news.types'
+import { tiptapToHtml } from '@/lib/tiptap'
+import type { JSONContent } from '@/lib/tiptap'
 import {
   mockFetchNews,
   mockFetchNewsItem,
@@ -33,6 +35,17 @@ const API_CONFIG = {
 /**
  * Service singleton pour les appels API News
  */
+/**
+ * Convertit le champ content d'un item API (TipTap JSON) en HTML
+ * Gère le fallback string pour rétro-compatibilité
+ */
+function convertContent<T extends { content?: unknown }>(item: T): T & { content?: string } {
+  if (item.content && typeof item.content === 'object') {
+    return { ...item, content: tiptapToHtml(item.content as JSONContent) }
+  }
+  return item as T & { content?: string }
+}
+
 class NewsService {
   private abortController: AbortController | null = null
 
@@ -67,10 +80,10 @@ class NewsService {
 
       clearTimeout(timeoutId)
 
-      // Convertir les dates string en Date
+      // Convertir les dates string en Date et le contenu TipTap JSON en HTML
       return {
         ...data,
-        items: data.items.map((item) => ({
+        items: data.items.map((item) => convertContent({
           ...item,
           publishedAt: new Date(item.publishedAt),
           updatedAt: item.updatedAt ? new Date(item.updatedAt) : undefined,
@@ -121,11 +134,11 @@ class NewsService {
     try {
       const data = await apiClient.get<NewsItem>(`${API_CONFIG.ENDPOINTS.NEWS}/${slug}`)
 
-      return {
+      return convertContent({
         ...data,
         publishedAt: new Date(data.publishedAt),
         updatedAt: data.updatedAt ? new Date(data.updatedAt) : undefined,
-      }
+      })
     } catch (error) {
       const axiosError = error as { response?: { status: number } }
 
@@ -148,7 +161,7 @@ class NewsService {
     try {
       const data = await apiClient.get<NewsItem[]>(API_CONFIG.ENDPOINTS.TRENDING)
 
-      return data.map((item) => ({
+      return data.map((item) => convertContent({
         ...item,
         publishedAt: new Date(item.publishedAt),
         updatedAt: item.updatedAt ? new Date(item.updatedAt) : undefined,
@@ -171,7 +184,7 @@ class NewsService {
         `${API_CONFIG.ENDPOINTS.LATEST}?limit=${limit}`
       )
 
-      return data.map((item) => ({
+      return data.map((item) => convertContent({
         ...item,
         publishedAt: new Date(item.publishedAt),
         updatedAt: item.updatedAt ? new Date(item.updatedAt) : undefined,
@@ -194,11 +207,11 @@ class NewsService {
 
       if (!data) return null
 
-      return {
+      return convertContent({
         ...data,
         publishedAt: new Date(data.publishedAt),
         updatedAt: data.updatedAt ? new Date(data.updatedAt) : undefined,
-      }
+      })
     } catch (error) {
       throw new NewsError('Erreur lors de la récupération de l\'actualité à la une', 'API_ERROR')
     }

@@ -68,7 +68,8 @@ export interface NewsItem {
   excerpt: string
 
   /**
-   * Contenu HTML complet (pour les articles)
+   * Contenu de l'article
+   * API : TipTap JSON (objet) — converti en HTML string par le service
    */
   content?: string
 

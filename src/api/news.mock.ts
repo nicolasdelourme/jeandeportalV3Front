@@ -1,25 +1,59 @@
 /**
  * Mock API pour les actualités
  * Utilisé en mode développement (VITE_API_MODE=mock)
- * Émule des articles créés par Tiptap envoyés sous forme JSON
+ * Le contenu est au format TipTap JSON, comme le vrai backend
  */
 
 import type { NewsItem, PaginatedNews, NewsQueryParams } from '@/types/news.types'
 import { NEWS_CONFIG } from '@/types/news.types'
+import type { JSONContent } from '@/lib/tiptap'
+import { tiptapToHtml } from '@/lib/tiptap'
+
+/**
+ * Type interne mock : content en TipTap JSON avant conversion
+ */
+interface MockNewsItem extends Omit<NewsItem, 'content'> {
+  content?: JSONContent
+}
+
+/**
+ * Convertit un mock item (content JSON) en NewsItem (content HTML)
+ */
+function toNewsItem(mock: MockNewsItem): NewsItem {
+  return {
+    ...mock,
+    content: mock.content ? tiptapToHtml(mock.content) : undefined,
+  }
+}
 
 /**
  * Article court - Brève VeraCash
  * Publié le : 26/01/2026 à 10h54
  */
-const ARTICLE_SHORT: NewsItem = {
+const ARTICLE_SHORT: MockNewsItem = {
   id: 'short-veracash',
   slug: 'toujours-pas-droit-garde-veracash',
   type: 'brief',
   title: 'Toujours pas de droit de garde chez VeraCash',
   excerpt:
     "Bonne nouvelle : le négociant français continue d'offrir le stockage gratuit de vos métaux précieux dans les Ports francs de Genève.",
-  content: `<p>Au début de l'année 2025, VeraCash annonçait une future révision de ses tarifs et, notamment, l'ajout de frais de garde des métaux précieux. Il faut dire que le négociant ne facture rien pour le stockage sécurisé, audité et assuré de votre or et de votre argent dans ces chambres fortes des Ports francs de Genève. Et, en GoldPremium (jetons et pièces à cours légal), il n'y a pas de frais à la revente, ni de prime négative.</p>
-<p>En clair, une fois les frais d'entrée payés (3 %), vous pouvez conserver votre métal jaune pendant des années, sans rien payer de plus (ce qui est très bénéfique en période de hausse du cours) ! A ce stade, le négociant français semble avoir abandonné l'idée et continue d'appliquer les tarifs de 2023, vous invitant même « ne pas vous soucier du stockage, il est offert » ! Pourvu que ça dure…</p>`,
+  content: {
+    type: 'doc',
+    content: [
+      {
+        type: 'paragraph',
+        content: [
+          { type: 'text', text: "Au début de l'année 2025, VeraCash annonçait une future révision de ses tarifs et, notamment, l'ajout de frais de garde des métaux précieux. Il faut dire que le négociant ne facture rien pour le stockage sécurisé, audité et assuré de votre or et de votre argent dans ces chambres fortes des Ports francs de Genève. Et, en GoldPremium (jetons et pièces à cours légal), il n'y a pas de frais à la revente, ni de prime négative." },
+        ],
+      },
+      {
+        type: 'paragraph',
+        content: [
+          { type: 'text', text: "En clair, une fois les frais d'entrée payés (3 %), vous pouvez conserver votre métal jaune pendant des années, sans rien payer de plus (ce qui est très bénéfique en période de hausse du cours) ! A ce stade, le négociant français semble avoir abandonné l'idée et continue d'appliquer les tarifs de 2023, vous invitant même « ne pas vous soucier du stockage, il est offert » ! Pourvu que ça dure…" },
+        ],
+      },
+    ],
+  },
   thumbnail:
     'https://www.shutterstock.com/shutterstock/photos/2209788541/display_1500/stock-photo-strong-room-gate-door-golden-color-for-safety-protect-valuable-in-bank-background-2209788541.jpg',
   publishedAt: new Date('2026-01-26T10:54:00'),
@@ -33,33 +67,109 @@ const ARTICLE_SHORT: NewsItem = {
  * Article long - Euros hors système bancaire
  * Publié le : 26/01/2026 à 10h54
  */
-const ARTICLE_LONG: NewsItem = {
+const ARTICLE_LONG: MockNewsItem = {
   id: 'long-euros-hors-systeme',
   slug: 'euros-hors-systeme-bancaire',
   type: 'article',
   title: 'Comment détenir des euros sans dépendre du système bancaire ?',
   excerpt:
     "Si une crise de la dette frappait à son tour la France, les autorités pourraient instaurer des mesures déjà prises ailleurs (Grèce, Chypre…) ou prévue par la loi (blocage). Et vous, qu'avez-vous prévu ?",
-  content: `<p>Qu'avez-vous prévu si, demain matin, vos retraits sont temporairement limités à quelques dizaines d'euros ? Si votre carte bancaire cesse de fonctionner pendant plusieurs heures, voire plusieurs jours ? Si une panne d'électricité ou un « bankrun » (panique bancaire) oblige les agences à baisser leur rideau de fer ? Ou si vos virements sont bloqués « par mesure de précaution », le temps que la situation se stabilise ? Ces scénarios ne relèvent pas de la fiction.</p>
-<p>La Grèce a connu des retraits plafonnés et des comptes gelés lors de sa crise bancaire. L'Espagne a récemment expérimenté une panne généralisée d'électricité et, par conséquent, des systèmes de paiement. Dans la zone euro, Chypre a vu l'ensemble de ses banques fermer pendant près de deux semaines en 2013 (et pendant une semaine en Grèce deux ans plus tard). Dans tous ces cas, l'argent n'a pas disparu. Mais il est devenu <strong>inaccessible</strong>, au moins provisoirement. La France n'a pas connu de tels événements mais la <strong>loi Sapin II</strong> prévoit explicitement la possibilité de suspendre temporairement tout retrait de l'épargne placée en assurance-vie, en cas de risque de crise systémique.</p>
-<p>La vraie question posée ici n'est pas de savoir si votre banque est solide, mais comment vous feriez face, concrètement, si l'accès à vos euros était perturbé. Pas forcément de manière durable. Mais dans l'intervalle – quelques jours, quelques semaines, le temps d'un retour à la normale – que feriez-vous ? Plusieurs solutions existent, chacune avec ses atouts et ses limites, à condition naturellement de les avoir prévues.</p>
-
-<h2>Des espèces (trop) recherchées</h2>
-<p>A court terme, dans les premiers jours de tension, les espèces jouent bien entendu un rôle essentiel. Disposez d'une réserve de billets et de pièces permettant de faire face à une défaillance des moyens de paiement, à un incident technique ou à une limitation ponctuelle des retraits temporaires salvateur. Tout Français devrait d'ailleurs prendre une telle précaution élémentaire, expressément conseillée par le gouvernement et la Banque centrale européenne eux-mêmes (à hauteur de 70 à 100 € par personne, ce qui semble bien insuffisant néanmoins).</p>
-<p>Mais cette solution a ses propres limites : s'il est envisageable de se prémunir d'une impossibilité d'accéder à ses comptes bancaires pour quelques jours, réserver des sommes plus importantes en cash afin de tenir dans la durée pose des problèmes pratiques, sécuritaires ou réglementaires. Les espèces sont un tampon, pas une organisation financière en soi, a fortiori en cas de crise plus marquée. Dans ce cas, ne comptez pas retirer de l'argent facilement, même au guichet de votre agence (sous réserve qu'elle soit ouverte). Les banques n'ont évidemment ni le stock d'espèces suffisant ni la logistique nécessaire pour couvrir les besoins les plus courants en temps normal, alors imaginez au beau milieu d'une crise, quand tout le monde battra le pavé pour quelques billets !</p>
-
-<div data-article-teaser data-slug="toujours-pas-droit-garde-veracash-1"></div>
-
-<h2>Et les métaux précieux ?</h2>
-<p>Les métaux précieux physiques constituent la principale protection patrimoniale reconnue : détenir de l'or (ou de l'argent) vous permet de sortir du système bancaire et de conserver une valeur tangible et indépendante de toute signature monétaire. Pour autant, vous le savez, vivre en « grammes d'or » ne peut s'envisager qu'en cas de crise durable où cours de laquelle les billets de banque ne vaudraient plus rien. Dans une telle situation, les métaux précieux (re)deviendraient effectivement monnaies ultimes.</p>
-<p>En revanche, si la restriction était plus mesurée – blocage partiel – voire réputée temporaire, sur quelques jours, or et argent ne seraient pas acceptés aussi spontanément dans la rue. La population, notamment française, y est tout simplement trop peu acculturée. Demandez autour de vous une estimation du prix d'un simple napoléon pour vous en convaincre (vous ne serez pas déçu du résultat) ! <strong>Sans confiance universelle, il n'y a pas de monnaie.</strong></p>
-
-<div data-imipie-chart data-family="gold" data-serie="lbmaSerie" data-start-date="2020-01-01" data-stop-date="2025-12-31" data-x-tick="365" data-height="350px" data-title="Cours de l'or (EUR/oz) - Valeur refuge"></div>
-
-<p>Et le bitcoin ? Lui aussi coche bien des cases puisqu'il est à la fois indépendant et décentralisé, donc impossible à bloquer par une quelconque autorité. Mais, sauf coup de bol, il ferait mal l'affaire en cas une crise : son prix fluctue bien trop fortement. Or, pour appréhender une période d'incertitude, il ne faut pas chercher à conserver un potentiel de gain grâce à la spéculation, mais à <em>sanctuariser une réserve de valeur stable</em>. Ainsi, le bitcoin qui peut très bien avoir toute sa place dans un patrimoine, ne permet pas de disposer d'un solide matelas en attendant que le système se débloque. Sinon d'un matelas… dégonflable !</p>
-
-<h2>Titres financiers et immobiliers inopérants</h2>
-<p>Les actions et autres titres financiers restent, quant à eux, entièrement dépendants de l'infrastructure bancaire et financière. Même si leur valeur fluctue indépendamment des comptes courants, leur détention passe par des intermédiaires, des plateformes et des systèmes de règlement centralisés. En cas de crise systémique, leur liquidité serait suspendue au moment même où vous en auriez besoin. Quant à l'immobilier, s'il protège sur le long terme, il est par définition illiquide (et illusoire pour faire face à une interruption temporaire des flux financiers).</p>`,
+  content: {
+    type: 'doc',
+    content: [
+      {
+        type: 'paragraph',
+        content: [
+          { type: 'text', text: "Qu'avez-vous prévu si, demain matin, vos retraits sont temporairement limités à quelques dizaines d'euros ? Si votre carte bancaire cesse de fonctionner pendant plusieurs heures, voire plusieurs jours ? Si une panne d'électricité ou un « bankrun » (panique bancaire) oblige les agences à baisser leur rideau de fer ? Ou si vos virements sont bloqués « par mesure de précaution », le temps que la situation se stabilise ? Ces scénarios ne relèvent pas de la fiction." },
+        ],
+      },
+      {
+        type: 'paragraph',
+        content: [
+          { type: 'text', text: "La Grèce a connu des retraits plafonnés et des comptes gelés lors de sa crise bancaire. L'Espagne a récemment expérimenté une panne généralisée d'électricité et, par conséquent, des systèmes de paiement. Dans la zone euro, Chypre a vu l'ensemble de ses banques fermer pendant près de deux semaines en 2013 (et pendant une semaine en Grèce deux ans plus tard). Dans tous ces cas, l'argent n'a pas disparu. Mais il est devenu " },
+          { type: 'text', marks: [{ type: 'bold' }], text: 'inaccessible' },
+          { type: 'text', text: ", au moins provisoirement. La France n'a pas connu de tels événements mais la " },
+          { type: 'text', marks: [{ type: 'bold' }], text: 'loi Sapin II' },
+          { type: 'text', text: " prévoit explicitement la possibilité de suspendre temporairement tout retrait de l'épargne placée en assurance-vie, en cas de risque de crise systémique." },
+        ],
+      },
+      {
+        type: 'paragraph',
+        content: [
+          { type: 'text', text: "La vraie question posée ici n'est pas de savoir si votre banque est solide, mais comment vous feriez face, concrètement, si l'accès à vos euros était perturbé. Pas forcément de manière durable. Mais dans l'intervalle – quelques jours, quelques semaines, le temps d'un retour à la normale – que feriez-vous ? Plusieurs solutions existent, chacune avec ses atouts et ses limites, à condition naturellement de les avoir prévues." },
+        ],
+      },
+      {
+        type: 'heading',
+        attrs: { level: 2 },
+        content: [{ type: 'text', text: 'Des espèces (trop) recherchées' }],
+      },
+      {
+        type: 'paragraph',
+        content: [
+          { type: 'text', text: "A court terme, dans les premiers jours de tension, les espèces jouent bien entendu un rôle essentiel. Disposez d'une réserve de billets et de pièces permettant de faire face à une défaillance des moyens de paiement, à un incident technique ou à une limitation ponctuelle des retraits temporaires salvateur. Tout Français devrait d'ailleurs prendre une telle précaution élémentaire, expressément conseillée par le gouvernement et la Banque centrale européenne eux-mêmes (à hauteur de 70 à 100 € par personne, ce qui semble bien insuffisant néanmoins)." },
+        ],
+      },
+      {
+        type: 'paragraph',
+        content: [
+          { type: 'text', text: "Mais cette solution a ses propres limites : s'il est envisageable de se prémunir d'une impossibilité d'accéder à ses comptes bancaires pour quelques jours, réserver des sommes plus importantes en cash afin de tenir dans la durée pose des problèmes pratiques, sécuritaires ou réglementaires. Les espèces sont un tampon, pas une organisation financière en soi, a fortiori en cas de crise plus marquée. Dans ce cas, ne comptez pas retirer de l'argent facilement, même au guichet de votre agence (sous réserve qu'elle soit ouverte). Les banques n'ont évidemment ni le stock d'espèces suffisant ni la logistique nécessaire pour couvrir les besoins les plus courants en temps normal, alors imaginez au beau milieu d'une crise, quand tout le monde battra le pavé pour quelques billets !" },
+        ],
+      },
+      {
+        type: 'articleTeaser',
+        attrs: { slug: 'toujours-pas-droit-garde-veracash-1' },
+      },
+      {
+        type: 'heading',
+        attrs: { level: 2 },
+        content: [{ type: 'text', text: 'Et les métaux précieux ?' }],
+      },
+      {
+        type: 'paragraph',
+        content: [
+          { type: 'text', text: "Les métaux précieux physiques constituent la principale protection patrimoniale reconnue : détenir de l'or (ou de l'argent) vous permet de sortir du système bancaire et de conserver une valeur tangible et indépendante de toute signature monétaire. Pour autant, vous le savez, vivre en « grammes d'or » ne peut s'envisager qu'en cas de crise durable où cours de laquelle les billets de banque ne vaudraient plus rien. Dans une telle situation, les métaux précieux (re)deviendraient effectivement monnaies ultimes." },
+        ],
+      },
+      {
+        type: 'paragraph',
+        content: [
+          { type: 'text', text: "En revanche, si la restriction était plus mesurée – blocage partiel – voire réputée temporaire, sur quelques jours, or et argent ne seraient pas acceptés aussi spontanément dans la rue. La population, notamment française, y est tout simplement trop peu acculturée. Demandez autour de vous une estimation du prix d'un simple napoléon pour vous en convaincre (vous ne serez pas déçu du résultat) ! " },
+          { type: 'text', marks: [{ type: 'bold' }], text: "Sans confiance universelle, il n'y a pas de monnaie." },
+        ],
+      },
+      {
+        type: 'imipieChart',
+        attrs: {
+          family: 'gold',
+          serie: 'lbmaSerie',
+          startDate: '2020-01-01',
+          stopDate: '2025-12-31',
+          xTick: 365,
+          height: '350px',
+        },
+      },
+      {
+        type: 'paragraph',
+        content: [
+          { type: 'text', text: "Et le bitcoin ? Lui aussi coche bien des cases puisqu'il est à la fois indépendant et décentralisé, donc impossible à bloquer par une quelconque autorité. Mais, sauf coup de bol, il ferait mal l'affaire en cas une crise : son prix fluctue bien trop fortement. Or, pour appréhender une période d'incertitude, il ne faut pas chercher à conserver un potentiel de gain grâce à la spéculation, mais à " },
+          { type: 'text', marks: [{ type: 'italic' }], text: 'sanctuariser une réserve de valeur stable' },
+          { type: 'text', text: ". Ainsi, le bitcoin qui peut très bien avoir toute sa place dans un patrimoine, ne permet pas de disposer d'un solide matelas en attendant que le système se débloque. Sinon d'un matelas… dégonflable !" },
+        ],
+      },
+      {
+        type: 'heading',
+        attrs: { level: 2 },
+        content: [{ type: 'text', text: 'Titres financiers et immobiliers inopérants' }],
+      },
+      {
+        type: 'paragraph',
+        content: [
+          { type: 'text', text: "Les actions et autres titres financiers restent, quant à eux, entièrement dépendants de l'infrastructure bancaire et financière. Même si leur valeur fluctue indépendamment des comptes courants, leur détention passe par des intermédiaires, des plateformes et des systèmes de règlement centralisés. En cas de crise systémique, leur liquidité serait suspendue au moment même où vous en auriez besoin. Quant à l'immobilier, s'il protège sur le long terme, il est par définition illiquide (et illusoire pour faire face à une interruption temporaire des flux financiers)." },
+        ],
+      },
+    ],
+  },
   encadres: [
     {
       type: 'alerte',
@@ -83,7 +193,7 @@ const ARTICLE_LONG: NewsItem = {
 /**
  * Les 3 vidéos YouTube de Nicolas Delourme
  */
-const VIDEO_1: NewsItem = {
+const VIDEO_1: MockNewsItem = {
   id: 'yt-video-1',
   slug: 'video-nicolas-delourme-1',
   type: 'video',
@@ -97,7 +207,7 @@ const VIDEO_1: NewsItem = {
   views: 15420,
 }
 
-const VIDEO_2: NewsItem = {
+const VIDEO_2: MockNewsItem = {
   id: 'yt-video-2',
   slug: 'video-nicolas-delourme-2',
   type: 'video',
@@ -111,7 +221,7 @@ const VIDEO_2: NewsItem = {
   views: 9870,
 }
 
-const VIDEO_3: NewsItem = {
+const VIDEO_3: MockNewsItem = {
   id: 'yt-video-3',
   slug: 'video-nicolas-delourme-3',
   type: 'video',
@@ -130,7 +240,7 @@ const VIDEO_3: NewsItem = {
  * 2 articles + 3 vidéos qui se répètent
  */
 function generateMockNews(): NewsItem[] {
-  const baseItems: NewsItem[] = [ARTICLE_LONG, ARTICLE_SHORT, VIDEO_1, VIDEO_2, VIDEO_3]
+  const baseItems: MockNewsItem[] = [ARTICLE_LONG, ARTICLE_SHORT, VIDEO_1, VIDEO_2, VIDEO_3]
   const result: NewsItem[] = []
 
   // On génère 30 items en répétant les 5 de base
@@ -138,7 +248,7 @@ function generateMockNews(): NewsItem[] {
     const baseItem = baseItems[i % baseItems.length]!
     const daysAgo = i // Chaque item est 1 jour plus ancien
 
-    result.push({
+    result.push(toNewsItem({
       ...baseItem,
       id: `${baseItem.id}-${i}`,
       slug: `${baseItem.slug}-${i}`,
@@ -146,7 +256,7 @@ function generateMockNews(): NewsItem[] {
         new Date('2026-01-26T10:54:00').getTime() - daysAgo * 24 * 60 * 60 * 1000
       ),
       views: Math.floor((baseItem.views ?? 1000) * (1 - i * 0.02)), // Moins de vues pour les plus anciens
-    })
+    }))
   }
 
   return result.sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime())
