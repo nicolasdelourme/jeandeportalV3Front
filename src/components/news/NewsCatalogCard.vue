@@ -8,14 +8,20 @@ import { computed } from 'vue'
 import type { NewsItem } from '@/types/news.types'
 import { Card } from '@/components/ui/card'
 import NewsBadge from '@/components/shared/NewsBadge.vue'
+import BookmarkButton from '@/components/shared/BookmarkButton.vue'
 import { AspectRatio } from '@/components/ui/aspect-ratio'
 import { Badge } from '@/components/ui/badge'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@/lib/icons'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   item: NewsItem
-}>()
+  featured?: boolean
+  horizontal?: boolean
+}>(), {
+  featured: false,
+  horizontal: false,
+})
 
 const icons = computed(() => ({
   play: byPrefixAndName.fas?.['play'],
@@ -47,10 +53,21 @@ const readTimeText = computed(() => {
 
 <template>
   <RouterLink :to="detailUrl" class="block h-full">
-    <Card class="catalog-card gap-2 p-2 group relative border border-secondary hover:shadow-md rounded-lg overflow-hidden transition-all duration-500 h-full flex flex-col">
+    <Card :class="[
+      'catalog-card gap-2 p-2 group relative border border-secondary hover:shadow-md rounded-lg overflow-hidden transition-all duration-500 h-full',
+      horizontal ? 'flex flex-col sm:flex-row' : 'flex flex-col'
+    ]">
       <!-- Image section -->
-      <div class="relative">
-        <AspectRatio :ratio="16/9">
+      <div :class="['relative', horizontal ? 'featured-image sm:w-[45%] sm:shrink-0 sm:self-stretch' : '']">
+        <!-- Horizontal layout: free height, fills container on sm+ -->
+        <img
+          v-if="horizontal"
+          :src="item.thumbnail"
+          :alt="item.title"
+          class="w-full h-full object-cover rounded-lg"
+        />
+        <!-- Standard layout: aspect ratio constrained -->
+        <AspectRatio v-else :ratio="16/9">
           <img
             :src="item.thumbnail"
             :alt="item.title"
@@ -80,23 +97,34 @@ const readTimeText = computed(() => {
           {{ formattedDuration }}
         </Badge>
 
-        <!-- Type badge - top left -->
+        <!-- Type badge - top right -->
         <div class="absolute top-3 right-3">
           <NewsBadge :type="item.type" class="shadow-sm" />
+        </div>
+
+        <!-- Bookmark button - top left -->
+        <div class="absolute top-3 left-3">
+          <BookmarkButton :slug="item.slug" variant="icon-only" />
         </div>
       </div>
 
       <!-- Content section -->
-      <div class="flex flex-col flex-1">
+      <div :class="['flex flex-col flex-1', horizontal ? 'sm:py-1 sm:pr-1' : '']">
         <!-- Title -->
-        <h3 class="font-heading font-bold text-lg leading-snug text-secondary line-clamp-2 mb-2 group-hover:text-secondary-foreground transition-colors duration-500">
+        <h3 :class="[
+          'font-heading font-bold leading-snug text-secondary mb-2 group-hover:text-secondary-foreground transition-colors duration-500',
+          featured ? 'text-xl sm:text-2xl line-clamp-3' : 'text-lg line-clamp-2'
+        ]">
           {{ item.title }}
         </h3>
 
-        <!-- Excerpt - only for articles -->
+        <!-- Excerpt -->
         <p
-          v-if="item.type === 'article'"
-          class="text-sm text-muted-foreground leading-relaxed line-clamp-2 mb-3 group-hover:text-white/80 transition-colors duration-500"
+          v-if="featured || item.type === 'article'"
+          :class="[
+            'text-sm text-muted-foreground leading-relaxed mb-3 group-hover:text-white/80 transition-colors duration-500',
+            featured ? 'line-clamp-3 sm:line-clamp-4' : 'line-clamp-2'
+          ]"
         >
           {{ item.excerpt }}
         </p>
@@ -147,5 +175,18 @@ const readTimeText = computed(() => {
 .catalog-card > :deep(*) {
   position: relative;
   z-index: 1;
+}
+
+/* Featured: constrain image height on mobile so it doesn't dominate */
+.featured-image {
+  max-height: 240px;
+  overflow: hidden;
+  border-radius: var(--radius);
+}
+
+@media (min-width: 640px) {
+  .featured-image {
+    max-height: none;
+  }
 }
 </style>

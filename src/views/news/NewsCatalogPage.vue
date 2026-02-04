@@ -64,6 +64,25 @@ const filteredItems = computed(() => {
 })
 
 /**
+ * Randomly pick 2 item IDs to feature.
+ * Stable per filter — re-rolls when filteredItems change.
+ */
+const featuredIds = computed(() => {
+  const items = filteredItems.value
+  if (items.length < 3) return new Set<string>()
+  const ids = new Set<string>()
+  // Simple seeded pick: shuffle indices based on list length as seed
+  const pool = items.map((_, i) => i)
+  // Fisher-Yates partial shuffle (pick 2)
+  for (let i = pool.length - 1; i > 0 && ids.size < 2; i--) {
+    const j = (i * 7 + items.length * 13) % (i + 1)
+    ;[pool[i], pool[j]] = [pool[j]!, pool[i]!]
+    ids.add(items[pool[i]!]!.id)
+  }
+  return ids
+})
+
+/**
  * Count per type for badge display
  */
 const countByType = computed(() => {
@@ -196,7 +215,7 @@ onMounted(loadData)
       <!-- Content -->
       <main class="max-w-7xl mx-auto px-4 md:p-8">
         <!-- Loading State -->
-        <div v-if="isLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 auto-rows-fr">
+        <div v-if="isLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
           <NewsCatalogCardSkeleton v-for="i in 6" :key="i" />
         </div>
 
@@ -218,15 +237,18 @@ onMounted(loadData)
             :type="activeFilter === 'all' ? 'catalog' : 'filter'"
           />
 
-          <!-- Cards grid -->
           <div
             v-else
-            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 auto-rows-fr"
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2"
+            style="grid-auto-flow: dense;"
           >
             <NewsCatalogCard
               v-for="item in filteredItems"
               :key="item.id"
               :item="item"
+              :featured="featuredIds.has(item.id)"
+              :horizontal="featuredIds.has(item.id)"
+              :class="featuredIds.has(item.id) ? 'sm:col-span-2' : ''"
             />
           </div>
 
