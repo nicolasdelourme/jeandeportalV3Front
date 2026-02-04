@@ -315,7 +315,7 @@ const isDropdownActive = (items: readonly { href: string }[]): boolean => {
             <!-- Logo -->
             <div class="flex items-center shrink-0">
                 <RouterLink to="/" class="flex items-center gap-2">
-                    <img src="/logoInfocash.png" alt="Logo Infocash"
+                    <img src="/logoInfocash.svg" alt="Logo Infocash"
                          class="w-32 h-8 md:w-36 md:h-8 object-contain" />
                 </RouterLink>
             </div>
