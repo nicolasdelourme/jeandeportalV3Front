@@ -218,15 +218,6 @@ watch(
                   {{ formattedDate }} à {{ formattedTime }}
                 </span>
 
-                <span v-if="formattedUpdatedAt" class="flex items-center gap-1 text-muted-foreground/80 italic">
-                  Mis à jour le {{ formattedUpdatedAt }}
-                </span>
-
-                <span v-if="item.author" class="flex items-center gap-1">
-                  <FontAwesomeIcon v-if="icons.user" :icon="icons.user" class="w-3.5 h-3.5" />
-                  {{ item.author }}
-                </span>
-
                 <span v-if="item.readTime" class="flex items-center gap-1">
                   <FontAwesomeIcon v-if="icons.clock" :icon="icons.clock" class="w-3.5 h-3.5" />
                   {{ item.readTime }} min de lecture
@@ -242,7 +233,15 @@ watch(
                   {{ formattedViews }}
                 </span>
 
+                <span v-if="formattedUpdatedAt" class="flex items-center gap-1 text-muted-foreground/80 italic">
+                  Mis à jour le {{ formattedUpdatedAt }}
+                </span>
               </div>
+
+              <!-- Author -->
+              <p v-if="item.author" class="text-sm text-muted-foreground mt-1">
+                {{ item.author }}
+              </p>
             </header>
 
             <!-- ==================== VIDEO ==================== -->
@@ -305,7 +304,7 @@ watch(
               />
 
               <!-- Chapeau / Excerpt -->
-              <p class="text-xl text-neutral-600 leading-relaxed mb-8 font-medium border-l-4 border-primary pl-4">
+              <p class="text-xl text-neutral-500 leading-relaxed mb-8 font-medium">
                 {{ item.excerpt }}
               </p>
 

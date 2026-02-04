@@ -236,11 +236,6 @@ onUnmounted(() => {
 
 <template>
   <div ref="wrapperRef" class="highcharts-chart-wrapper my-6">
-    <!-- Titre optionnel -->
-    <h4 v-if="config.title" class="font-heading font-bold text-lg mb-3 text-foreground">
-      {{ config.title }}
-    </h4>
-
     <!-- État de chargement -->
     <div
       v-if="scriptsLoading || isFetching"

@@ -27,16 +27,14 @@ onMounted(async () => {
 
 <template>
   <!-- Loading skeleton -->
-  <div v-if="isLoading" class="flex items-center gap-3 py-3 my-4 not-prose animate-pulse">
+  <div v-if="isLoading" class="flex items-center gap-3 py-3 my-6 border-y border-neutral-200 not-prose animate-pulse">
     <span class="h-4 w-24 bg-neutral-200 rounded"></span>
-    <span class="w-px h-4 bg-neutral-300"></span>
     <span class="h-4 w-48 bg-neutral-200 rounded"></span>
   </div>
 
   <!-- Resolved teaser -->
-  <div v-else-if="title" class="flex items-center gap-3 py-3 my-4 not-prose">
+  <div v-else-if="title" class="flex items-center gap-3 py-3 my-6 border-y border-neutral-200 not-prose">
     <span class="text-sm font-semibold text-muted-foreground uppercase tracking-wide whitespace-nowrap">A lire aussi</span>
-    <span class="w-px h-4 bg-neutral-300"></span>
     <RouterLink :to="`/actualites/${slug}`" class="text-sm font-medium text-primary hover:underline truncate">
       {{ title }}
     </RouterLink>
