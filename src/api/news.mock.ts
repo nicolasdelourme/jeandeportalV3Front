@@ -23,6 +23,7 @@ const ARTICLE_SHORT: NewsItem = {
   thumbnail:
     'https://www.shutterstock.com/shutterstock/photos/2209788541/display_1500/stock-photo-strong-room-gate-door-golden-color-for-safety-protect-valuable-in-bank-background-2209788541.jpg',
   publishedAt: new Date('2026-01-26T10:54:00'),
+  updatedAt: new Date('2026-01-28T16:30:00'),
   readTime: 2,
   author: 'Nicolas Delourme',
   views: 3420,
@@ -46,6 +47,8 @@ const ARTICLE_LONG: NewsItem = {
 <h2>Des espèces (trop) recherchées</h2>
 <p>A court terme, dans les premiers jours de tension, les espèces jouent bien entendu un rôle essentiel. Disposez d'une réserve de billets et de pièces permettant de faire face à une défaillance des moyens de paiement, à un incident technique ou à une limitation ponctuelle des retraits temporaires salvateur. Tout Français devrait d'ailleurs prendre une telle précaution élémentaire, expressément conseillée par le gouvernement et la Banque centrale européenne eux-mêmes (à hauteur de 70 à 100 € par personne, ce qui semble bien insuffisant néanmoins).</p>
 <p>Mais cette solution a ses propres limites : s'il est envisageable de se prémunir d'une impossibilité d'accéder à ses comptes bancaires pour quelques jours, réserver des sommes plus importantes en cash afin de tenir dans la durée pose des problèmes pratiques, sécuritaires ou réglementaires. Les espèces sont un tampon, pas une organisation financière en soi, a fortiori en cas de crise plus marquée. Dans ce cas, ne comptez pas retirer de l'argent facilement, même au guichet de votre agence (sous réserve qu'elle soit ouverte). Les banques n'ont évidemment ni le stock d'espèces suffisant ni la logistique nécessaire pour couvrir les besoins les plus courants en temps normal, alors imaginez au beau milieu d'une crise, quand tout le monde battra le pavé pour quelques billets !</p>
+
+<div data-article-teaser data-slug="toujours-pas-droit-garde-veracash-1"></div>
 
 <h2>Et les métaux précieux ?</h2>
 <p>Les métaux précieux physiques constituent la principale protection patrimoniale reconnue : détenir de l'or (ou de l'argent) vous permet de sortir du système bancaire et de conserver une valeur tangible et indépendante de toute signature monétaire. Pour autant, vous le savez, vivre en « grammes d'or » ne peut s'envisager qu'en cas de crise durable où cours de laquelle les billets de banque ne vaudraient plus rien. Dans une telle situation, les métaux précieux (re)deviendraient effectivement monnaies ultimes.</p>
@@ -71,6 +74,7 @@ const ARTICLE_LONG: NewsItem = {
   thumbnail:
     'https://img.lemde.fr/2015/07/29/686/0/5211/2603/1342/671/60/0/abab459_44dcd005b408410ba645fcccfb529ee6-44dcd005b408410ba645fcccfb529ee6-0.jpg',
   publishedAt: new Date('2026-01-26T10:54:00'),
+  updatedAt: new Date('2026-01-30T09:15:00'),
   readTime: 12,
   author: 'Nicolas Delourme',
   views: 8750,

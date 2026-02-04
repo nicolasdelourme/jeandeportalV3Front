@@ -73,6 +73,7 @@ class NewsService {
         items: data.items.map((item) => ({
           ...item,
           publishedAt: new Date(item.publishedAt),
+          updatedAt: item.updatedAt ? new Date(item.updatedAt) : undefined,
         })),
       }
     } catch (error) {
@@ -123,6 +124,7 @@ class NewsService {
       return {
         ...data,
         publishedAt: new Date(data.publishedAt),
+        updatedAt: data.updatedAt ? new Date(data.updatedAt) : undefined,
       }
     } catch (error) {
       const axiosError = error as { response?: { status: number } }
@@ -149,6 +151,7 @@ class NewsService {
       return data.map((item) => ({
         ...item,
         publishedAt: new Date(item.publishedAt),
+        updatedAt: item.updatedAt ? new Date(item.updatedAt) : undefined,
       }))
     } catch (error) {
       throw new NewsError('Erreur lors de la récupération des tendances', 'API_ERROR')
@@ -171,6 +174,7 @@ class NewsService {
       return data.map((item) => ({
         ...item,
         publishedAt: new Date(item.publishedAt),
+        updatedAt: item.updatedAt ? new Date(item.updatedAt) : undefined,
       }))
     } catch (error) {
       throw new NewsError('Erreur lors de la récupération des dernières actualités', 'API_ERROR')
@@ -193,6 +197,7 @@ class NewsService {
       return {
         ...data,
         publishedAt: new Date(data.publishedAt),
+        updatedAt: data.updatedAt ? new Date(data.updatedAt) : undefined,
       }
     } catch (error) {
       throw new NewsError('Erreur lors de la récupération de l\'actualité à la une', 'API_ERROR')

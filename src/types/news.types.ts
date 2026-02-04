@@ -93,6 +93,11 @@ export interface NewsItem {
   publishedAt: Date
 
   /**
+   * Date de dernière mise à jour (si différente de publishedAt)
+   */
+  updatedAt?: Date
+
+  /**
    * Temps de lecture estimé en minutes (pour les articles)
    */
   readTime?: number

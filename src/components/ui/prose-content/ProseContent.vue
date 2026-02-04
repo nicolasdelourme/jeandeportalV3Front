@@ -13,6 +13,7 @@ import {
     TableRow,
 } from '@/components/ui/table'
 import { HighchartsChart } from '@/components/ui/highcharts-chart'
+import ArticleTeaser from '@/components/news/ArticleTeaser.vue'
 import type { ArticleChartConfig } from '@/types/imipie.types'
 
 interface Props {
@@ -24,9 +25,13 @@ interface TableData {
     rows: string[][]
 }
 
+interface TeaserData {
+    slug: string
+}
+
 interface ContentSegment {
-    type: 'html' | 'table' | 'chart'
-    content: string | TableData | ArticleChartConfig
+    type: 'html' | 'table' | 'chart' | 'teaser'
+    content: string | TableData | ArticleChartConfig | TeaserData
 }
 
 const props = defineProps<Props>()
@@ -114,14 +119,31 @@ function parseChartPlaceholder(divHtml: string): ArticleChartConfig | null {
 }
 
 /**
+ * Parse un placeholder de teaser article et extrait le slug
+ * Format: <div data-article-teaser data-slug="mon-slug"></div>
+ */
+function parseTeaserPlaceholder(divHtml: string): TeaserData | null {
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(divHtml, 'text/html')
+    const div = doc.querySelector('div[data-article-teaser]')
+
+    if (!div) return null
+
+    const slug = div.getAttribute('data-slug')
+    if (!slug) return null
+
+    return { slug }
+}
+
+/**
  * Decoupe le HTML en segments (html brut, tables et graphiques)
  */
 const segments = computed<ContentSegment[]>(() => {
     if (!props.html) return []
 
     const result: ContentSegment[] = []
-    // Regex combinée pour tables et placeholders de graphiques
-    const combinedRegex = /(<table[\s\S]*?<\/table>)|(<div[^>]*data-imipie-chart[^>]*>(?:<\/div>)?)/gi
+    // Regex combinée pour tables, placeholders de graphiques et teasers
+    const combinedRegex = /(<table[\s\S]*?<\/table>)|(<div[^>]*data-imipie-chart[^>]*>(?:<\/div>)?)|(<div[^>]*data-article-teaser[^>]*>(?:<\/div>)?)/gi
     let lastIndex = 0
     let match
 
@@ -134,7 +156,7 @@ const segments = computed<ContentSegment[]>(() => {
             }
         }
 
-        // Determine if it's a table or a chart
+        // Determine if it's a table, chart, or teaser
         const matchedContent = match[0]
 
         if (match[1]) {
@@ -150,6 +172,15 @@ const segments = computed<ContentSegment[]>(() => {
                 result.push({
                     type: 'chart',
                     content: chartConfig,
+                })
+            }
+        } else if (match[3]) {
+            // It's an article teaser
+            const teaserData = parseTeaserPlaceholder(matchedContent)
+            if (teaserData) {
+                result.push({
+                    type: 'teaser',
+                    content: teaserData,
                 })
             }
         }
@@ -206,6 +237,12 @@ const segments = computed<ContentSegment[]>(() => {
             <HighchartsChart
                 v-else-if="segment.type === 'chart'"
                 :config="segment.content as ArticleChartConfig"
+            />
+
+            <!-- Article teaser -->
+            <ArticleTeaser
+                v-else-if="segment.type === 'teaser'"
+                :slug="(segment.content as TeaserData).slug"
             />
         </template>
     </div>
