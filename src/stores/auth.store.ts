@@ -19,6 +19,7 @@ import {
 import { logger } from '@/utils/logger'
 import { sanitizeUser } from '@/utils/sanitize'
 import { useCartStore } from '@/stores/cart.store'
+import { useBookmarkStore } from '@/stores/bookmark.store'
 
 /**
  * Store d'authentification
@@ -146,6 +147,10 @@ export const useAuthStore = defineStore('auth', () => {
                     logger.warn('⚠️ [AUTH STORE] Erreur lors de la sync panier (non bloquant):', err)
                 }
             }
+
+            // Initialiser les bookmarks
+            const bookmarkStore = useBookmarkStore()
+            bookmarkStore.initialize()
 
             // Retourner l'URL de redirection
             const redirectUrl = response.afterLogin || '/'

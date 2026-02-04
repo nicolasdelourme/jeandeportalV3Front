@@ -55,6 +55,14 @@ const routes: RouteRecordRaw[] = [
         component: () => import("@/views/news/NewsCatalogPage.vue"),
     },
     {
+        path: "/actualites/favoris",
+        name: "news-bookmarks",
+        component: () => import("@/views/news/BookmarksPage.vue"),
+        meta: {
+            requiresAuth: true,
+        },
+    },
+    {
         path: "/actualites/:slug",
         name: "news-detail",
         component: () => import("@/views/news/NewsDetailPage.vue"),

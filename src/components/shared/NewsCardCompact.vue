@@ -6,6 +6,7 @@
 import { computed } from 'vue'
 import type { NewsItem } from '@/types/news.types'
 import NewsBadge from '@/components/shared/NewsBadge.vue'
+import BookmarkButton from '@/components/shared/BookmarkButton.vue'
 
 const props = withDefaults(defineProps<{
   item: NewsItem
@@ -99,6 +100,11 @@ const relativeDate = computed(() => {
         <NewsBadge :type="item.type" class="!text-[10px] !px-1.5 !py-0.5" />
         <span>{{ relativeDate }}</span>
       </div>
+    </div>
+
+    <!-- Bookmark -->
+    <div class="shrink-0 self-center">
+      <BookmarkButton :slug="item.slug" variant="ghost" size="sm" />
     </div>
   </RouterLink>
 </template>

@@ -8,6 +8,7 @@
 import { computed } from 'vue'
 import type { NewsItem } from '@/types/news.types'
 import NewsBadge from '@/components/shared/NewsBadge.vue'
+import BookmarkButton from '@/components/shared/BookmarkButton.vue'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -93,13 +94,17 @@ const readTimeText = computed(() => {
         >
           {{ formattedDuration }}
         </Badge>
+
       </div>
 
       <!-- Content -->
       <div class="flex flex-col justify-between flex-1 min-w-0">
         <div class="flex flex-col gap-2">
-          <!-- Badge -->
-          <NewsBadge :type="item.type" />
+          <!-- Badge + Bookmark -->
+          <div class="flex items-center justify-between">
+            <NewsBadge :type="item.type" />
+            <BookmarkButton :slug="item.slug" variant="button" size="sm" />
+          </div>
 
           <!-- Title -->
           <h3 class="font-heading font-bold text-lg md:text-xl leading-tight text-secondary line-clamp-2 group-hover:text-primary transition-colors duration-500">

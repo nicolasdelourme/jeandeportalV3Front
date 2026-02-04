@@ -14,6 +14,7 @@ import NewsBadge from '@/components/shared/NewsBadge.vue'
 import VideoEmbed from '@/components/news/VideoEmbed.vue'
 import SidebarAcademy from '@/components/shared/SidebarAcademy.vue'
 import NewsCardCompact from '@/components/shared/NewsCardCompact.vue'
+import BookmarkButton from '@/components/shared/BookmarkButton.vue'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
@@ -37,7 +38,6 @@ const icons = computed(() => ({
   eye: byPrefixAndName.fas?.['eye'],
   calendar: byPrefixAndName.fas?.['calendar'],
   play: byPrefixAndName.fas?.['play'],
-  heart: byPrefixAndName.fas?.['heart'],
   share: byPrefixAndName.fas?.['share-nodes'],
   triangleExclamation: byPrefixAndName.fas?.['triangle-exclamation'],
   circleInfo: byPrefixAndName.fas?.['circle-info'],
@@ -64,6 +64,28 @@ const formattedTime = computed(() => {
     hour: '2-digit',
     minute: '2-digit',
   }).format(item.value.publishedAt)
+})
+
+/**
+ * Date de mise à jour formatée (null si absente ou même jour que publishedAt)
+ */
+const formattedUpdatedAt = computed(() => {
+  if (!item.value?.updatedAt) return null
+  // Ne pas afficher si même jour que publishedAt
+  const pub = item.value.publishedAt
+  const upd = item.value.updatedAt
+  if (
+    pub.getFullYear() === upd.getFullYear() &&
+    pub.getMonth() === upd.getMonth() &&
+    pub.getDate() === upd.getDate()
+  ) {
+    return null
+  }
+  return new Intl.DateTimeFormat('fr-FR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(upd)
 })
 
 /**
@@ -178,8 +200,11 @@ watch(
           <article class="flex-1 min-w-0 max-w-4xl">
             <!-- Header -->
             <header class="mb-8">
-              <!-- Badge -->
-              <NewsBadge :type="item.type" class="mb-4" />
+              <!-- Badge + Bookmark -->
+              <div class="flex items-center justify-between mb-4">
+                <NewsBadge :type="item.type" />
+                <BookmarkButton :slug="item.slug" variant="button" />
+              </div>
 
               <!-- Title -->
               <h1 class="font-heading font-bold text-3xl md:text-4xl lg:text-5xl text-secondary leading-tight mb-4">
@@ -191,6 +216,10 @@ watch(
                 <span class="flex items-center gap-1">
                   <FontAwesomeIcon v-if="icons.calendar" :icon="icons.calendar" class="w-3.5 h-3.5" />
                   {{ formattedDate }} à {{ formattedTime }}
+                </span>
+
+                <span v-if="formattedUpdatedAt" class="flex items-center gap-1 text-muted-foreground/80 italic">
+                  Mis à jour le {{ formattedUpdatedAt }}
                 </span>
 
                 <span v-if="item.author" class="flex items-center gap-1">
@@ -212,6 +241,7 @@ watch(
                   <FontAwesomeIcon v-if="icons.eye" :icon="icons.eye" class="w-3.5 h-3.5" />
                   {{ formattedViews }}
                 </span>
+
               </div>
             </header>
 
@@ -236,11 +266,7 @@ watch(
                 <span v-if="formattedViews" class="text-sm text-muted-foreground">
                   {{ formattedViews }}
                 </span>
-                <div class="flex-1" />
-                <Button variant="outline" size="sm" class="gap-2">
-                  <FontAwesomeIcon v-if="icons.heart" :icon="icons.heart" class="w-4 h-4" />
-                  J'aime
-                </Button>
+                <div class="flex-1" ></div>
                 <Button variant="outline" size="sm" class="gap-2">
                   <FontAwesomeIcon v-if="icons.share" :icon="icons.share" class="w-4 h-4" />
                   Partager

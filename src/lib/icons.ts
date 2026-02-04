@@ -20,6 +20,7 @@ import {
   faArrowRightFromBracket,
   faBars,
   faBasketShopping,
+  faBookmark as faBookmarkSolid,
   faBolt,
   faBook,
   faBookOpenLines,
@@ -116,6 +117,7 @@ import {
 // REGULAR (far) - Classic Regular Icons
 // ============================================================================
 import {
+  faBookmark as faBookmarkRegular,
   faClock as faClockRegular,
   faDownload as faDownloadRegular,
   faEnvelope as faEnvelopeRegular,
@@ -262,6 +264,9 @@ export const fas = {
   'phone': faPhone,
   'quote-left': faQuoteLeft,
 
+  // Bookmarks
+  'bookmark': faBookmarkSolid,
+
   // Misc
   'bolt': faBolt,
   'compass': faCompass,
@@ -286,6 +291,7 @@ export const fas = {
  * Usage: icons.far.clock ou icons.far['clock']
  */
 export const far = {
+  'bookmark': faBookmarkRegular,
   'clock': faClockRegular,
   'download': faDownloadRegular,
   'envelope': faEnvelopeRegular,
