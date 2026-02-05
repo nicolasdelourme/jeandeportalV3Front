@@ -3,7 +3,41 @@
  * Génère des données fictives pour le développement
  */
 
-import type { ImiPieChartParams, ImiPieChartResponse } from '@/types/imipie.types'
+import type { ImiPieChartResponse } from '@/types/imipie.types'
+
+/**
+ * Parse l'URL imiPie pour extraire les paramètres
+ */
+interface ParsedImiPieUrl {
+  family: string
+  serie: string
+  startDate?: string
+  stopDate?: string
+  xTick?: number
+}
+
+function parseImiPieUrl(url: string): ParsedImiPieUrl {
+  try {
+    const urlObj = new URL(url)
+    const pathParts = urlObj.pathname.split('/').filter(Boolean)
+    // Expected: ['api', 'gold', 'lbmaSerie', 'highcharts']
+    const family = pathParts[1] ?? 'gold'
+    const serie = pathParts[2] ?? 'lbmaSerie'
+
+    return {
+      family,
+      serie,
+      startDate: urlObj.searchParams.get('startDate') ?? undefined,
+      stopDate: urlObj.searchParams.get('stopDate') ?? undefined,
+      xTick: urlObj.searchParams.has('xTick')
+        ? parseInt(urlObj.searchParams.get('xTick')!, 10)
+        : undefined,
+    }
+  } catch {
+    // Fallback si l'URL est invalide
+    return { family: 'gold', serie: 'lbmaSerie' }
+  }
+}
 
 /**
  * Génère des données de série temporelle aléatoires
@@ -90,14 +124,18 @@ function getFamilyConfig(family: string): FamilyConfig {
 
 /**
  * Simule un appel API avec délai
+ * @param url URL complète de l'API imiPie
  */
 export async function mockFetchChart(
-  params: ImiPieChartParams
+  url: string
 ): Promise<ImiPieChartResponse> {
   // Simuler un délai réseau (300-800ms)
   await new Promise((resolve) =>
     setTimeout(resolve, 300 + Math.random() * 500)
   )
+
+  // Parser l'URL pour extraire les paramètres
+  const params = parseImiPieUrl(url)
 
   // Récupérer la config de la famille (avec fallback sur gold)
   const familyConfig = getFamilyConfig(params.family)

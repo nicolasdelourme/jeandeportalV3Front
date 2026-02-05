@@ -207,12 +207,7 @@ const ARTICLE_LONG: MockNewsItem = {
       {
         type: 'imipieChart',
         attrs: {
-          family: 'gold',
-          serie: 'lbmaSerie',
-          startDate: '2020-01-01',
-          stopDate: '2025-12-31',
-          xTick: 365,
-          // height non défini — l'API gère le ratio nativement
+          url: 'https://imipie.ovh/api/gold/lbmaSerie/highcharts?output=json&profile=infocashWeb&startDate=2020-01-01&stopDate=2025-12-31&xTick=365',
         },
       },
       // Blockquote natif TipTap
