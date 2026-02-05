@@ -102,7 +102,7 @@ function parseTable(tableHtml: string): TableData {
 
 /**
  * Parse un placeholder de graphique et extrait la configuration
- * Format: <div data-imipie-chart data-family="gold" data-serie="lbmaSerie" ...></div>
+ * Format: <div data-imipie-chart data-url="https://imipie.ovh/api/..." ...></div>
  */
 function parseChartPlaceholder(divHtml: string): ArticleChartConfig | null {
     const parser = new DOMParser()
@@ -111,21 +111,13 @@ function parseChartPlaceholder(divHtml: string): ArticleChartConfig | null {
 
     if (!div) return null
 
-    const family = div.getAttribute('data-family')
-    const serie = div.getAttribute('data-serie')
+    const url = div.getAttribute('data-url')
 
-    // family et serie sont requis
-    if (!family || !serie) {
-        /* console.warn('[ProseContent] Chart placeholder missing required data-family or data-serie') */
-        return null
-    }
+    // L'URL est obligatoire
+    if (!url) return null
 
     return {
-        family,
-        serie,
-        startDate: div.getAttribute('data-start-date') || undefined,
-        stopDate: div.getAttribute('data-stop-date') || undefined,
-        xTick: div.getAttribute('data-x-tick') ? parseInt(div.getAttribute('data-x-tick')!, 10) : undefined,
+        url,
         height: div.getAttribute('data-height') || undefined,
         title: div.getAttribute('data-title') || undefined,
     }

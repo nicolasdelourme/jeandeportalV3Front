@@ -67,13 +67,7 @@ async function fetchChartData() {
   fetchError.value = null
 
   try {
-    chartData.value = await imipieService.fetchChart({
-      family: props.config.family,
-      serie: props.config.serie,
-      startDate: props.config.startDate,
-      stopDate: props.config.stopDate,
-      xTick: props.config.xTick,
-    })
+    chartData.value = await imipieService.fetchChart(props.config.url)
   } catch (error) {
     if (error instanceof ImiPieAPIError) {
       fetchError.value = error.message
