@@ -94,6 +94,37 @@ const ArticleTeaser = Node.create({
 })
 
 /**
+ * Node custom : encadré éditorial (callout)
+ * Contient du texte riche (paragraphes, bold, etc.)
+ * Produit : <div data-callout data-style="info" data-icon="circle-info" data-title="...">contenu</div>
+ */
+const CalloutBlock = Node.create({
+  name: 'calloutBlock',
+  group: 'block',
+  content: 'block+',
+
+  addAttributes() {
+    return {
+      style: { default: 'info' },
+      icon: { default: null },
+      title: { default: null },
+    }
+  },
+
+  renderHTML({ HTMLAttributes }) {
+    const attrs: Record<string, string> = { 'data-callout': '' }
+    if (HTMLAttributes.style) attrs['data-style'] = HTMLAttributes.style
+    if (HTMLAttributes.icon) attrs['data-icon'] = HTMLAttributes.icon
+    if (HTMLAttributes.title) attrs['data-title'] = HTMLAttributes.title
+    return ['div', attrs, 0]
+  },
+
+  parseHTML() {
+    return [{ tag: 'div[data-callout]' }]
+  },
+})
+
+/**
  * Liste des extensions TipTap utilisees pour la conversion
  */
 const extensions = [
@@ -107,6 +138,7 @@ const extensions = [
   Image,
   ImipieChart,
   ArticleTeaser,
+  CalloutBlock,
 ]
 
 /**

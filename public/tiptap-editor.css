@@ -320,6 +320,32 @@
   content: 'Graphique Highcharts';
 }
 
+/* ─── calloutBlock — Encadré éditorial ─── */
+.ProseMirror [data-type="calloutBlock"] {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.ProseMirror [data-type="calloutBlock"][data-style="alerte"] {
+  border-left: 4px solid var(--color-primary);
+  background: rgba(255, 222, 0, 0.1);
+}
+
+.ProseMirror [data-type="calloutBlock"][data-style="info"] {
+  border: 2px solid var(--color-primary);
+}
+
+.ProseMirror [data-type="calloutBlock"][data-style="success"] {
+  border-left: 4px solid #10b981;
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.ProseMirror [data-type="calloutBlock"][data-style="danger"] {
+  border-left: 4px solid #ef4444;
+  background: rgba(239, 68, 68, 0.08);
+}
+
 /* ─── articleTeaser — Teaser "A lire aussi" ─── */
 .ProseMirror [data-type="articleTeaser"] {
   display: flex;
