@@ -19,23 +19,24 @@ export const NEWS_TYPE_LABELS: Record<NewsType, string> = {
 } as const
 
 /**
- * Encadré dans un article
+ * Auteur d'un contenu
+ * Anticipation : table authors en base avec avatar
  */
-export interface NewsEncadre {
+export interface NewsAuthor {
   /**
-   * Type d'encadré : alerte (court) ou info (long avec titre)
+   * Identifiant unique (future clé primaire)
    */
-  type: 'alerte' | 'info'
+  id: string
 
   /**
-   * Titre (uniquement pour type 'info')
+   * Nom complet de l'auteur
    */
-  title?: string
+  name: string
 
   /**
-   * Contenu HTML de l'encadré
+   * URL de l'avatar (optionnel, fallback sur initiales)
    */
-  content: string
+  avatar?: string
 }
 
 /**
@@ -74,11 +75,6 @@ export interface NewsItem {
   content?: string
 
   /**
-   * Encadrés de l'article (alertes, infos)
-   */
-  encadres?: NewsEncadre[]
-
-  /**
    * ID de la vidéo YouTube (pour les vidéos)
    */
   youtubeId?: string
@@ -109,9 +105,9 @@ export interface NewsItem {
   duration?: number
 
   /**
-   * Auteur (optionnel)
+   * Auteur du contenu (optionnel)
    */
-  author?: string
+  author?: NewsAuthor
 
   /**
    * Nombre de vues (pour le classement trending)
