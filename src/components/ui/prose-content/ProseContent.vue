@@ -174,22 +174,22 @@ const CALLOUT_DEFAULTS: Record<string, { icon: string; iconClass: string; classe
     alerte: {
         icon: 'triangle-exclamation',
         iconClass: 'text-primary',
-        classes: 'border-l-4 border-l-primary bg-primary/10 rounded-lg p-4 lg:p-6',
+        classes: 'border-l-4 border-l-primary bg-primary/10 rounded-lg p-4 lg:p-6 my-5',
     },
     info: {
         icon: 'circle-info',
         iconClass: 'text-primary',
-        classes: 'border-2 border-primary rounded-lg p-4 lg:p-6',
+        classes: 'border-2 border-primary rounded-lg p-4 lg:p-6 my-5',
     },
     success: {
         icon: 'circle-check',
         iconClass: 'text-emerald-600',
-        classes: 'border-l-4 border-l-emerald-500 bg-emerald-50 rounded-lg p-4 lg:p-6',
+        classes: 'border-l-4 border-l-emerald-500 bg-emerald-50 rounded-lg p-4 lg:p-6 my-5',
     },
     danger: {
         icon: 'shield-halved',
         iconClass: 'text-red-600',
-        classes: 'border-l-4 border-l-red-500 bg-red-50 rounded-lg p-4 lg:p-6',
+        classes: 'border-l-4 border-l-red-500 bg-red-50 rounded-lg p-4 lg:p-6 my-5',
     },
 }
 
@@ -384,7 +384,7 @@ const segments = computed<ContentSegment[]>(() => {
             <!-- Blockquote with quote icon -->
             <blockquote
                 v-else-if="segment.type === 'blockquote'"
-                class="flex items-start gap-2.5 border-l-4 border-neutral-300 rounded-lg p-4 lg:p-6 italic text-neutral-600"
+                class="flex items-start gap-2.5 border-l-4 border-neutral-300 rounded-lg p-4 lg:p-6 italic text-neutral-600 my-5"
             >
                 <FontAwesomeIcon
                     v-if="quoteIcon"
