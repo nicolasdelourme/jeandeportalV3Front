@@ -4,10 +4,31 @@
  * Le contenu est au format TipTap JSON, comme le vrai backend
  */
 
-import type { NewsItem, PaginatedNews, NewsQueryParams } from '@/types/news.types'
+import type { NewsItem, PaginatedNews, NewsQueryParams, NewsAuthor } from '@/types/news.types'
 import { NEWS_CONFIG } from '@/types/news.types'
 import type { JSONContent } from '@/lib/tiptap'
 import { tiptapToHtml } from '@/lib/tiptap'
+
+/**
+ * Auteurs mock (pas d'avatar pour tester le fallback initiales)
+ */
+const AUTHORS: Record<string, NewsAuthor> = {
+  nicolas: {
+    id: 'author-nicolas',
+    name: 'Nicolas Delourme',
+    // avatar: undefined — fallback sur "ND"
+  },
+  marie: {
+    id: 'author-marie',
+    name: 'Marie Dupont',
+    // avatar: undefined — fallback sur "MD"
+  },
+  jean: {
+    id: 'author-jean',
+    name: 'Jean-Pierre Martin',
+    // avatar: undefined — fallback sur "JM"
+  },
+}
 
 /**
  * Type interne mock : content en TipTap JSON avant conversion
@@ -59,7 +80,7 @@ const ARTICLE_SHORT: MockNewsItem = {
   publishedAt: new Date('2026-01-26T10:54:00'),
   updatedAt: new Date('2026-01-28T16:30:00'),
   readTime: 2,
-  author: 'Nicolas Delourme',
+  author: AUTHORS.nicolas,
   views: 3420,
 }
 
@@ -116,6 +137,21 @@ const ARTICLE_LONG: MockNewsItem = {
           { type: 'text', text: "Mais cette solution a ses propres limites : s'il est envisageable de se prémunir d'une impossibilité d'accéder à ses comptes bancaires pour quelques jours, réserver des sommes plus importantes en cash afin de tenir dans la durée pose des problèmes pratiques, sécuritaires ou réglementaires. Les espèces sont un tampon, pas une organisation financière en soi, a fortiori en cas de crise plus marquée. Dans ce cas, ne comptez pas retirer de l'argent facilement, même au guichet de votre agence (sous réserve qu'elle soit ouverte). Les banques n'ont évidemment ni le stock d'espèces suffisant ni la logistique nécessaire pour couvrir les besoins les plus courants en temps normal, alors imaginez au beau milieu d'une crise, quand tout le monde battra le pavé pour quelques billets !" },
         ],
       },
+      // Callout alerte — ancien encadré alerte déplacé dans le flux
+      {
+        type: 'calloutBlock',
+        attrs: { style: 'alerte', icon: 'triangle-exclamation' },
+        content: [
+          {
+            type: 'paragraph',
+            content: [
+              { type: 'text', text: "Détenir des stablecoins ne supprime pas tous les risques. Le principal est celui de la " },
+              { type: 'text', marks: [{ type: 'bold' }], text: '« contrepartie »' },
+              { type: 'text', text: " : un stablecoin repose sur un émetteur privé qui s'engage à garantir la parité avec la devise de référence. Autrement dit, vous ne détenez pas une créance sur une banque centrale comme avec un billet, mais d'une créance envers une entreprise privée, comme une banque de détail (ni plus ni moins). Cette société gère des réserves censées couvrir l'ensemble des jetons en circulation." },
+            ],
+          },
+        ],
+      },
       {
         type: 'articleTeaser',
         attrs: { slug: 'toujours-pas-droit-garde-veracash-1' },
@@ -129,6 +165,36 @@ const ARTICLE_LONG: MockNewsItem = {
         type: 'paragraph',
         content: [
           { type: 'text', text: "Les métaux précieux physiques constituent la principale protection patrimoniale reconnue : détenir de l'or (ou de l'argent) vous permet de sortir du système bancaire et de conserver une valeur tangible et indépendante de toute signature monétaire. Pour autant, vous le savez, vivre en « grammes d'or » ne peut s'envisager qu'en cas de crise durable où cours de laquelle les billets de banque ne vaudraient plus rien. Dans une telle situation, les métaux précieux (re)deviendraient effectivement monnaies ultimes." },
+        ],
+      },
+      // Callout info — ancien encadré info déplacé dans le flux
+      {
+        type: 'calloutBlock',
+        attrs: { style: 'info', icon: 'circle-info', title: 'Qui sont les émetteurs de stablecoins ?' },
+        content: [
+          {
+            type: 'paragraph',
+            content: [
+              { type: 'text', text: "Les stablecoins sont émis par des acteurs privés qui garantissent, sur le papier, la parité avec une devise officielle grâce à des réserves dédiées. Le risque de contrepartie n'étant pas nul – l'émetteur pouvant faire faillite emportant avec lui le magot –, il convient de se tourner vers les acteurs les plus solides. Le plus important d'entre eux est " },
+              { type: 'text', marks: [{ type: 'bold' }], text: 'Tether' },
+              { type: 'text', text: ", émetteur de l'USDT, aujourd'hui le stablecoin le plus utilisé au monde. Selon l'agence Bloomberg, Tether est devenu le 18ᵉ détenteur mondial de bons du Trésor américain, devant des pays comme l'Allemagne ou l'Arabie saoudite !" },
+            ],
+          },
+          {
+            type: 'paragraph',
+            content: [
+              { type: 'text', marks: [{ type: 'bold' }], text: 'Circle' },
+              { type: 'text', text: " est une autre entreprise américaine, émettrice de l'USDC et l'EURC : l'entreprise se distingue par une communication très orientée vers la transparence et la conformité, avec des réserves composées de liquidités et de dette d'État de court terme. Pour les Européens, l'EURC permet de détenir des euros numériques sans risque de change." },
+            ],
+          },
+          {
+            type: 'paragraph',
+            content: [
+              { type: 'text', text: "Enfin, " },
+              { type: 'text', marks: [{ type: 'bold' }], text: 'SG-Forge' },
+              { type: 'text', text: ", filiale de la Société Générale, émet l'EUR CoinVertible (EURCV). Son intérêt est surtout institutionnel : il illustre l'entrée des grandes banques européennes à pas mesuré dans l'univers des stablecoins." },
+            ],
+          },
         ],
       },
       {
@@ -146,8 +212,20 @@ const ARTICLE_LONG: MockNewsItem = {
           startDate: '2020-01-01',
           stopDate: '2025-12-31',
           xTick: 365,
-          height: '350px',
+          // height non défini — l'API gère le ratio nativement
         },
+      },
+      // Blockquote natif TipTap
+      {
+        type: 'blockquote',
+        content: [
+          {
+            type: 'paragraph',
+            content: [
+              { type: 'text', text: "La monnaie est une convention, un accord collectif. Elle n'a de valeur que parce que chacun accepte de lui en reconnaître une. Le jour où cette confiance vacille, même brièvement, c'est tout l'édifice qui tremble." },
+            ],
+          },
+        ],
       },
       {
         type: 'paragraph',
@@ -155,6 +233,19 @@ const ARTICLE_LONG: MockNewsItem = {
           { type: 'text', text: "Et le bitcoin ? Lui aussi coche bien des cases puisqu'il est à la fois indépendant et décentralisé, donc impossible à bloquer par une quelconque autorité. Mais, sauf coup de bol, il ferait mal l'affaire en cas une crise : son prix fluctue bien trop fortement. Or, pour appréhender une période d'incertitude, il ne faut pas chercher à conserver un potentiel de gain grâce à la spéculation, mais à " },
           { type: 'text', marks: [{ type: 'italic' }], text: 'sanctuariser une réserve de valeur stable' },
           { type: 'text', text: ". Ainsi, le bitcoin qui peut très bien avoir toute sa place dans un patrimoine, ne permet pas de disposer d'un solide matelas en attendant que le système se débloque. Sinon d'un matelas… dégonflable !" },
+        ],
+      },
+      // Callout success — nouveau
+      {
+        type: 'calloutBlock',
+        attrs: { style: 'success', icon: 'circle-check', title: 'Le saviez-vous ?' },
+        content: [
+          {
+            type: 'paragraph',
+            content: [
+              { type: 'text', text: "Les stablecoins adossés au dollar représentent aujourd'hui plus de 150 milliards de dollars de capitalisation. L'USDT de Tether concentre à lui seul environ les deux tiers de ce marché, ce qui en fait le troisième actif numérique mondial derrière le Bitcoin et l'Ethereum." },
+            ],
+          },
         ],
       },
       {
@@ -168,25 +259,27 @@ const ARTICLE_LONG: MockNewsItem = {
           { type: 'text', text: "Les actions et autres titres financiers restent, quant à eux, entièrement dépendants de l'infrastructure bancaire et financière. Même si leur valeur fluctue indépendamment des comptes courants, leur détention passe par des intermédiaires, des plateformes et des systèmes de règlement centralisés. En cas de crise systémique, leur liquidité serait suspendue au moment même où vous en auriez besoin. Quant à l'immobilier, s'il protège sur le long terme, il est par définition illiquide (et illusoire pour faire face à une interruption temporaire des flux financiers)." },
         ],
       },
+      // Callout danger — nouveau
+      {
+        type: 'calloutBlock',
+        attrs: { style: 'danger', icon: 'shield-halved', title: 'Attention' },
+        content: [
+          {
+            type: 'paragraph',
+            content: [
+              { type: 'text', text: "Ne conservez jamais l'intégralité de votre épargne sur un seul support numérique, qu'il s'agisse d'un compte bancaire, d'une plateforme crypto ou d'un portefeuille de stablecoins. La diversification des supports reste la meilleure protection contre les risques de contrepartie et les défaillances techniques." },
+            ],
+          },
+        ],
+      },
     ],
   },
-  encadres: [
-    {
-      type: 'alerte',
-      content: `Détenir des stablecoins ne supprime pas tous les risques. Le principal est celui de la <strong>« contrepartie »</strong> : un stablecoin repose sur un émetteur privé qui s'engage à garantir la parité avec la devise de référence. Autrement dit, vous ne détenez pas une créance sur une banque centrale comme avec un billet, mais d'une créance envers une entreprise privée, comme une banque de détail (ni plus ni moins). Cette société gère des réserves censées couvrir l'ensemble des jetons en circulation.`,
-    },
-    {
-      type: 'info',
-      title: 'Qui sont les émetteurs de stablecoins ?',
-      content: `Les stablecoins sont émis par des acteurs privés qui garantissent, sur le papier, la parité avec une devise officielle grâce à des réserves dédiées. Le risque de contrepartie n'étant pas nul – l'émetteur pouvant faire faillite emportant avec lui le magot –, il convient de se tourner vers les acteurs les plus solides. Le plus important d'entre eux est <strong>Tether</strong>, émetteur de l'USDT, aujourd'hui le stablecoin le plus utilisé au monde. Selon l'agence Bloomberg, Tether est devenu le 18ᵉ détenteur mondial de bons du Trésor américain, devant des pays comme l'Allemagne ou l'Arabie saoudite ! Environ deux tiers de ses réserves sont investis en dette américaine à court terme (moins d'un an), et près de 5 % en or, soit environ 80 tonnes de lingots, principalement conservées en Suisse.<br><br><strong>Circle</strong> est une autre entreprise américaine, émettrice de l'USDC et l'EURC : l'entreprise se distingue par une communication très orientée vers la transparence et la conformité, avec des réserves composées de liquidités et de dette d'État de court terme. Pour les Européens, l'EURC permet de détenir des euros numériques sans risque de change.<br><br>Enfin, <strong>SG-Forge</strong>, filiale de la Société Générale, émet l'EUR CoinVertible (EURCV). Son intérêt est surtout institutionnel : il illustre l'entrée des grandes banques européennes à pas mesuré dans l'univers des stablecoins.`,
-    },
-  ],
   thumbnail:
     'https://img.lemde.fr/2015/07/29/686/0/5211/2603/1342/671/60/0/abab459_44dcd005b408410ba645fcccfb529ee6-44dcd005b408410ba645fcccfb529ee6-0.jpg',
   publishedAt: new Date('2026-01-26T10:54:00'),
   updatedAt: new Date('2026-01-30T09:15:00'),
   readTime: 12,
-  author: 'Nicolas Delourme',
+  author: AUTHORS.nicolas,
   views: 8750,
 }
 
@@ -203,7 +296,7 @@ const VIDEO_1: MockNewsItem = {
   thumbnail: 'https://img.youtube.com/vi/hxGC2H2tFvY/mqdefault.jpg',
   publishedAt: new Date('2026-01-25T14:00:00'),
   duration: 1200,
-  author: 'Nicolas Delourme',
+  author: AUTHORS.nicolas,
   views: 15420,
 }
 
@@ -217,7 +310,7 @@ const VIDEO_2: MockNewsItem = {
   thumbnail: 'https://img.youtube.com/vi/Y9PYpw6dd4Q/mqdefault.jpg',
   publishedAt: new Date('2026-01-24T10:00:00'),
   duration: 1245,
-  author: 'Nicolas Delourme',
+  author: AUTHORS.nicolas,
   views: 9870,
 }
 
@@ -231,7 +324,7 @@ const VIDEO_3: MockNewsItem = {
   thumbnail: 'https://img.youtube.com/vi/jN-FLG3xo5k/mqdefault.jpg',
   publishedAt: new Date('2026-01-23T11:00:00'),
   duration: 1890,
-  author: 'Nicolas Delourme',
+  author: AUTHORS.nicolas,
   views: 12350,
 }
 
