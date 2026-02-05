@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * Page Détail Actualité
- * Articles: Clean reading layout avec encadrés stylés (Card components)
+ * Articles: Clean reading layout (callouts rendus inline via ProseContent)
  * Videos: YouTube embed + infos enrichies
  * Briefs: Layout compact avec image discrète
  */
@@ -15,10 +15,10 @@ import VideoEmbed from '@/components/news/VideoEmbed.vue'
 import SidebarAcademy from '@/components/shared/SidebarAcademy.vue'
 import NewsCardCompact from '@/components/shared/NewsCardCompact.vue'
 import BookmarkButton from '@/components/shared/BookmarkButton.vue'
+import AuthorBadge from '@/components/shared/AuthorBadge.vue'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { Card, CardContent } from '@/components/ui/card'
 import { ProseContent } from '@/components/ui/prose-content'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { byPrefixAndName } from '@/lib/icons'
@@ -35,12 +35,10 @@ const icons = computed(() => ({
   arrowLeft: byPrefixAndName.fas?.['arrow-left'],
   clock: byPrefixAndName.far?.['clock'],
   user: byPrefixAndName.fas?.['user'],
-  eye: byPrefixAndName.fas?.['eye'],
+
   calendar: byPrefixAndName.fas?.['calendar'],
   play: byPrefixAndName.fas?.['play'],
   share: byPrefixAndName.fas?.['share-nodes'],
-  triangleExclamation: byPrefixAndName.fas?.['triangle-exclamation'],
-  circleInfo: byPrefixAndName.fas?.['circle-info'],
 }))
 
 /**
@@ -98,16 +96,6 @@ const formattedDuration = computed(() => {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`
 })
 
-/**
- * Nombre de vues formaté
- */
-const formattedViews = computed(() => {
-  if (!item.value?.views) return null
-  if (item.value.views >= 1000) {
-    return `${(item.value.views / 1000).toFixed(1)}k vues`
-  }
-  return `${item.value.views} vues`
-})
 
 /**
  * Charge l'actualité par slug
@@ -211,11 +199,17 @@ watch(
                 {{ item.title }}
               </h1>
 
+              <!-- Author -->
+              <AuthorBadge v-if="item.author" :author="item.author" class="mb-2" />
+
               <!-- Meta -->
               <div class="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                 <span class="flex items-center gap-1">
                   <FontAwesomeIcon v-if="icons.calendar" :icon="icons.calendar" class="w-3.5 h-3.5" />
                   {{ formattedDate }} à {{ formattedTime }}
+                  <template v-if="formattedUpdatedAt">
+                    (mis à jour le {{ formattedUpdatedAt }})
+                  </template>
                 </span>
 
                 <span v-if="item.readTime" class="flex items-center gap-1">
@@ -227,21 +221,7 @@ watch(
                   <FontAwesomeIcon v-if="icons.clock" :icon="icons.clock" class="w-3.5 h-3.5" />
                   {{ formattedDuration }}
                 </span>
-
-                <span v-if="formattedViews" class="flex items-center gap-1">
-                  <FontAwesomeIcon v-if="icons.eye" :icon="icons.eye" class="w-3.5 h-3.5" />
-                  {{ formattedViews }}
-                </span>
-
-                <span v-if="formattedUpdatedAt" class="flex items-center gap-1 text-muted-foreground/80 italic">
-                  Mis à jour le {{ formattedUpdatedAt }}
-                </span>
               </div>
-
-              <!-- Author -->
-              <p v-if="item.author" class="text-sm text-muted-foreground mt-1">
-                {{ item.author }}
-              </p>
             </header>
 
             <!-- ==================== VIDEO ==================== -->
@@ -261,9 +241,6 @@ watch(
                 </Badge>
                 <span v-if="formattedDuration" class="text-sm text-muted-foreground">
                   Durée : {{ formattedDuration }}
-                </span>
-                <span v-if="formattedViews" class="text-sm text-muted-foreground">
-                  {{ formattedViews }}
                 </span>
                 <div class="flex-1" ></div>
                 <Button variant="outline" size="sm" class="gap-2">
@@ -309,56 +286,8 @@ watch(
               </p>
 
               <!-- Article Content with ProseContent for Highcharts support -->
-              <div class="space-y-6">
-                <div v-if="item.content" class="bg-white rounded-lg">
-                  <ProseContent :html="item.content" />
-                </div>
-
-                <!-- Encadrés (Card components like ArticleLongPage) -->
-                <template v-if="item.encadres && item.encadres.length > 0">
-                  <template v-for="(encadre, index) in item.encadres" :key="index">
-                    <!-- Encadré court (alerte) -->
-                    <Card
-                      v-if="encadre.type === 'alerte'"
-                      class="border-l-4 border-l-primary rounded-lg bg-primary/10 p-0"
-                    >
-                      <CardContent class="p-4 lg:p-6">
-                        <div class="flex items-start gap-3">
-                          <FontAwesomeIcon
-                            v-if="icons.triangleExclamation"
-                            :icon="icons.triangleExclamation"
-                            class="w-5 h-5 mt-0.5 shrink-0 text-primary"
-                          />
-                          <p
-                            class="text-lg text-foreground leading-relaxed"
-                            v-html="encadre.content"
-                          ></p>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <!-- Encadré long (info box avec titre) -->
-                    <Card
-                      v-else-if="encadre.type === 'info'"
-                      class="border-2 border-primary rounded-lg p-0"
-                    >
-                      <CardContent class="p-4 lg:p-6 space-y-3">
-                        <div class="flex items-center gap-2">
-                          <FontAwesomeIcon
-                            v-if="icons.circleInfo"
-                            :icon="icons.circleInfo"
-                            class="w-5 h-5 text-primary"
-                          />
-                          <h4 class="font-heading font-bold text-lg">{{ encadre.title }}</h4>
-                        </div>
-                        <p
-                          class="text-lg text-muted-foreground leading-relaxed"
-                          v-html="encadre.content"
-                        ></p>
-                      </CardContent>
-                    </Card>
-                  </template>
-                </template>
+              <div v-if="item.content" class="bg-white rounded-lg">
+                <ProseContent :html="item.content" />
               </div>
             </template>
 
@@ -420,7 +349,6 @@ watch(
 </template>
 
 <style>
-/* Minimal styles - ProseContent handles most styling */
-/* Card components handle encadrés */
-/* ProseContent handles Highcharts via data-imipie-chart attributes */
+/* Minimal styles - ProseContent handles all article content rendering */
+/* including callouts, charts, teasers and tables */
 </style>
