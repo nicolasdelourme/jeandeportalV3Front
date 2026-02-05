@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * ProseContent - Render TipTap HTML with shadcn Table components and Highcharts
- * Parses HTML content, extracts tables and chart placeholders, renders them with components
+ * Parses HTML content, extracts tables, chart placeholders, teasers and callouts, renders them with components
  */
 import { computed } from 'vue'
 import {
@@ -14,6 +14,8 @@ import {
 } from '@/components/ui/table'
 import { HighchartsChart } from '@/components/ui/highcharts-chart'
 import ArticleTeaser from '@/components/news/ArticleTeaser.vue'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { byPrefixAndName } from '@/lib/icons'
 import type { ArticleChartConfig } from '@/types/imipie.types'
 
 interface Props {
@@ -29,9 +31,20 @@ interface TeaserData {
     slug: string
 }
 
+interface CalloutData {
+    style: string
+    icon: string | null
+    title: string | null
+    content: string
+}
+
+interface BlockquoteData {
+    content: string
+}
+
 interface ContentSegment {
-    type: 'html' | 'table' | 'chart' | 'teaser'
-    content: string | TableData | ArticleChartConfig | TeaserData
+    type: 'html' | 'table' | 'chart' | 'teaser' | 'callout' | 'blockquote'
+    content: string | TableData | ArticleChartConfig | TeaserData | CalloutData | BlockquoteData
 }
 
 const props = defineProps<Props>()
@@ -136,14 +149,92 @@ function parseTeaserPlaceholder(divHtml: string): TeaserData | null {
 }
 
 /**
+ * Parse un placeholder de callout et extrait les attributs + contenu interne
+ * Format: <div data-callout data-style="info" data-icon="circle-info" data-title="...">contenu HTML</div>
+ */
+function parseCalloutBlock(divHtml: string): CalloutData | null {
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(divHtml, 'text/html')
+    const div = doc.querySelector('div[data-callout]')
+
+    if (!div) return null
+
+    return {
+        style: div.getAttribute('data-style') || 'info',
+        icon: div.getAttribute('data-icon') || null,
+        title: div.getAttribute('data-title') || null,
+        content: div.innerHTML,
+    }
+}
+
+/**
+ * Styles par défaut pour les callouts
+ */
+const CALLOUT_DEFAULTS: Record<string, { icon: string; iconClass: string; classes: string }> = {
+    alerte: {
+        icon: 'triangle-exclamation',
+        iconClass: 'text-primary',
+        classes: 'border-l-4 border-l-primary bg-primary/10 rounded-lg p-4 lg:p-6',
+    },
+    info: {
+        icon: 'circle-info',
+        iconClass: 'text-primary',
+        classes: 'border-2 border-primary rounded-lg p-4 lg:p-6',
+    },
+    success: {
+        icon: 'circle-check',
+        iconClass: 'text-emerald-600',
+        classes: 'border-l-4 border-l-emerald-500 bg-emerald-50 rounded-lg p-4 lg:p-6',
+    },
+    danger: {
+        icon: 'shield-halved',
+        iconClass: 'text-red-600',
+        classes: 'border-l-4 border-l-red-500 bg-red-50 rounded-lg p-4 lg:p-6',
+    },
+}
+
+function asCallout(content: string | TableData | ArticleChartConfig | TeaserData | CalloutData | BlockquoteData): CalloutData {
+    return content as CalloutData
+}
+
+function asBlockquote(content: string | TableData | ArticleChartConfig | TeaserData | CalloutData | BlockquoteData): BlockquoteData {
+    return content as BlockquoteData
+}
+
+function calloutClasses(style: string): string {
+    return CALLOUT_DEFAULTS[style]?.classes ?? CALLOUT_DEFAULTS.info!.classes
+}
+
+function calloutIcon(data: CalloutData) {
+    const iconName = data.icon ?? CALLOUT_DEFAULTS[data.style]?.icon ?? 'circle-info'
+    return byPrefixAndName.fas?.[iconName as keyof typeof byPrefixAndName.fas]
+}
+
+function calloutIconClass(style: string): string {
+    return CALLOUT_DEFAULTS[style]?.iconClass ?? CALLOUT_DEFAULTS.info!.iconClass
+}
+
+/**
+ * Parse un blockquote et extrait le contenu interne
+ */
+function parseBlockquote(html: string): BlockquoteData {
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(html, 'text/html')
+    const blockquote = doc.querySelector('blockquote')
+    return { content: blockquote?.innerHTML ?? '' }
+}
+
+const quoteIcon = byPrefixAndName.fas?.['quote-left']
+
+/**
  * Decoupe le HTML en segments (html brut, tables et graphiques)
  */
 const segments = computed<ContentSegment[]>(() => {
     if (!props.html) return []
 
     const result: ContentSegment[] = []
-    // Regex combinée pour tables, placeholders de graphiques et teasers
-    const combinedRegex = /(<table[\s\S]*?<\/table>)|(<div[^>]*data-imipie-chart[^>]*>(?:<\/div>)?)|(<div[^>]*data-article-teaser[^>]*>(?:<\/div>)?)/gi
+    // Regex combinée pour tables, placeholders de graphiques, teasers, callouts et blockquotes
+    const combinedRegex = /(<table[\s\S]*?<\/table>)|(<div[^>]*data-imipie-chart[^>]*>(?:<\/div>)?)|(<div[^>]*data-article-teaser[^>]*>(?:<\/div>)?)|(<div[^>]*data-callout[^>]*>[\s\S]*?<\/div>)|(<blockquote[\s\S]*?<\/blockquote>)/gi
     let lastIndex = 0
     let match
 
@@ -183,6 +274,21 @@ const segments = computed<ContentSegment[]>(() => {
                     content: teaserData,
                 })
             }
+        } else if (match[4]) {
+            // It's a callout block
+            const calloutData = parseCalloutBlock(matchedContent)
+            if (calloutData) {
+                result.push({
+                    type: 'callout',
+                    content: calloutData,
+                })
+            }
+        } else if (match[5]) {
+            // It's a blockquote
+            result.push({
+                type: 'blockquote',
+                content: parseBlockquote(matchedContent),
+            })
         }
 
         lastIndex = match.index + match[0].length
@@ -244,6 +350,52 @@ const segments = computed<ContentSegment[]>(() => {
                 v-else-if="segment.type === 'teaser'"
                 :slug="(segment.content as TeaserData).slug"
             />
+
+            <!-- Callout block -->
+            <div
+                v-else-if="segment.type === 'callout'"
+                :class="calloutClasses(asCallout(segment.content).style)"
+            >
+                <div v-if="asCallout(segment.content).title" class="flex items-center gap-2.5 mb-2">
+                    <FontAwesomeIcon
+                        v-if="calloutIcon(asCallout(segment.content))"
+                        :icon="calloutIcon(asCallout(segment.content))"
+                        class="w-5 h-5 shrink-0"
+                        :class="calloutIconClass(asCallout(segment.content).style)"
+                    />
+                    <h4 class="font-heading font-bold text-lg my-0!">
+                        {{ asCallout(segment.content).title }}
+                    </h4>
+                </div>
+                <div :class="asCallout(segment.content).title ? '' : 'flex items-start gap-2.5'">
+                    <FontAwesomeIcon
+                        v-if="!asCallout(segment.content).title && calloutIcon(asCallout(segment.content))"
+                        :icon="calloutIcon(asCallout(segment.content))"
+                        class="w-5 h-5 mt-[0.34em] shrink-0"
+                        :class="calloutIconClass(asCallout(segment.content).style)"
+                    />
+                    <div
+                        class="text-lg leading-relaxed [&>p]:mb-2 [&>p:last-child]:mb-0"
+                        v-html="asCallout(segment.content).content"
+                    ></div>
+                </div>
+            </div>
+
+            <!-- Blockquote with quote icon -->
+            <blockquote
+                v-else-if="segment.type === 'blockquote'"
+                class="flex items-start gap-2.5 border-l-4 border-neutral-300 rounded-lg p-4 lg:p-6 italic text-neutral-600"
+            >
+                <FontAwesomeIcon
+                    v-if="quoteIcon"
+                    :icon="quoteIcon"
+                    class="text-neutral-300 text-lg opacity-60"
+                />
+                <div
+                    class="[&>p]:mb-0"
+                    v-html="asBlockquote(segment.content).content"
+                ></div>
+            </blockquote>
         </template>
     </div>
 </template>
