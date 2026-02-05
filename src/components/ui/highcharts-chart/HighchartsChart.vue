@@ -55,8 +55,9 @@ const isFetching = ref(false)
 // Loader Highcharts
 const { isLoaded: scriptsLoaded, isLoading: scriptsLoading, error: scriptsError, loadHighcharts } = useHighchartsLoader()
 
-// Hauteur calculée
-const chartHeight = computed(() => props.config.height || '400px')
+// Hauteur explicitement demandée (optionnel)
+// Si non définie, Highcharts gère le ratio nativement
+const explicitHeight = computed(() => props.config.height)
 
 /**
  * Charge les données du graphique
@@ -104,14 +105,9 @@ function renderChart() {
     // pour éviter l'erreur structuredClone du HighchartsPayloadClient
     const purePayload: ImiPieChartResponse = JSON.parse(JSON.stringify(chartData.value))
 
-    // Nettoyer les dimensions fixes du payload pour permettre au graphique
-    // de s'adapter à son conteneur (l'API peut envoyer des dimensions fixes)
-    if (purePayload.chart) {
-      delete (purePayload.chart as Record<string, unknown>).width
-      delete (purePayload.chart as Record<string, unknown>).height
-      // S'assurer que le chart est responsive
-      ;(purePayload.chart as Record<string, unknown>).reflow = true
-    }
+    // Ne PAS altérer width/height du payload — l'API gère le responsive
+    // Si l'API ne retourne pas de dimensions, Highcharts s'adapte au conteneur
+    // Si elle en retourne (demande explicite), on les respecte
 
     // Cast des globales Highcharts
     const Highcharts = window.Highcharts as HighchartsGlobal | undefined
@@ -130,15 +126,6 @@ function renderChart() {
     } else {
       throw new Error('Highcharts ou HighchartsPayloadClient non disponible')
     }
-
-    // Forcer un recalcul complet des dimensions après le rendu
-    // setSize(null, null) recalcule automatiquement depuis le conteneur
-    setTimeout(() => {
-      if (chartInstance) {
-        const containerHeight = parseInt(chartHeight.value) || 400
-        chartInstance.setSize(null, containerHeight, false)
-      }
-    }, 50)
   } catch (error) {
     logger.error('[HighchartsChart] Render error:', error)
     fetchError.value = 'Erreur lors du rendu du graphique'
@@ -199,13 +186,11 @@ watch(
 function setupResizeObserver() {
   if (!wrapperRef.value) return
 
-  resizeObserver = new ResizeObserver((entries) => {
-    // Recalculer les dimensions quand le conteneur change de taille
-    if (chartInstance && entries[0]) {
-      const { width } = entries[0].contentRect
-      const containerHeight = parseInt(chartHeight.value) || 400
-      // setSize avec animation désactivée pour éviter les saccades
-      chartInstance.setSize(width, containerHeight, false)
+  resizeObserver = new ResizeObserver(() => {
+    // Demander à Highcharts de recalculer ses dimensions
+    // reflow() respecte le ratio natif du graphique
+    if (chartInstance) {
+      chartInstance.reflow()
     }
   })
 
@@ -240,7 +225,7 @@ onUnmounted(() => {
     <div
       v-if="scriptsLoading || isFetching"
       class="flex flex-col items-center justify-center bg-muted/30 rounded-lg border border-border relative"
-      :style="{ height: chartHeight }"
+      :style="{ height: explicitHeight || '400px' }"
     >
       <Skeleton class="w-full h-full rounded-lg" />
       <div class="absolute flex flex-col items-center gap-2 text-muted-foreground">
@@ -284,11 +269,12 @@ onUnmounted(() => {
     </Alert>
 
     <!-- Conteneur du graphique -->
+    <!-- Hauteur gérée par Highcharts nativement (ratio), sauf si explicitement demandée -->
     <div
       v-show="!scriptsLoading && !isFetching && !fetchError && !scriptsError"
       :id="containerId"
-      class="highcharts-container rounded-lg"
-      :style="{ height: chartHeight }"
+      class="highcharts-container rounded-lg px-0"
+      :style="explicitHeight ? { height: explicitHeight } : undefined"
     ></div>
   </div>
 </template>
@@ -298,7 +284,6 @@ onUnmounted(() => {
   position: relative;
   width: 100%;
   max-width: 100%;
-  overflow: hidden;
 }
 
 .highcharts-container {
@@ -306,15 +291,19 @@ onUnmounted(() => {
   max-width: 100%;
 }
 
-/* Override Highcharts styles pour s'intégrer au design et forcer la largeur */
+/* Override Highcharts styles pour s'intégrer au design */
 :deep(.highcharts-container) {
   font-family: var(--font-body), Inter, sans-serif;
   width: 100% !important;
   max-width: 100% !important;
+  /* Laisser le SVG définir la hauteur, ne pas contraindre */
+  height: auto !important;
+  overflow: visible !important;
 }
 
 :deep(.highcharts-container svg) {
   max-width: 100%;
+  display: block;
 }
 
 :deep(.highcharts-title) {
