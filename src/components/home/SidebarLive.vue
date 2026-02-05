@@ -28,17 +28,17 @@ onMounted(async () => {
   <section class="flex flex-col gap-4">
     <!-- Header -->
     <div class="flex items-center gap-2">
-      <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse" aria-hidden="true" />
+      <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse" aria-hidden="true" ></span>
       <h3 class="font-heading font-bold text-lg text-secondary">En Continu</h3>
     </div>
 
     <!-- Loading state -->
     <div v-if="isLoading" class="space-y-3">
       <div v-for="i in 3" :key="i" class="flex gap-3 animate-pulse">
-        <div class="w-16 h-16 rounded-md bg-neutral-200" />
+        <div class="w-16 h-16 rounded-md bg-neutral-200" ></div>
         <div class="flex-1 space-y-2">
-          <div class="h-4 bg-neutral-200 rounded w-3/4" />
-          <div class="h-3 bg-neutral-200 rounded w-1/2" />
+          <div class="h-4 bg-neutral-200 rounded w-3/4" ></div>
+          <div class="h-3 bg-neutral-200 rounded w-1/2" ></div>
         </div>
       </div>
     </div>

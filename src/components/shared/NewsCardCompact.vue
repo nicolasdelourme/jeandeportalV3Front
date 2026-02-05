@@ -90,7 +90,7 @@ const relativeDate = computed(() => {
           class="w-2 h-2 mt-1.5 shrink-0 rounded-full bg-primary"
           aria-label="Nouveau"
         />
-        <h4 class="font-medium text-sm leading-tight text-secondary line-clamp-2 group-hover:text-primary transition-colors">
+        <h4 class="font-medium text-sm leading-tight text-secondary line-clamp-2 group-hover:underline transition-all">
           {{ item.title }}
         </h4>
       </div>
