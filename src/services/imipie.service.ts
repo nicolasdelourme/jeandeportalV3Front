@@ -3,7 +3,7 @@
  * Gestion des appels à l'API imiPie pour récupérer les données de graphiques
  */
 
-import type { ImiPieChartParams, ImiPieChartResponse } from '@/types/imipie.types'
+import type { ImiPieChartResponse } from '@/types/imipie.types'
 import { ImiPieAPIError } from '@/types/imipie.types'
 import { mockFetchChart } from '@/api/imipie.mock'
 
@@ -14,8 +14,6 @@ const USE_MOCK = import.meta.env.VITE_API_MODE === 'mock'
  * Configuration de l'API imiPie
  */
 const API_CONFIG = {
-  BASE_URL: 'https://imipie.ovh/api',
-  DEFAULT_PROFILE: 'infocashWeb',
   TIMEOUT: 30000, // 30 secondes
   CACHE_TTL: 5 * 60 * 1000, // 5 minutes
 } as const
@@ -36,20 +34,6 @@ class ImiPieService {
   private pendingRequests: Map<string, Promise<ImiPieChartResponse>> = new Map()
 
   /**
-   * Génère une clé de cache unique pour les paramètres
-   */
-  private getCacheKey(params: ImiPieChartParams): string {
-    return JSON.stringify({
-      family: params.family,
-      serie: params.serie,
-      profile: params.profile || API_CONFIG.DEFAULT_PROFILE,
-      startDate: params.startDate,
-      stopDate: params.stopDate,
-      xTick: params.xTick,
-    })
-  }
-
-  /**
    * Vérifie si une entrée du cache est valide
    */
   private isCacheValid(entry: CacheEntry): boolean {
@@ -57,35 +41,13 @@ class ImiPieService {
   }
 
   /**
-   * Construit l'URL de l'API avec les paramètres
-   */
-  private buildUrl(params: ImiPieChartParams): string {
-    const url = new URL(
-      `${API_CONFIG.BASE_URL}/${params.family}/${params.serie}/highcharts`
-    )
-
-    url.searchParams.set('output', 'json')
-    url.searchParams.set('profile', params.profile || API_CONFIG.DEFAULT_PROFILE)
-
-    if (params.startDate) {
-      url.searchParams.set('startDate', params.startDate)
-    }
-    if (params.stopDate) {
-      url.searchParams.set('stopDate', params.stopDate)
-    }
-    if (params.xTick) {
-      url.searchParams.set('xTick', params.xTick.toString())
-    }
-
-    return url.toString()
-  }
-
-  /**
    * Récupère les données d'un graphique depuis l'API imiPie
+   * @param url URL complète de l'API imiPie
    * @throws {ImiPieAPIError} Si l'API échoue ou timeout
    */
-  async fetchChart(params: ImiPieChartParams): Promise<ImiPieChartResponse> {
-    const cacheKey = this.getCacheKey(params)
+  async fetchChart(url: string): Promise<ImiPieChartResponse> {
+    // La clé de cache est l'URL elle-même
+    const cacheKey = url
 
     // Vérifier le cache
     const cached = this.cache.get(cacheKey)
@@ -93,7 +55,7 @@ class ImiPieService {
       return cached.data
     }
 
-    // Vérifier si une requête est déjà en cours pour les mêmes paramètres
+    // Vérifier si une requête est déjà en cours pour la même URL
     const pending = this.pendingRequests.get(cacheKey)
     if (pending) {
       return pending
@@ -101,7 +63,7 @@ class ImiPieService {
 
     // Mode mock : utiliser les données fictives
     if (USE_MOCK) {
-      const promise = mockFetchChart(params)
+      const promise = mockFetchChart(url)
         .then((data) => {
           this.cache.set(cacheKey, { data, timestamp: Date.now() })
           return data
@@ -114,9 +76,7 @@ class ImiPieService {
       return promise
     }
 
-    // Mode réel : appeler l'API
-    const url = this.buildUrl(params)
-
+    // Mode réel : appeler l'API directement avec l'URL fournie
     const promise = this.fetchFromAPI(url)
       .then((data) => {
         this.cache.set(cacheKey, { data, timestamp: Date.now() })
@@ -190,11 +150,10 @@ class ImiPieService {
   }
 
   /**
-   * Supprime une entrée spécifique du cache
+   * Supprime une entrée spécifique du cache par URL
    */
-  invalidateCache(params: ImiPieChartParams): void {
-    const cacheKey = this.getCacheKey(params)
-    this.cache.delete(cacheKey)
+  invalidateCache(url: string): void {
+    this.cache.delete(url)
   }
 }
 
