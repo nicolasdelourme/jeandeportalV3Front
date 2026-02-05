@@ -3,37 +3,12 @@
  */
 
 /**
- * Paramètres pour une requête API imiPie
- */
-export interface ImiPieChartParams {
-  /** Famille de données (ex: 'gold', 'silver') */
-  family: string
-  /** Série de données (ex: 'lbmaSerie') */
-  serie: string
-  /** Profil d'affichage (défaut: 'infocashWeb') */
-  profile?: string
-  /** Date de début 'YYYY-MM-DD' */
-  startDate?: string
-  /** Date de fin 'YYYY-MM-DD' */
-  stopDate?: string
-  /** Intervalle de l'axe X en jours */
-  xTick?: number
-}
-
-/**
  * Configuration pour un graphique dans un article ou standalone
+ * Le backend fournit l'URL complète de l'API imiPie
  */
 export interface ArticleChartConfig {
-  /** Famille de données (ex: 'gold', 'silver') */
-  family: string
-  /** Série de données (ex: 'lbmaSerie') */
-  serie: string
-  /** Date de début 'YYYY-MM-DD' */
-  startDate?: string
-  /** Date de fin 'YYYY-MM-DD' */
-  stopDate?: string
-  /** Intervalle de l'axe X en jours */
-  xTick?: number
+  /** URL complète de l'API imiPie */
+  url: string
   /** Hauteur du graphique (ex: '400px') */
   height?: string
   /** Titre affiché au-dessus du graphique */

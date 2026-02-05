@@ -23,7 +23,7 @@ import { Image } from '@tiptap/extension-image'
 
 /**
  * Node custom : graphique imiPie / Highcharts
- * Produit : <div data-imipie-chart data-family="..." data-serie="..." ...></div>
+ * Produit : <div data-imipie-chart data-url="..." data-height="..." data-title="..."></div>
  */
 const ImipieChart = Node.create({
   name: 'imipieChart',
@@ -32,32 +32,17 @@ const ImipieChart = Node.create({
 
   addAttributes() {
     return {
-      family: { default: null },
-      serie: { default: null },
-      startDate: { default: null },
-      stopDate: { default: null },
-      xTick: { default: null },
-      height: { default: null },
+      url: { default: null },      // URL complète de l'API
+      height: { default: null },   // Hauteur optionnelle
+      title: { default: null },    // Titre optionnel
     }
   },
 
   renderHTML({ HTMLAttributes }) {
     const attrs: Record<string, string> = { 'data-imipie-chart': '' }
-    const map: Record<string, string> = {
-      family: 'data-family',
-      serie: 'data-serie',
-      startDate: 'data-start-date',
-      stopDate: 'data-stop-date',
-      xTick: 'data-x-tick',
-      height: 'data-height',
-    }
-
-    for (const [key, dataAttr] of Object.entries(map)) {
-      if (HTMLAttributes[key] != null) {
-        attrs[dataAttr] = String(HTMLAttributes[key])
-      }
-    }
-
+    if (HTMLAttributes.url) attrs['data-url'] = HTMLAttributes.url
+    if (HTMLAttributes.height) attrs['data-height'] = HTMLAttributes.height
+    if (HTMLAttributes.title) attrs['data-title'] = HTMLAttributes.title
     return ['div', attrs]
   },
 
