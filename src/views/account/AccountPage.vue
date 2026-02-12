@@ -10,7 +10,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import ProfileSection from '@/components/account/ProfileSection.vue'
 import SubscriptionSection from '@/components/account/SubscriptionSection.vue'
 import PurchasesSection from '@/components/account/PurchasesSection.vue'
-import LegacyLinkingSection from '@/components/account/LegacyLinkingSection.vue'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { useAuth } from '@/composables/useAuth'
@@ -60,7 +59,7 @@ const activeTab = ref('profile')
 
                 <!-- Tabs Navigation -->
                 <Tabs v-model="activeTab" class="w-full ">
-                    <TabsList class="grid w-full grid-cols-4 rounded-lg">
+                    <TabsList class="grid w-full grid-cols-3 rounded-lg">
                         <TabsTrigger value="profile" class="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-secondary data-[state=inactive]:hover:bg-primary/20 cursor-pointer">
                             <span style="font-family: Roboto, sans-serif;" >Profil</span>
                         </TabsTrigger>
@@ -69,9 +68,6 @@ const activeTab = ref('profile')
                         </TabsTrigger>
                         <TabsTrigger value="purchases" class="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-secondary data-[state=inactive]:hover:bg-primary/20 cursor-pointer">
                             <span style="font-family: Roboto, sans-serif;" >Mes achats</span>
-                        </TabsTrigger>
-                        <TabsTrigger value="legacy" class="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-secondary data-[state=inactive]:hover:bg-primary/20 cursor-pointer">
-                            <span style="font-family: Roboto, sans-serif;" >Gestion</span>
                         </TabsTrigger>
                     </TabsList>
 
@@ -88,11 +84,6 @@ const activeTab = ref('profile')
                     <!-- Purchases Tab -->
                     <TabsContent value="purchases">
                         <PurchasesSection />
-                    </TabsContent>
-
-                    <!-- Legacy Linking Tab -->
-                    <TabsContent value="legacy">
-                        <LegacyLinkingSection />
                     </TabsContent>
                 </Tabs>
             </div>
