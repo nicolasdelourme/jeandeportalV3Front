@@ -118,6 +118,13 @@ const routes: RouteRecordRaw[] = [
         },
     },
     {
+        path: "/rattachement",
+        name: "legacy-linking",
+        component: () => import("@/views/account/LinkLegacyAccountPage.vue"),
+        // Pas de requiresAuth - accessible à tous (guests + auth)
+        // Le tunnel gère lui-même l'authentification
+    },
+    {
         path: "/mon-compte/annuler-abonnement",
         name: "cancel-subscription",
         component: () => import("@/views/account/CancelSubscription.vue"),

@@ -6,10 +6,11 @@ Ce document décrit les nodes TipTap personnalisés utilisés dans le frontend I
 
 1. [Architecture générale](#architecture-générale)
 2. [Node `calloutBlock`](#node-calloutblock) — Encadrés éditoriaux
-3. [Node `imipieChart`](#node-imipiechart) — Graphiques Highcharts
-4. [Node `articleTeaser`](#node-articleteaser) — Renvoi vers un article
-5. [CSS pour l'éditeur](#css-pour-léditeur)
-6. [Exemples JSON complets](#exemples-json-complets)
+3. [Node `articleHeader`](#node-articleheader) — Chapeau d'article
+4. [Node `imipieChart`](#node-imipiechart) — Graphiques Highcharts
+5. [Node `articleTeaser`](#node-articleteaser) — Renvoi vers un article
+6. [CSS pour l'éditeur](#css-pour-léditeur)
+7. [Exemples JSON complets](#exemples-json-complets)
 
 ---
 
@@ -28,6 +29,7 @@ Le frontend utilise `@tiptap/html` avec `generateHTML()` pour convertir le JSON 
 | Node | Type | Description |
 |------|------|-------------|
 | `calloutBlock` | Container (`content: 'block+'`) | Encadré éditorial avec titre et icône |
+| `articleHeader` | Inline container (`content: 'inline*'`) | Chapeau/accroche de l'article |
 | `imipieChart` | Atom (`atom: true`) | Graphique Highcharts via API imiPie |
 | `articleTeaser` | Atom (`atom: true`) | Renvoi inline vers un autre article |
 
@@ -106,6 +108,36 @@ Encadré éditorial stylisé pour mettre en valeur du contenu important (alerte,
         { "type": "text", "text": "Attention : ceci est une alerte importante." }
       ]
     }
+  ]
+}
+```
+
+---
+
+## Node `articleHeader`
+
+Chapeau d'article (accroche) affiché en plus grand sous le titre. C'est un node **inline container** : il peut contenir du texte avec du gras, de l'italique, des liens.
+
+### Attributs
+
+Aucun attribut — le style est géré par le frontend.
+
+### Rendu HTML généré
+
+```html
+<p data-article-header>
+  Si une crise de la dette frappait la France, <strong>qu'avez-vous prévu ?</strong>
+</p>
+```
+
+### Structure JSON TipTap
+
+```json
+{
+  "type": "articleHeader",
+  "content": [
+    { "type": "text", "text": "Si une crise de la dette frappait la France, " },
+    { "type": "text", "marks": [{ "type": "bold" }], "text": "qu'avez-vous prévu ?" }
   ]
 }
 ```
@@ -321,6 +353,17 @@ Le fichier `public/tiptap-editor.css` contient les styles pour prévisualiser le
 }
 ```
 
+### Style pour articleHeader
+
+```css
+.ProseMirror [data-type="articleHeader"] {
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: #525252;
+  margin-bottom: 1.5rem;
+}
+```
+
 ---
 
 ## Exemples JSON complets
@@ -331,6 +374,14 @@ Le fichier `public/tiptap-editor.css` contient les styles pour prévisualiser le
 {
   "type": "doc",
   "content": [
+    {
+      "type": "articleHeader",
+      "content": [
+        { "type": "text", "text": "Résumé de l'article avec du " },
+        { "type": "text", "marks": [{ "type": "bold" }], "text": "gras possible" },
+        { "type": "text", "text": "." }
+      ]
+    },
     {
       "type": "paragraph",
       "content": [
@@ -554,11 +605,32 @@ const ArticleTeaser = Node.create({
 })
 ```
 
+### Node articleHeader (exemple JS)
+
+```javascript
+import { Node } from '@tiptap/core'
+
+const ArticleHeader = Node.create({
+  name: 'articleHeader',
+  group: 'block',
+  content: 'inline*',
+
+  renderHTML() {
+    return ['p', { 'data-article-header': '' }, 0]
+  },
+
+  parseHTML() {
+    return [{ tag: 'p[data-article-header]' }]
+  },
+})
+```
+
 ---
 
 ## Checklist d'implémentation
 
 - [ ] Créer le node `calloutBlock` avec les 4 styles (alerte, info, success, danger)
+- [ ] Créer le node `articleHeader` pour le chapeau d'article
 - [ ] Créer le node `imipieChart` avec tous les attributs
 - [ ] Créer le node `articleTeaser` avec sélecteur d'article
 - [ ] Ajouter les styles CSS de prévisualisation

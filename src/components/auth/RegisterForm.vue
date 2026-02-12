@@ -57,7 +57,8 @@ const formSchema = toTypedSchema(z.object({
         .min(8, { message: 'Le mot de passe doit contenir au moins 8 caractères' })
         .regex(/[A-Z]/, { message: 'Le mot de passe doit contenir au moins une majuscule' })
         .regex(/[a-z]/, { message: 'Le mot de passe doit contenir au moins une minuscule' })
-        .regex(/[0-9]/, { message: 'Le mot de passe doit contenir au moins un chiffre' }),
+        .regex(/[0-9]/, { message: 'Le mot de passe doit contenir au moins un chiffre' })
+        .regex(/[^A-Za-z0-9]/, { message: 'Le mot de passe doit contenir au moins un caractère spécial' }),
     confirmPassword: z.string({ required_error: 'Veuillez confirmer votre mot de passe' }),
     phone: z.string()
         .optional()
@@ -323,7 +324,7 @@ const onSubmit = handleSubmit((values) => {
                     </div>
                 </div>
                 <FormDescription v-if="!values.password" class="text-xs text-neutral-500">
-                    Au moins 8 caractères avec majuscule, minuscule et chiffre
+                    Au moins 8 caractères avec majuscule, minuscule, chiffre et caractère spécial
                 </FormDescription>
 
                 <FormMessage />
