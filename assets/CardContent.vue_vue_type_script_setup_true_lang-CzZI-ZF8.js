@@ -1,0 +1,1 @@
+import{f as s}from"./DefaultLayout.vue_vue_type_script_setup_true_lang-Br6uEOr3.js";import{A as a,Q as t,H as e,a5 as o,u as r,J as u}from"./vue-vendor-BHZkLje3.js";const n=a({__name:"CardContent",props:{class:{}},setup(a){const n=a;return(a,p)=>(e(),t("div",{"data-slot":"card-content",class:o(r(s)("px-6",n.class))},[u(a.$slots,"default")],2))}});export{n as _};

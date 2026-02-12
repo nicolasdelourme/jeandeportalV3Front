@@ -1,0 +1,1 @@
+.news-card[data-v-fea309da]:before{content:"";position:absolute;inset:0;background:linear-gradient(145deg,var(--secondary) 31%,color-mix(in srgb,var(--secondary) 75%,transparent) 95%);opacity:0;transition:opacity .5s ease;pointer-events:none;z-index:0}.news-card[data-v-fea309da]:hover:before{opacity:1}.news-card[data-v-fea309da]>*{position:relative;z-index:1}

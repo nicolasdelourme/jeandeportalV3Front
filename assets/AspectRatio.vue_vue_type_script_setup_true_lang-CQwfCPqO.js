@@ -1,0 +1,1 @@
+import{_ as s}from"./ui-vendor-Dpzf4R5k.js";import{A as a,G as t,H as o,u as e,D as r,I as p,J as i}from"./vue-vendor-BHZkLje3.js";const n=a({__name:"AspectRatio",props:{ratio:{},asChild:{type:Boolean},as:{}},setup(a){const n=a;return(a,u)=>(o(),t(e(s),r({"data-slot":"aspect-ratio"},n),{default:p(()=>[i(a.$slots,"default")]),_:3},16))}});export{n as _};

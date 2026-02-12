@@ -1,0 +1,368 @@
+/**
+ * tiptap-editor.css
+ * CSS standalone pour l'editeur TipTap du backoffice PHP.
+ * Reproduit le rendu du front Infocash dans le conteneur .ProseMirror.
+ *
+ * Usage backend :
+ *   <link rel="stylesheet" href="https://jeandeportal.fr/tiptap-editor.css">
+ */
+
+/* ═══════════════════════════════════════════════════════════════════════
+   1. FONTS
+   ═══════════════════════════════════════════════════════════════════════ */
+@import url('https://use.typekit.net/hnt0ocn.css');
+
+/* ═══════════════════════════════════════════════════════════════════════
+   2. VARIABLES CSS
+   ═══════════════════════════════════════════════════════════════════════ */
+:root {
+  /* Couleurs principales */
+  --color-primary: #ffde00;
+  --color-secondary: #1d1d1d;
+
+  /* Neutres */
+  --color-neutral-50: #fafafa;
+  --color-neutral-100: #f5f5f5;
+  --color-neutral-200: #e5e7eb;
+  --color-neutral-300: #d1d5db;
+  --color-neutral-500: #737373;
+  --color-neutral-600: #525252;
+  --color-neutral-700: #374151;
+  --color-neutral-800: #262626;
+  --color-neutral-900: #171717;
+
+  /* Thematiques */
+  --color-theme-metaux: #ffde00;
+  --color-theme-metaux-light: #FFF9D3;
+  --color-theme-metaux-dark: #D4B200;
+
+  --color-theme-portefeuille: #A8C7EA;
+  --color-theme-portefeuille-light: #EBF3FA;
+  --color-theme-portefeuille-dark: #7BA8D9;
+
+  --color-theme-liberte: #F4BFA6;
+  --color-theme-liberte-light: #FDF5F0;
+  --color-theme-liberte-dark: #E9A080;
+
+  --color-theme-bonus: #1D1D1D;
+  --color-theme-bonus-light: #F5F5F5;
+  --color-theme-bonus-dark: #000000;
+
+  /* Typography */
+  --font-heading: 'bernina-sans-condensed', 'Inter', sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   3. CONTENEUR EDITEUR .ProseMirror
+   ═══════════════════════════════════════════════════════════════════════ */
+.ProseMirror {
+  font-family: var(--font-body);
+  font-size: 1.125rem;       /* text-lg = 18px */
+  line-height: 1.625;        /* leading-relaxed */
+  color: var(--color-neutral-700);
+}
+
+.ProseMirror:focus {
+  outline: none;
+}
+
+/* ─── Paragraphes ─── */
+.ProseMirror p {
+  margin-bottom: 1rem;
+}
+
+/* ─── Headings ─── */
+.ProseMirror h1,
+.ProseMirror h2,
+.ProseMirror h3,
+.ProseMirror h4,
+.ProseMirror h5,
+.ProseMirror h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--color-neutral-800);
+}
+
+.ProseMirror h1 {
+  font-size: 1.875rem;   /* text-3xl */
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.ProseMirror h2 {
+  font-size: 1.5rem;     /* text-2xl */
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.ProseMirror h3 {
+  font-size: 1.25rem;    /* text-xl */
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.ProseMirror h4 {
+  font-size: 1.125rem;   /* text-lg */
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.ProseMirror h5 {
+  font-size: 1rem;       /* text-base */
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.ProseMirror h6 {
+  font-size: 0.875rem;   /* text-sm */
+  font-weight: 600;
+  color: var(--color-neutral-700);
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Premier heading sans marge haute */
+.ProseMirror > h1:first-child,
+.ProseMirror > h2:first-child,
+.ProseMirror > h3:first-child,
+.ProseMirror > h4:first-child,
+.ProseMirror > h5:first-child,
+.ProseMirror > h6:first-child {
+  margin-top: 0;
+}
+
+/* ─── Formatage inline ─── */
+.ProseMirror strong {
+  font-weight: 700;
+  color: var(--color-neutral-800);
+}
+
+.ProseMirror em {
+  font-style: italic;
+}
+
+.ProseMirror u {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
+}
+
+.ProseMirror s {
+  text-decoration: line-through;
+  color: var(--color-neutral-500);
+}
+
+.ProseMirror mark {
+  background: #fef3c7;
+  padding: 0 0.25rem;
+  border-radius: 0.125rem;
+}
+
+/* ─── Listes ─── */
+.ProseMirror ul {
+  list-style-type: disc;
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.ProseMirror ol {
+  list-style-type: decimal;
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.ProseMirror li {
+  padding-left: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.ProseMirror li > ul,
+.ProseMirror li > ol {
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+
+/* ─── Liens ─── */
+.ProseMirror a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.ProseMirror a:hover {
+  opacity: 0.8;
+}
+
+/* ─── Blockquote ─── */
+.ProseMirror blockquote {
+  border-left: 4px solid var(--color-primary);
+  padding-left: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  font-style: italic;
+  color: var(--color-neutral-600);
+  background: rgba(255, 222, 0, 0.08);
+  border-radius: 0 0.125rem 0.125rem 0;
+}
+
+.ProseMirror blockquote p {
+  margin-bottom: 0;
+}
+
+/* ─── Code inline ─── */
+.ProseMirror code:not(pre code) {
+  background: var(--color-neutral-100);
+  color: var(--color-neutral-800);
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+}
+
+/* ─── Code block ─── */
+.ProseMirror pre {
+  background: var(--color-neutral-900);
+  color: var(--color-neutral-100);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.ProseMirror pre code {
+  background: transparent;
+  padding: 0;
+  font-size: 0.875rem;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  line-height: 1.625;
+}
+
+/* ─── Images ─── */
+.ProseMirror img {
+  border-radius: 0.5rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  max-width: 100%;
+  height: auto;
+}
+
+.ProseMirror figure {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.ProseMirror figcaption {
+  font-size: 0.875rem;
+  color: var(--color-neutral-500);
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+/* ─── Tables ─── */
+.ProseMirror table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+}
+
+.ProseMirror th,
+.ProseMirror td {
+  border: 1px solid var(--color-neutral-200);
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+.ProseMirror th {
+  background: var(--color-neutral-50);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.ProseMirror tr:nth-child(even) {
+  background: rgba(250, 250, 250, 0.5);
+}
+
+/* ─── Separateur ─── */
+.ProseMirror hr {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  border: none;
+  height: 1px;
+  background: var(--color-neutral-200);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   4. BLOCS CUSTOM — Placeholders visuels pour l'editeur
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ─── imipieChart — placeholder Highcharts ─── */
+.ProseMirror [data-type="imipieChart"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  margin: 1.5rem 0;
+  background: var(--color-neutral-50);
+  border: 2px dashed var(--color-neutral-300);
+  border-radius: 0.5rem;
+  color: var(--color-neutral-500);
+  font-size: 0.875rem;
+}
+
+.ProseMirror [data-type="imipieChart"]::before {
+  content: 'Graphique Highcharts';
+}
+
+/* ─── calloutBlock — Encadré éditorial ─── */
+.ProseMirror [data-type="calloutBlock"] {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.ProseMirror [data-type="calloutBlock"][data-style="alerte"] {
+  border-left: 4px solid var(--color-primary);
+  background: rgba(255, 222, 0, 0.1);
+}
+
+.ProseMirror [data-type="calloutBlock"][data-style="info"] {
+  border: 2px solid var(--color-primary);
+}
+
+.ProseMirror [data-type="calloutBlock"][data-style="success"] {
+  border-left: 4px solid #10b981;
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.ProseMirror [data-type="calloutBlock"][data-style="danger"] {
+  border-left: 4px solid #ef4444;
+  background: rgba(239, 68, 68, 0.08);
+}
+
+/* ─── articleTeaser — Teaser "A lire aussi" ─── */
+.ProseMirror [data-type="articleTeaser"] {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  margin: 1.5rem 0;
+  border-top: 1px solid var(--color-neutral-200);
+  border-bottom: 1px solid var(--color-neutral-200);
+  font-size: 0.875rem;
+}
+
+.ProseMirror [data-type="articleTeaser"]::before {
+  content: 'A LIRE AUSSI';
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-neutral-500);
+  white-space: nowrap;
+}
